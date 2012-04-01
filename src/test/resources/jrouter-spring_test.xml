@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    <description>jrouter与springframework集成的配置文件</description>
+
+    <!-- 使用annotation 自动注册bean, 并保证@Required,@Autowired的属性被注入 -->
+    <context:component-scan base-package="jrouter" />
+
+    <!-- test spring inject -->
+    <bean id="springInject" class="java.lang.String">
+        <constructor-arg type="String" value="spring inject"/>
+    </bean>
+
+    <!-- test action -->
+    <bean id="URLTestAction2" class="jrouter.URLTestAction2" />
+
+    <!-- JRouter ActionFactory Test -->
+    <bean id="actionFactoryTest" class="jrouter.spring.DefaultActionFactoryBean">
+        <property name="configurationClass" value="jrouter.config.Configuration"/>
+        <!-- load from xml first -->
+        <property name="configLocation" value="classpath:jrouter_test.xml" />
+        <property name="actionFactoryProperties">
+            <value>
+                extension =
+                actionCacheNumber = 100000
+            </value>
+        </property>
+        <property name="actions">
+            <list>
+                <value>jrouter.URLTestAction</value>
+                <ref bean="URLTestAction2"/>
+            </list>
+        </property>
+    </bean>
+</beans>

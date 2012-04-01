@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/jrouter-1.5.xsd">
+
+    <action-factory class="jrouter.impl.DefaultActionFactory" >
+        <property name="defaultInterceptorStack" value="empty" />
+        <property name="defaultResultType" value="empty" />
+        <property name="extension" value="." />
+    </action-factory>
+    <!-- constant -->
+    <!--
+    <constant name="DefaultInterceptorStack" value="empty" />
+    <constant name="DefaultResultType" value="empty" />
+    <constant name="extension" value="do" />
+    -->
+
+    <!-- interceptor -->
+    <interceptor class="jrouter.interceptor.SampleInterceptor" />
+
+    <!-- interceptor-stack -->
+    <interceptor-stack class="jrouter.interceptor.DefaultInterceptorStack" />
+
+    <!-- result-type -->
+    <result-type class="jrouter.result.DefaultResult" />
+
+    <!-- include -->
+    <include file="test/include1.xml" />
+</jrouter>

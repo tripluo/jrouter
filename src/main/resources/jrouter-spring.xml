@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+    <description>jrouter与springframework集成的配置文件</description>
+
+    <!-- JRouter ActionFactory -->
+    <bean id="actionFactory" class="jrouter.spring.DefaultActionFactoryBean">
+        <!-- optional default:null -->
+        <property name="configLocation" value="classpath:jrouter-1.5.xml" />
+        <!-- optional default -->
+        <property name="configurationClass" value="jrouter.config.Configuration"/>
+        <!-- optional default -->
+        <property name="actionFactoryClass" value="jrouter.impl.DefaultActionFactory"/>
+        <!-- optional default -->
+        <property name="objectFactory">
+            <bean class="jrouter.spring.SpringObjectFactory"/>
+        </property>
+        <!-- optional default -->
+        <property name="actionFactoryProperties">
+            <value>
+                <!-- optional default:null -->
+                actionInvocationClass = jrouter.impl.DefaultActionInvocation
+                <!-- optional default:null -->
+                defaultInterceptorStack = empty
+                <!-- optional default:null -->
+                defaultResultType = empty
+                <!-- optional default -->
+                pathSeparator = /
+                <!-- optional default -->
+                extension = .
+                <!-- optional default -->
+                actionCacheNumber = 10000
+            </value>
+        </property>
+
+        <!-- scan classes properties -->
+        <property name="classScannerProperties">
+            <list>
+                <value>
+                    package = jrouter
+                    includeExpression = jrouter.impl.**
+                    excludeExpression = jrouter.result.**, jrouter.interceptor.**
+                </value>
+            </list>
+        </property>
+
+        <property name="interceptors">
+            <list>
+                <!-- the value can be the class name or the ref bean: -->
+                <value>jrouter.interceptor.SampleInterceptor</value>
+            </list>
+        </property>
+        <property name="interceptorStacks">
+            <list>
+                <!-- the value can be the class name or the ref bean: -->
+                <value>jrouter.interceptor.DefaultInterceptorStack</value>
+            </list>
+        </property>
+        <property name="resultTypes">
+            <list>
+                <!-- the value can be the class name or the ref bean: -->
+                <value>jrouter.result.DefaultResult</value>
+            </list>
+        </property>
+        <property name="results">
+            <list>
+                <!-- the value can be the class name or the ref bean: -->
+                <value>jrouter.result.DefaultResult</value>
+            </list>
+        </property>
+        <property name="actions">
+            <list>
+                <!-- the value can be the class name or the ref bean: -->
+            </list>
+        </property>
+    </bean>
+</beans>

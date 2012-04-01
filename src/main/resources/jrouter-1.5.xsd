@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.5">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
+    <xsd:annotation>
+        <xsd:documentation>
+            <![CDATA[
+            JRouter Schema, version 1.5 Authors: sunjumper@163.com.
+            This defines a simple and consistent way of creating components, managed by a JRouter ActionFactory,
+            read by jrouter.config.Configuration.
+            ]]>
+        </xsd:documentation>
+    </xsd:annotation>
+    <!-- main -->
+    <xsd:element name="jrouter">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                The top level (typically root) element.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="1" ref="action-factory"/>
+                <xsd:choice minOccurs="0" maxOccurs="unbounded">
+                    <xsd:element ref="action"/>
+                    <xsd:element ref="interceptor"/>
+                    <xsd:element ref="interceptor-stack"/>
+                    <xsd:element ref="result-type"/>
+                    <xsd:element ref="result"/>
+                    <xsd:element ref="component-scan"/>
+                    <xsd:element ref="include" />
+                    <xsd:element ref="aop-config" />
+                </xsd:choice>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="action-factory">
+        <xsd:annotation>
+            <xsd:documentation source="java:jrouter.ActionFactory">
+                <![CDATA[
+                The JRouter ActionFactory configuration.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
+            </xsd:sequence>
+            <xsd:attribute name="class" use="optional">
+                <xsd:annotation>
+                    <xsd:documentation source="java:java.lang.Class">
+                        <![CDATA[
+                        The class of ActionFactory.
+                        ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="action">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="path"/>
+            </xsd:sequence>
+            <xsd:attribute name="class" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="path">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                The specified path in an Action; see the '<action>' element.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
+            </xsd:sequence>
+            <xsd:attribute name="name" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        <![CDATA[
+                        The specified name of a action path, without suffix.
+                        ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="interceptor">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
+            </xsd:sequence>
+            <xsd:attribute name="class" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="interceptor-stack">
+        <xsd:complexType>
+            <xsd:attribute name="class" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="result-type">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
+            </xsd:sequence>
+            <xsd:attribute name="class" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="result">
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="property"/>
+            </xsd:sequence>
+            <xsd:attribute name="class" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="component-scan">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                Scans the classpath for annotated components of action, interceptorStack, interceptor, resultType, result.
+                By default, the JRouter-provided @Action, @Interceptor, @InterceptorStack, @Result and @ResultType stereotypes will be detected.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="package" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        <![CDATA[
+                        The comma-separated list of included packages to scan for annotated components.
+                        ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="includeExpression">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        <![CDATA[
+                        The comma-separated list of expression classes from the included package. The default value is ".**".
+                        ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="excludeExpression">
+                <xsd:annotation>
+                    <xsd:documentation>
+                        <![CDATA[
+                        The comma-separated list of excluded expression classes.
+                        ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="include">
+        <xsd:annotation>
+            <xsd:documentation source="java:org.springframework.core.io.Resource">
+                <![CDATA[
+                Specifies an XML bean definition resource to import.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="file" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    The absolute resource location of the XML (bean definition) file to import, for example "/myImport.xml" or "/includes/myImport.xml".
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="property">
+        <xsd:complexType>
+            <xsd:attribute name="name" use="required"/>
+            <xsd:attribute name="value" use="required"/>
+        </xsd:complexType>
+    </xsd:element>
+
+    <!-- TODO -->
+    <!-- aop -->
+    <xsd:element name="aop-config">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                The aop configuration element.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:sequence>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="aop-interceptor-stack"/>
+                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="aop-action"/>
+            </xsd:sequence>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="aop-interceptor-stack">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                Modify the existed InterceptorStack with specified interceptors and InterceptorStack.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="matches" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="interceptors">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="interceptor-statck">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="type" use="required" type="aop-type">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <xsd:element name="aop-action">
+        <xsd:annotation>
+            <xsd:documentation>
+                <![CDATA[
+                Modify the existed action's InterceptorStack with specified interceptors and interceptorStatck.
+                ]]>
+            </xsd:documentation>
+        </xsd:annotation>
+        <xsd:complexType>
+            <xsd:attribute name="matches" use="required">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="interceptors">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="interceptor-statck">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+            <xsd:attribute name="type" use="required" type="aop-type">
+                <xsd:annotation>
+                    <xsd:documentation>
+                    <![CDATA[
+                    ]]>
+                    </xsd:documentation>
+                </xsd:annotation>
+            </xsd:attribute>
+        </xsd:complexType>
+    </xsd:element>
+
+    <!-- aop types -->
+    <xsd:simpleType name="aop-type">
+        <xsd:restriction base="xsd:NMTOKEN">
+            <xsd:enumeration value="add-before"/>
+            <xsd:enumeration value="add-after"/>
+            <xsd:enumeration value="override"/>
+        </xsd:restriction>
+    </xsd:simpleType>
+
+</xsd:schema>

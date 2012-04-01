@@ -1,0 +1,189 @@
+
+JROUTER CHANGELOG
+==========================
+http://code.google.com/p/jrouter
+
+Requirements
+* aop : interceptors --> actions
+* aop-type : add-before, add-after, override
+* bytecode
+
+Changes in version 1.5.4 (2012-04-02)
+* jrouter-1.5.xsd，<component-scan>标签去除原有include属性，新增includeExpression和excludeExpression属性，匹配过滤扫描类。
+* 引入AntPathMatcher，路径匹配工具。
+* 新增ClassScanner，类扫描工具。
+* 重构Configuration。配置扫描工具(ClassScanner)属性替换原有包含(scanComponents)/排除(excludePackages)属性。
+* 重构DefaultActionFactoryBean。配置扫描属性setClassScannerProperties替换原有setScanPackages和 setClassScannerProperties。
+* 修正jrouter-1.5.xml。
+* 修正测试配置文件jrouter_autoscan.xml、jrouter-spring_autoscan.xml。
+
+Changes in version 1.5.4-M1 (2012-03-03)
+---------------------------------------
+* 增强DefaultProxy的invoke(Object...)方法，支持变长参数。
+* 引入spring-test的测试包，改进与springframework集成的测试。
+
+
+Changes in version 1.5.3 (2012-02-02)
+---------------------------------------
+* 修改StringUtil类，新增isBlank和isNotBlank进行空白值判断。
+* 新增LRUMap类，替换DefaultActionFactory原有actionCache的缓存类型。
+* 更新Injector的putClassProperties(...)和putActionProperties(...)方法。
+* 基于容器启动后数据的一致性，删除DefaultActionFactory的多个set方法。
+* 新增DefaultActionFactory类的构造函数<init>(java.util.Map)，初始化属性。
+* 修改Configuraation的加载方法；修改DefaultActionFactoryBean的加载方法。
+
+
+Changes in version 1.5.2 (2012-01-02)
+---------------------------------------
+* 重构Configuration类，新增方法buildActionFactory()替代getFactory()。
+* 重构DefaultActionFactoryBean类，更好的与springframework集成。
+* 更改jrouter-spring.xml内容结构。
+
+
+Changes in version 1.5.2-M2 (2011-12-24)
+---------------------------------------
+* 更新依赖包logback至 1.0.0.
+* 修改DefaultActionFactory的路径分隔符PATH_SEPARATO为成员变量pathSeparator，默认值仍为'/'，不能为' '。
+* jrouter.xml中可设置"<action-factory>"的属性pathSeparator值。
+* 修正PathTree的添加节点方式，默认覆盖节点原有的值。
+* 修正DefaultActionFactory添加Action的方法addAction(DefaultActionProxy ap)。
+* 新增Injector的putClassProperties(...)和putActionProperties(...)重载方法。
+* 新增Configuration的加载配置load(...)重载方法。
+* 修改jrouter-1.5.xsd，新增"<aop-config>"标签。
+
+
+Changes in version 1.5.2-M1 (2011-10-02)
+---------------------------------------
+* 更新DefaultActionFactoryBean，新增scanPackages、excludePackages属性配置，自动扫描类并添加为组件。
+* 更改StringUtil方法"isNull(...)"为"isEmpty(...)"；"isNotNull(...)"为"isNotEmpty(...)"。
+
+
+Changes in version 1.5.1 (2011-09-03)
+---------------------------------------
+* 新增接口jrouter.ActionProxy。
+* 调整类jrouter.impl.ActionProxy名称为jrouter.impl.DefaultActionProxy，并实现ActionProxy接口。
+* 新增ClassUtil工具类，扫描class文件。
+* 新增CollectionUtil集合工具类。
+* 修改AbstractProxy的方法"getMethodInfo()"为"getMethod()"。
+* 调整SpringObjectFactory，可设置springframework属性注入的策略"autowireMode"，默认"byName"。
+* 新增@Parameter注解类。
+* @Action新增parameters，可配置Action初始化参数的键/值(多值)集合。
+* 通过ActionProxy接口的getActionParameters、getActionParameter、getActionParameterValues方法获取@Action的parameters。
+* jrouter-1.5.xsd中新增"component-scan"元素。
+* jrouter-1.5.xml中新增"<component-scan package=... exclude=... />"标签，根据包名自动搜索和加载组件。
+* Configuration中新增处理"<component-scan/>"标签方法。
+
+
+Changes in version 1.5.0 (2011-08-06)
+---------------------------------------
+* 新增ObjectFactory对象工厂接口。
+* ActionFactory中新增getObjectFactory()方法返回创建对象的工厂对象。
+* DefaultActionFactory中新增objectFactory变量，并提供默认的对象工厂。
+* 新增SpringObjectFactory，提供与springframework的集成；由springframework的工厂对象创建新的对象实例。
+* 更新DefaultActionFactoryBean，提供ObjectFactory对象的注入，默认为SpringObjectFactory的实现。
+
+Changes in version 1.5.0-SNAPSHOT (2011-07-30)
+---------------------------------------
+* 新增jrouter.impl.DefaultProxy类，统一处理调用代理方法时的异常。
+* 新增Injector工具类处理简单的属性值注入。
+* 原有jrouter.xml变更为jrouter-1.4.xml。
+* 新增jrouter-1.5.xml配置结构及jrouter-1.5.xsd结构。新增标签<action-factory>；新增属性标签<property>值注入。
+* 调整DefaultActionFactory的变量名"actionsCache"为"actionCache"。
+* 调整DefaultActionFactory，Action调用结果的路径信息中包含':'可省略Action中的@Result(name = "*"...)。
+* DefaultActionFactory新增"invokeUndefinedResult(...)"扩展方法，处理未匹配的结果字符串。
+* 新增接口ActionFactory的"addResults(Object obj)"和"getResults()"方法。
+* DefaultActionFactory中新增全局结果对象集合results。
+* jrouter-1.5.xml更新结果类型标签<result-type>替换原有<result>，新的<result>标签代表配置全局结果对象。
+* 更新Configuration，默认加载jrouter-1.5.xml；不再适配原有jrouter.xml。
+* 更新DefaultActionFactoryBean，新增results属性集合，配置全局结果对象集合。
+* 更改DefaultActionFactory中路径后缀extension的处理方式，默认截断'.'之后的字符。
+* jrouter-1.5配置文件，标签<action>新增子标签<path>，配置指定路径Action的属性注入。
+* Injector更新属性注入的方式，主要属于Action所属对象的属性注入。
+* 更新ActionFactory接口，去除部分接口方法。
+* 更新Configuration中xml配置的处理方式。
+* @Action中添加interceptors，可配置指定的拦截器集合。
+* @Namespace中添加interceptors，可配置指定的拦截器集合。
+* 修改DefaultInterceptorStack中空拦截栈的名称"defalut"为"empty"。
+* 修改DefaultResult中空结果类型的名称"default"为"empty"。
+
+
+Changes in version 1.4.6 (2011-05-23)
+---------------------------------------
+
+* @Action无需强制指定name，默认为""，DefaultActionFactory判断为""则设置为其标注方法的名称。
+* 新增Action路径全匹配，可使用@Result(name = "*")做字符串结果的非完全匹配。
+* DefaultActionFactory类新增"invokeResult(...)"扩展方法处理非完全匹配；默认提供"type:location"格式的路径解析处理。
+* DefaultActionFactory类新增"invokeObjectResult(...)"扩展方法。
+* DefaultActionFactory类新增"createActionInvocation(...)"扩展方法；默认生成新的DefaultActionInvocation实例。
+* DefaultActionFactory类新增actionInvocationClass调用参数限制变量及其"setter"和"getter"方法，修正"createActionProxy(...)"和"createResultTypeProxy(...)"方法。
+* jrouter.xsd中新增<xs:enumeration value="actionInvocationClass"/>特殊常量定义。
+* jrouter.xml中新增<constant name="actionInvocationClass" value="..." />元素。
+* 更新DefaultActionFactoryBean，新增"setActionInvocationClass(...)"。
+* 更新DefaultActionFactoryBean，废弃"setClassName(String className)"变更为新增的"setActionFactoryClass(String actionFactoryClass)"方法。
+* 更新jrouter-spring.xml配置文件。
+* 更新DefaultActionFactory路径分隔符"PATH"变量名称为"PATH_SEPARATOR"。
+* 删除DefaultActionFactory的"afterPathCreation(String path)"方法，更改名称为"addExtension(String path)"。
+* 新增Action的树结构路径PathTree实现。可使用诸如@Action(name="/*/*/*...)"或@Action(name="/{v1}/{v2}/*...)"的匹配路径。
+* 新增树结构路径PathTreeMap实现，适配Map接口。
+* DefaultActionInvocation类新增"actionPathParameters"变量，返回调用Action时路径匹配的键值映射。
+* 更新DefaultActionFactory的actions集合，"getActions()"返回树路径结构的Map映射。
+* 新增DefaultActionFactory中Action路径与代理对象的映射缓存，并控制缓存的最大数目，"getActionsCache()"返回缓存的对象。
+* 更新DefaultActionFactoryBean，新增"setActionCacheNumber(...)"。
+* bugfix，更正@Action的scope为"PROTOTYPE"时拦截器和结果对象的NPE错误。
+
+
+Changes in version 1.4.5 (2011-04-08)
+---------------------------------------
+
+* 废除接口ActionInvocation中的"setResult(Result result)"方法。
+* 修正ActionProxy中拦截器集合变量名称interceptorStack为interceptors，同时修改其"setInterceptors(...)"和"getInterceptors()"方法。
+* 新增InvocationProxyException异常类。
+* 更新DefaultActionInvocation、ActionProxy、InterceptorProxy、ResultTypeProxy的"invoke(...)"方法，改抛出JRouterException为InvocationProxyException。
+* 更新DefaultActionFactory的"invoke(...)"方法。捕获InvocationProxyException异常后，重新封装源异常信息后抛出。
+* 修正DefaultResult内置"forward"结果类型的处理方法"actionForward(ActionInvocation invocation)"。
+
+
+No version 1.4.4 (2011-04-08)
+---------------------------------------
+
+
+Changes in version 1.4.3 (2011-02-01)
+---------------------------------------
+
+* jrouter.xsd中新增<xs:enumeration value="extension"/>特殊常量定义。
+* 新增Action路径的后缀名称设定。jrouter.xml中新增<constant name="extension" value="..." />元素。
+* DefaultActionFactory类新增extension变量及其"setter"和"getter"方法。
+* DefaultActionFactory类新增afterPathCreation(String path)扩展方法；默认添加Action生成路径的后缀名称。
+* Configuration类增加"afterActionFactoryCreation(ActionFactory<?> factory)"扩展方法，用于ActionFactory特点子类对象的初始化配置。
+* 新增与springframework集成包，新增DefaultActionFactoryBean类。
+* 新增jrouter-spring.xml配置文件。
+* 删除ActionContext类，改名为ThreadContext类。
+
+
+Changes in version 1.4.2 (2011-01-03)
+---------------------------------------
+
+* 更新并修正DefaultActionFactory中"createActionProxy(...)"方法，去除生成Action路径首尾的''和'/'。
+* StringUtil中增加"trim(String src, char sep)"方法。
+* jrouter.xsd中新增<xs:element ref="include" />常量定义。
+* jrouter.xml中新增<include file="..." />元素，允许引入xml配置文件。
+* 更新Configuration类处理<include file="..." />机制。
+
+
+Changes in version 1.4.1 (2010-12-05)
+---------------------------------------
+
+* 更新ActionProxy、InterceptorProxy、ResultTypeProxy的方法"invoke(...)"发生异常时封装异常本身，"getCause()"可能为null导致异常信息丢失。
+* 更新DefaultActionFactory的方法"invoke(...)"发生异常时封装异常本身，"getCause()"可能为null导致异常信息丢失。
+* 删除InvokeException类，更新JRouterException；所有用到的InvokeException改为JRouterException。
+* 更新ActionInvocation和DefaultActionInvocation的"invoke(...)"和"invokeActionOnly(...)"方法，由抛出Exception改为抛出jrouterException运行时异常。
+
+
+Changes in version 1.4 (2010-10-01)
+---------------------------------------
+
+* 支持Maven。
+* 重写并规范pom.xml文件。
+* 更新@Namespace的value为name，使用@Namespace(name="...")。
+* 添加线程变量工具ActionContext的"remove()"方法。
+* 更新ActionProxy的方法"getNewInstance()"为"getInstance()"。
