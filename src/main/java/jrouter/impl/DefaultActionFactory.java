@@ -23,6 +23,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import jrouter.*;
 import jrouter.annotation.*;
+import jrouter.bytecode.javassist.JavassistProxyFactory;
 import jrouter.util.ClassUtil;
 import jrouter.util.StringUtil;
 import org.slf4j.Logger;
@@ -42,9 +43,7 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultActionFactory implements ActionFactory {
 
-    /**
-     * 日志
-     */
+    /** 日志 */
     private static final Logger LOG = LoggerFactory.getLogger(DefaultActionFactory.class);
 
     /**
@@ -63,7 +62,7 @@ public class DefaultActionFactory implements ActionFactory {
     private String extension = ".";
 
     /**
-     * Action运行时上下文的类型，用于传递上下文参数时的界限判断。 未指定参数类型即null时表示允许ActionInvocation类型的任意子类。
+     * Action运行时上下文的类型，用于传递上下文参数时的界限判断。未指定参数类型即null时表示允许ActionInvocation类型的任意子类。
      */
     private Class<? extends ActionInvocation> actionInvocationClass;
 
@@ -90,6 +89,11 @@ public class DefaultActionFactory implements ActionFactory {
      * 创建对象的工厂对象。
      */
     private ObjectFactory objectFactory;
+
+    /**
+     * 生成底层方法代理的工厂对象。
+     */
+    private ProxyFactory proxyFactory = null;
 ////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -128,9 +132,6 @@ public class DefaultActionFactory implements ActionFactory {
      * @param properties 指定的初始化数据键值映射。
      */
     public DefaultActionFactory(Map<String, Object> properties) {
-        //initiate properties
-        setActionFactoryProperties(properties);
-
         interceptors = new HashMap<String, InterceptorProxy>();
         interceptorStacks = new HashMap<String, InterceptorStackProxy>();
         actions = new PathTreeMap<DefaultActionProxy>(pathSeparator);
@@ -138,22 +139,8 @@ public class DefaultActionFactory implements ActionFactory {
         resultTypes = new HashMap<String, ResultTypeProxy>();
         results = new HashMap<String, ResultProxy>();
 
-        //default objectFactory
-        if (objectFactory == null) {
-            objectFactory = new ObjectFactory() {
-
-                @Override
-                public <T> T newInstance(Class<T> clazz) {
-                    try {
-                        return clazz.newInstance();
-                    } catch (IllegalAccessException e) {
-                        throw new JRouterException(e);
-                    } catch (InstantiationException e) {
-                        throw new JRouterException(e);
-                    }
-                }
-            };
-        }
+        //initiate properties
+        setActionFactoryProperties(properties);
     }
 
     /**
@@ -164,11 +151,12 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 设置属性值。
+     * 设置ActionFactory初始化属性值。
      *
      * @param properties 属性值键值映射。
      */
     private void setActionFactoryProperties(Map<String, Object> properties) {
+        boolean setBytecode = false;
         for (Map.Entry<String, Object> e : properties.entrySet()) {
             String name = e.getKey();
             Object value = e.getValue();
@@ -179,7 +167,6 @@ public class DefaultActionFactory implements ActionFactory {
             //string value
             String strValue = value.toString().trim();
             if ("actionInvocationClass".equalsIgnoreCase(name)) {
-                //if(value instanceof )
                 try {
                     //设置Action运行时上下文的类型
                     actionInvocationClass = value instanceof Class
@@ -192,42 +179,98 @@ public class DefaultActionFactory implements ActionFactory {
             } else if ("defaultInterceptorStack".equalsIgnoreCase(name)) {
                 //设置默认拦截栈名称
                 this.defaultInterceptorStack = strValue;
-                LOG.info("set DefaultInterceptorStack : " + defaultInterceptorStack);
+                LOG.info("Set defaultInterceptorStack : " + defaultInterceptorStack);
             } else if ("defaultResultType".equalsIgnoreCase(name)) {
                 //设置默认结果视图类型
                 this.defaultResultType = strValue;
-                LOG.info("set DefaultResultType : " + defaultResultType);
+                LOG.info("Set defaultResultType : " + defaultResultType);
             } else if ("pathSeparator".equalsIgnoreCase(name)) {
                 if (StringUtil.isNotBlank(strValue)) {
                     pathSeparator = strValue.charAt(0);
-                    LOG.info("set PathSeparator : " + this.pathSeparator);
+                    LOG.info("Set pathSeparator : " + this.pathSeparator);
                 }
             } else if ("extension".equalsIgnoreCase(name)) {
                 if (value != null) {
-                    //设置路径后缀名称
+                    //设置路径后缀名称，不为null，可设置为空串
                     this.extension = strValue;
-                    LOG.info("set Extension : " + this.extension);
+                    LOG.info("Set extension : " + this.extension);
                 }
             } else if ("actionCacheNumber".equalsIgnoreCase(name)) {
                 actionCacheNumber = Integer.parseInt(strValue);
-                LOG.info("set ActionCacheNumber : " + this.actionCacheNumber);
+                LOG.info("Set actionCacheNumber : " + this.actionCacheNumber);
             } else if ("objectFactory".equalsIgnoreCase(name)) {
                 //设置创建对象的工厂对象
                 this.objectFactory = (ObjectFactory) value;
-                LOG.info("set ObjectFactory : " + this.objectFactory);
+                LOG.info("Set objectFactory : " + this.objectFactory);
+            } else if ("bytecode".equalsIgnoreCase(name)) {
+                setBytecode = true;
+                if (value instanceof String) {
+                    //default to use java reflect directly
+                    if ("default".equalsIgnoreCase(strValue)) {
+                        proxyFactory = null;
+                        LOG.info("Set proxyFactory : " + strValue);
+                    } else if ("javassist".equalsIgnoreCase(strValue)) {
+                        proxyFactory = new JavassistProxyFactory();
+                        LOG.info("Set proxyFactory : " + this.proxyFactory);
+                    } else {
+                        setBytecode = false;
+                        LOG.info("Unknown bytecode property : " + strValue);
+                    }
+                } else {
+                    proxyFactory = (ProxyFactory) value;
+                    LOG.info("Set proxyFactory : " + this.proxyFactory);
+                }
             } else {
                 LOG.warn("Unknown property \"{}\" : {}", name, value);
+            }
+        }
+        //default objectFactory
+        setDefaultObjectFactory();
+        //default proxyFactory
+        if (!setBytecode)
+            setDefaultProxyFactory();
+    }
+
+    /**
+     * 当objectFactory对象为空时，设置其值。
+     * 默认提供DefaultObjectFactory对象。
+     */
+    private void setDefaultObjectFactory() {
+        if (objectFactory == null) {
+            objectFactory = new DefaultObjectFactory();
+            LOG.info("No objectFactory setting, use default : " + objectFactory);
+        }
+    }
+
+    /**
+     * 当proxyFactory对象为空时，设置其值。
+     * 默认当引入了javassist时提供JavassistProxyFactory对象；若无javassist引用则默认采用java反射机制。
+     */
+    private void setDefaultProxyFactory() {
+        if (proxyFactory == null) {
+            boolean hasJavassist = false;
+            try {
+                //check javassist jar
+                ClassUtil.loadClass("javassist.ClassPool");
+                hasJavassist = true;
+            } catch (ClassNotFoundException ex) {
+                LOG.info("No proxyFactory setting and no javassist jar found, use java reflect as default");
+            }
+            if (hasJavassist) {
+                proxyFactory = new JavassistProxyFactory();
+                LOG.info("No proxyFactory setting, use javassist as default : " + proxyFactory);
             }
         }
     }
 
     /**
-     * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。 Action调用是否为线程安全取决于路径所映射方法的线程安全性。
+     * 通过路径调用相应的Action，可传递Action底层方法相应的参数。
+     * Action调用是否为线程安全取决于路径所映射底层方法的线程安全性。
      *
      * @param path Action的映射路径。
      * @param params Action的调用参数。
      *
-     * @return 调用后的结果；如果结果为字符串类型非空且存在结果对象，则查找相应的结果类型并返回调用后的结果； 反之直接返回结果。
+     * @return 调用后的结果；如果结果为字符串类型非空且存在结果对象，则查找相应的结果类型并返回调用后的结果；反之默认直接返回结果。
      *
      * @throws JRouterException 如果发生调用错误。
      *
@@ -238,7 +281,7 @@ public class DefaultActionFactory implements ActionFactory {
     public Object invokeAction(String path, Object... params) throws JRouterException {
         LOG.debug("Start invoking Action [{}]; Parameters {} ", path, java.util.Arrays.toString(params));
         //remove the extension
-        //当后缀为单个字符时，按路径最后出现分割符的位置截断路径后缀； 当后缀为未空字符串时，如果路径已后缀结尾，截断后缀。
+        //当后缀为单个字符时，按路径最后出现分割符的位置截断路径后缀；当后缀为未空字符串时，如果路径已后缀结尾，截断后缀。
         if (StringUtil.isNotEmpty(extension)) {
             int len = extension.length();
             //extension为特定的标记字符，则截去标记字符后的部分
@@ -250,7 +293,7 @@ public class DefaultActionFactory implements ActionFactory {
             } else {
                 //extension为特定的后缀字符串
                 if (path.endsWith(extension)) {
-                    //extension前一位非字母或数字
+                    //如果extension前一位非字母或数字
                     if (!Character.isLetterOrDigit(path.charAt(path.length() - len - 1))) {
                         len++;
                     }
@@ -314,7 +357,7 @@ public class DefaultActionFactory implements ActionFactory {
             }
         } catch (InvocationProxyException e) {
             //去除不必要的InvocationProxyException异常，封装异常的源并抛出。
-            throw new InvocationProxyException(e.getSource(), null);
+            throw e.getSourceInvocationException();
         }
         LOG.debug("Finish invoking Action [{}]; Parameters {}; Final result : [{}]",
                 new String[]{path, java.util.Arrays.toString(params), String.valueOf(res)});
@@ -395,7 +438,8 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 提供非完全匹配路径的结果对象的调用方式。 默认提供全字符串结果的匹配处理。
+     * 提供非完全匹配路径的结果对象的调用方式。
+     * 默认提供全字符串结果的匹配处理。
      *
      * @param invocation Action运行时上下文。
      * @param result Action调用完成后的结果对象。
@@ -495,7 +539,8 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 用于子类继承，提供非字符串<code>string</code>对象的处理方式。 默认直接返回非字符串对象，void方法返回 null 。
+     * 用于子类继承，提供非字符串<code>string</code>对象的处理方式。
+     * 默认直接返回非字符串对象，void方法返回 null 。
      *
      * @param invocation Action运行时上下文。
      * @param res Action调用完成后的结果。
@@ -503,7 +548,7 @@ public class DefaultActionFactory implements ActionFactory {
      * @return 非字符串对象。
      */
     protected Object invokeObjectResult(ActionInvocation invocation, Object res) {
-        LOG.warn("Return object result [{}] directly at : {}", res, invocation.getActionProxy().getMethod());
+        LOG.warn("Invoking Object Result [{}] and return directly at : {}", res, invocation.getActionProxy().getMethod());
         return res;
     }
 
@@ -517,7 +562,7 @@ public class DefaultActionFactory implements ActionFactory {
      * @return 结果字符串。
      */
     protected Object invokeUndefinedResult(ActionInvocation invocation, String resInfo) {
-        LOG.warn("No match Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethod());
+        LOG.warn("Invoking undefined String Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethod());
         //throw new JRouterException("No match Result [" + resInfo + "] at " + ap.getMethod(), ap);
         //不作处理直接跳过，直接返回调用结果字符串
         return resInfo;
@@ -873,7 +918,7 @@ public class DefaultActionFactory implements ActionFactory {
         } else {
             throw new IllegalArgumentException("Illegal arguments in Interceptor : " + method);
         }
-        return new InterceptorProxy(interceptor, method, obj, requireAction);
+        return new InterceptorProxy(this, interceptor, method, obj, requireAction);
     }
 
     /**
@@ -897,7 +942,7 @@ public class DefaultActionFactory implements ActionFactory {
             name = field.get(obj).toString();
             //空命名异常
             if (StringUtil.isEmpty(name))
-                throw new IllegalArgumentException("Null name InterceptorStack : "
+                throw new IllegalArgumentException("Null name of InterceptorStack : "
                         + field.getName() + " at " + obj.getClass());
         }
         //interceptors name
@@ -943,7 +988,7 @@ public class DefaultActionFactory implements ActionFactory {
             throw new IllegalArgumentException("Illegal arguments in ResultType : " + method);
         }
 
-        return new ResultTypeProxy(resultType, method, obj, requireAction);
+        return new ResultTypeProxy(this, resultType, method, obj, requireAction);
     }
 
     /**
@@ -967,11 +1012,11 @@ public class DefaultActionFactory implements ActionFactory {
         } else {
             throw new IllegalArgumentException("Illegal arguments in Result : " + method);
         }
-        return new ResultProxy(res, method, obj, requireAction);
+        return new ResultProxy(this, res, method, obj, requireAction);
     }
 
     /**
-     * 判断代理方法的参数是否合法；仅允许无参数方法或仅ActionInvocation类型参数的方法。 未指定参数类型时允许ActionInvocation类型的任意子类；否则为{@link #actionInvocationClass}的父类。
+     * 判断代理方法的参数是否合法；仅允许无参数方法或仅ActionInvocation类型参数的方法。未指定参数类型时允许ActionInvocation类型的任意子类；否则为{@link #actionInvocationClass}的父类。
      *
      * @param params 代理方法的参数类型。
      *
@@ -1023,7 +1068,7 @@ public class DefaultActionFactory implements ActionFactory {
             }
         }
 
-        //包含注入指定path的Action需重新生成对象
+        //包含指定path的属性注入，其Action需重新生成对象
         if (obj != null && Injector.actionInjection.containsKey(path)) {
             obj = objectFactory.newInstance(obj.getClass());
             Injector.injectAction(path, obj);
@@ -1219,6 +1264,28 @@ public class DefaultActionFactory implements ActionFactory {
     @Override
     public ObjectFactory getObjectFactory() {
         return objectFactory;
+    }
+
+    @Override
+    public ProxyFactory getProxyFactory() {
+        return proxyFactory;
+    }
+
+    /**
+     * 默认创建对象的工厂类。
+     */
+    private static class DefaultObjectFactory implements ObjectFactory {
+
+        @Override
+        public <T> T newInstance(Class<T> clazz) {
+            try {
+                return clazz.newInstance();
+            } catch (IllegalAccessException e) {
+                throw new JRouterException(e);
+            } catch (InstantiationException e) {
+                throw new JRouterException(e);
+            }
+        }
     }
 
     /**

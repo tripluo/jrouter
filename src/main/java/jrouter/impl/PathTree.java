@@ -34,10 +34,10 @@ class PathTreeMap<T> extends AbstractMap<String, T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    //树结构路径
+    /** 树结构路径 */
     private PathTree<T> tree;
 
-    //entrySet views for adapting for the Map interface
+    //** entrySet views for adapting for the Map interface */
     private transient Set<Map.Entry<String, T>> entrySet = null;
 
     /**
@@ -108,23 +108,19 @@ class PathTree<T> implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 默认的路径分隔符
-     */
+    /** 默认的路径分隔符 */
     public static final char PATH_SEPARATOR = '/';
 
-    /**
-     * 路径分割符
-     */
+    /** 路径分割符 */
     private char pathSeparator = PATH_SEPARATOR;
 
-    /**
-     * 单路径匹配标识
-     */
+    /** 单路径匹配标识 */
     public static final String SINGLE_MATCH = "*";
 
     /**
-     * @deprecated 路径尾匹配
+     * 路径尾匹配
+     *
+     * @deprecated
      */
     private static final String Last_Match = "**";
 
@@ -325,7 +321,7 @@ class PathTree<T> implements Serializable {
     private void fillMatchParameters(TreeNode matcher, String[] paths,
             Map<String, String> matchParameters) {
         if (matchParameters != null) {
-            /*
+            /**
             //parse the * parameters
             String fullCode = Integer.toBinaryString(matcher.code);
             //0 is the root '/'
@@ -394,14 +390,14 @@ class PathTree<T> implements Serializable {
     /**
      * 获取添加路径的非完全匹配名称，完全字符串则返回 null。
      *
-     *  --> null
+     * --> null
      * * --> null
      * abc --> null
      * {} --> null
      * {abc} --> abc
-     * { abc  } -->  abc  (" abc  ")
+     * { abc } --> abc (" abc ")
      * {*} --> *
-     * { } -->   (" ")
+     * { } --> (" ")
      * {{abc} --> {abc
      * {{abc}}} --> {abc}}
      *

@@ -11,7 +11,7 @@
     <!-- JRouter ActionFactory -->
     <bean id="actionFactory" class="jrouter.spring.DefaultActionFactoryBean">
         <!-- optional default:null -->
-        <property name="configLocation" value="classpath:jrouter-1.5.xml" />
+        <property name="configLocation" value="classpath:jrouter.xml" />
         <!-- optional default -->
         <property name="configurationClass" value="jrouter.config.Configuration"/>
         <!-- optional default -->

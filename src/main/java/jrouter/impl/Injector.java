@@ -36,19 +36,13 @@ import org.slf4j.LoggerFactory;
  */
 public class Injector {
 
-    /*
-     * 日志记录
-     */
+    /* 日志记录 */
     private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
 
-    /**
-     * 对象类型与其注入属性的映射
-     */
+    /** 对象类型与其注入属性的映射 */
     static final Map<Class, Injection[]> classInjection = new HashMap<Class, Injection[]>();
 
-    /**
-     * action对象与其注入属性的映射
-     */
+    /** action对象与其注入属性的映射 */
     static final Map<String, Injection[]> actionInjection = new HashMap<String, Injection[]>();
 
     /**
@@ -128,20 +122,21 @@ public class Injector {
     }
 
     /*
-     * 注入Action所在对象的属性。
+     * 注入Action所在路径（path）的属性；路径（path）属性已包含对象类型的属性。
      *
-     * @param actionPath 指定Action的全路径。 @param invoker Action所在的对象。
+     * @param actionPath 指定Action的全路径。
+     * @param invoker Action所在的对象。
      *
-     * @throws IllegalAccessException 如果属性注入的方法不可访问。 @throws InvocationTargetException
-     * 如果属性注入的方法发生异常。
+     * @throws IllegalAccessException 如果属性注入的方法不可访问。
+     * @throws InvocationTargetException 如果属性注入的方法发生异常。
      */
     static void injectAction(String actionPath, Object invoker) throws IllegalAccessException,
             InvocationTargetException {
         Injection[] injects = actionInjection.get(actionPath);
         //如果指定的Action中无注入属性，则查找其对象类型的注入属性
-        if (injects == null) {
-            injects = classInjection.get(invoker.getClass());
-        }
+//        if (injects == null) {
+//            injects = classInjection.get(invoker.getClass());
+//        }
         if (injects != null && injects.length > 0) {
             for (Injection ij : injects) {
                 ij.setter.invoke(invoker, ij.value);

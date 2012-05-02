@@ -30,6 +30,7 @@
                 pathSeparator = /
                 extension = .
                 actionCacheNumber = 100000
+                bytecode = default
             </value>
         </property>
         <!-- scan classes properties -->

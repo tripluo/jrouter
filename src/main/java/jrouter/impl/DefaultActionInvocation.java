@@ -31,54 +31,34 @@ import org.slf4j.LoggerFactory;
  */
 public class DefaultActionInvocation implements ActionInvocation {
 
-    /**
-     * 日志
-     */
+    /** 日志 */
     private static final Logger LOG = LoggerFactory.getLogger(DefaultActionInvocation.class);
 
-    /**
-     * Action是否已调用
-     */
+    /** Action是否已调用 */
     protected boolean executed = false;
 
-    /**
-     * ActionFactory
-     */
+    /** ActionFactory */
     private ActionFactory actionFactory;
 
-    /**
-     * DefaultActionProxy
-     */
+    /** DefaultActionProxy */
     private DefaultActionProxy actionProxy;
 
-    /**
-     * interceptors reference
-     */
+    /** interceptors reference */
     private List<InterceptorProxy> interceptors;
 
-    /**
-     * recursion invoke index
-     */
+    /** recursion invoke index */
     private int _index = 0;
 
-    /**
-     * 方法调用的参数
-     */
+    /** 方法调用的参数 */
     private Object[] params;
 
-    /**
-     * 方法调用后的结果
-     */
+    /** 方法调用后的结果 */
     private Object invokeResult;
 
-    /**
-     * Action结果对象
-     */
+    /** Action结果对象 */
     private Result result;
 
-    /**
-     * Action路径的参数匹配映射
-     */
+    /** Action路径的参数匹配映射 */
     private Map<String, String> actionPathParameters;
 
     /**

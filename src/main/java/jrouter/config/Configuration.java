@@ -38,7 +38,7 @@ import org.w3c.dom.Node;
 
 /**
  * 启动jrouter容器的入口配置类。
- * 通过Configuration类加载jrouter的配置文件（默认为jrouter-1.5.xml）初始化ActionFactory及加载相应的属性配置，最终得到ActionFactory具体实例。
+ * 通过Configuration类加载jrouter的配置文件（默认为jrouter.xml）初始化ActionFactory及加载相应的属性配置，最终得到ActionFactory具体实例。
  *
  * <p>
  * 如果jrouter.xml中未指明ActionFactory的具体实现类，则默认使用{@link DefaultActionFactory
@@ -66,10 +66,10 @@ public class Configuration implements Serializable {
 //                           xml配置文件元素                                   //
 ////////////////////////////////////////////////////////////////////////////////
     /** 默认xml文件的名称 */
-    public static final String JROUTER_XML = "jrouter-1.5.xml";
+    public static final String JROUTER_XML = "jrouter.xml";
 
     /** 默认xsd文件的名称 */
-    public static final String JROUTER_XSD = "jrouter-1.5.xsd";
+    public static final String JROUTER_XSD = "jrouter-1.6.xsd";
 
     /** 配置文件中表示ActionFactory的标签名 */
     public static final String ACTION_FACTORY = "action-factory";
@@ -117,7 +117,11 @@ public class Configuration implements Serializable {
     /** 配置文件中表示包名称的标签属性 */
     public static final String PACKAGE = "package";
 
-    /** 配置文件中表示不包含的标签属性 */
+    /**
+     * 配置文件中表示不包含的标签属性
+     *
+     * @deprecated
+     */
     @Deprecated
     public static final String EXCLUDE = "exclude";
 
@@ -632,7 +636,7 @@ public class Configuration implements Serializable {
                 //add a new ClassScanner for each <component-scan>
                 classScanners.add(parseClassScanner(props));
             } else {
-                LOG.warn("\"package\" can't be empty for <component-scan>.");
+                LOG.warn("Property \"{}\" can't be empty for <component-scan>.", PACKAGE);
             }
         }
     }
@@ -651,7 +655,7 @@ public class Configuration implements Serializable {
             String name = e.getKey();
             String value = e.getValue();
             if (value == null) {
-                LOG.warn("Property \"{}\" can't be null.", name);
+                LOG.warn("Property \"{}\" can't be empty.", name);
                 continue;
             }
             Set<String> set = new LinkedHashSet<String>();
@@ -751,10 +755,10 @@ public class Configuration implements Serializable {
     }
 
     /**
-     * 由此<code>Configuration</code>对象中的配置属性创建一个新的<code>ActionFactory</code>对象。 此<code>Configuration</code>对象中配置属性的变更不影响已生成的<code>ActionFactory</code>对象。
+     * 由此Configuration对象中的配置属性创建一个新的ActionFactory对象。
+     * 此Configuration对象中配置属性的变更不影响已生成的ActionFactory对象。
      *
-     * @param <T>
-     * <code>ActionFactory</code>的类型。
+     * @param <T> ActionFactory的类型。
      *
      * @return 生成的<code>ActionFactory</code>对象。
      *
@@ -960,7 +964,8 @@ public class Configuration implements Serializable {
     }
 
     /**
-     * 用于子类继承, 在初始化ActionFactory前执行设置其一些特定的操作。 默认情况下不做任何处理。
+     * 用于子类继承, 在初始化ActionFactory前执行设置其一些特定的操作。
+     * 默认情况下不做任何处理。
      *
      * @param factory 未初始化属性的{@link ActionFactory}。
      */

@@ -25,14 +25,10 @@ import jrouter.annotation.ResultType;
  */
 public class DefaultResult {
 
-    /**
-     * 默认结果类型名称，不作任何处理
-     */
+    /** 默认结果类型名称，不作任何处理 */
     public static final String EMPTY = "empty";
 
-    /**
-     * action forward结果类型名称
-     */
+    /** action forward结果类型名称 */
     public static final String FORWARD = "forward";
 
     /**
@@ -46,7 +42,8 @@ public class DefaultResult {
     }
 
     /**
-     * Action结果直接调用映射的Action，类似forward结果类型。 forward可多次关联调用，需自行判断循环调用。
+     * Action结果直接调用映射的Action，类似forward结果类型。
+     * forward可多次关联调用，需自行判断循环调用。
      *
      * @param invocation Action运行时上下文。
      *

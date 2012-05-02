@@ -25,19 +25,13 @@ import java.util.List;
  */
 public final class InterceptorStackProxy {
 
-    /**
-     * 拦截栈名称
-     */
+    /** 拦截栈名称 */
     private String name;
 
-    /**
-     * 拦截栈取名字段
-     */
+    /** 拦截栈取名字段 */
     private Field field;
 
-    /**
-     * 包含的拦截器集合
-     */
+    /** 包含的拦截器集合 */
     private List<InterceptorProxy> interceptors;
 
     /**

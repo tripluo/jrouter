@@ -187,6 +187,7 @@ public class ActionFactoryTest {
             assertNotNull(e);
             //ActionFactory调用抛出异常，测试消除拦截器的递归调用对异常信息的扰乱。
             assertFalse(e.getCause() instanceof InvocationProxyException);
+            assertSame(ap, e.getTarget());
         }
 
         String url4 = "/test/singleVarArgsArray";
@@ -293,7 +294,7 @@ public class ActionFactoryTest {
     }
 
     /**
-     * 测试Action、Interceptor、Result中属性注入的正确性。 注入的属性参加jrouter_test.xml配置文件。
+     * 测试Action、Interceptor、Result中属性注入的正确性。注入的属性参加jrouter_test.xml配置文件。
      *
      * @see jrouter.SimpleAction#inject()
      * @see jrouter.interceptor.DemoInterceptor
@@ -327,7 +328,7 @@ public class ActionFactoryTest {
             assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url, factory.invokeAction(url, DemoResult.DEMO_RESULT_EXCEPTION));
         } catch (InvocationProxyException e) {
             assertNotNull(e);
-            assertTrue(e.getSource().getClass() == RuntimeException.class);
+            assertTrue(e.getSource() instanceof RuntimeException);
         }
         assertEquals("unknown_result1", factory.invokeAction(url, "unknown_result1"));
         assertEquals("unknown_result2", factory.invokeAction(url, "unknown_result2"));

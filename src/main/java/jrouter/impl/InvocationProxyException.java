@@ -25,13 +25,11 @@ public class InvocationProxyException extends JRouterException {
 
     private static final long serialVersionUID = 1L;
 
-    /**
-     * 定位异常发生对象
-     */
+    /** 定位异常发生对象 */
     private Object target;
 
     /**
-     * 构造一个包含指定详细消息和异常发生对象的InvocationException。
+     * 构造一个包含指定原因和异常发生对象的InvocationException。
      *
      * @see #getSource()
      *
@@ -66,6 +64,20 @@ public class InvocationProxyException extends JRouterException {
         while (cur instanceof InvocationProxyException && (cur = cur.getCause()) != null) {
         }
         return cur;
+    }
+
+    /**
+     * 返回最初抛出的InvocationException。
+     *
+     * @return 最初抛出的InvocationException。
+     */
+    public InvocationProxyException getSourceInvocationException() {
+        Throwable cur = this;
+        Throwable cause = null;
+        while ((cause = cur.getCause()) instanceof InvocationProxyException) {
+            cur = cause;
+        }
+        return (InvocationProxyException) cur;
     }
 
     /**

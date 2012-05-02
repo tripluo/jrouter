@@ -209,7 +209,7 @@ public class SimpleAction {
      * 注入属性。
      */
     public void setNumber(int number) {
-        LOG.info("setNumber \"{}\" in {}", number, this);
+        LOG.info("Set number \"{}\" in {}", number, this);
         this.number = number;
     }
 
@@ -217,7 +217,7 @@ public class SimpleAction {
      * 注入属性。
      */
     public void setString(String string) {
-        LOG.info("setString \"{}\" in {}", string, this);
+        LOG.info("Set string \"{}\" in {}", string, this);
         this.string = string;
     }
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="jrouter-1.5.xsd">
+         xsi:noNamespaceSchemaLocation="jrouter-1.6.xsd">
 
     <!-- optional default -->
     <action-factory class="jrouter.impl.DefaultActionFactory" >
@@ -16,6 +16,8 @@
         <property name="extension" value="." />
         <!-- optional default -->
         <property name="actionCacheNumber" value="10000" />
+        <!-- optional default -->
+        <property name="bytecode" value="javassist" />
     </action-factory>
 
     <!-- scan classes, use ',' as separate -->

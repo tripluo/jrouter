@@ -33,6 +33,13 @@ public interface ActionFactory<T> {
     ObjectFactory getObjectFactory();
 
     /**
+     * 返回创建方法代理对象的工厂对象。
+     *
+     * @return 方法代理对象的工厂对象。
+     */
+    ProxyFactory getProxyFactory();
+
+    /**
      * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。
      *
      * @param key Action的映射路径。

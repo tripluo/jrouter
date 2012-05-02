@@ -17,6 +17,7 @@
 package jrouter.impl;
 
 import java.lang.reflect.Method;
+import jrouter.ActionFactory;
 import jrouter.annotation.Result;
 import jrouter.annotation.ResultType;
 
@@ -25,31 +26,27 @@ import jrouter.annotation.ResultType;
  */
 public final class ResultProxy extends DefaultProxy {
 
-    /**
-     * 是否传递ActionInvocation参数
-     */
+    /** 是否传递ActionInvocation参数 */
     private boolean requireAction;
 
-    /**
-     * 结果对象
-     */
+    /** 结果对象 */
     private Result result;
 
-    /**
-     * 结果对象相应的结果类型 未完成
-     */
+    /** 结果对象相应的结果类型 未完成 */
     private ResultType resultType;
 
     /**
      * 构造一个结果对象的代理类，包含指定的结果对象及其调用参数的状态。
      *
+     * @param actionFactory 指定的ActionFactory。
      * @param result 代理的结果对象。
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      * @param requireAction 拦截器调用是否传递ActionInvocation参数。
      */
-    public ResultProxy(Result result, Method method, Object object, boolean requireAction) {
-        super(method, object);
+    public ResultProxy(ActionFactory actionFactory, Result result, Method method, Object object,
+            boolean requireAction) {
+        super(method, object, actionFactory.getProxyFactory());
         this.result = result;
         this.requireAction = requireAction;
     }

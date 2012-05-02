@@ -25,14 +25,10 @@ import jrouter.ActionInvocation;
  */
 public class ThreadContext {
 
-    /**
-     * Thread Safe
-     */
+    /** Thread Safe */
     protected static final ThreadLocal threadContext = new ThreadLocal();
 
-    /**
-     * Action运行时上下文
-     */
+    /** Action运行时上下文 */
     private ActionInvocation actionInvocation;
 
     /**

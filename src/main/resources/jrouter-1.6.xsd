@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.5">
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified" version="1.6">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace"/>
     <xsd:annotation>
         <xsd:documentation>
             <![CDATA[
-            JRouter Schema, version 1.5 Authors: sunjumper@163.com.
+            JRouter Schema, version 1.6 Authors: sunjumper@163.com.
             This defines a simple and consistent way of creating components, managed by a JRouter ActionFactory,
             read by jrouter.config.Configuration.
             ]]>

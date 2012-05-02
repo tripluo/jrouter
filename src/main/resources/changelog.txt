@@ -3,12 +3,30 @@ JROUTER CHANGELOG
 ==========================
 http://code.google.com/p/jrouter
 
-Requirements
+TODO
 * aop : interceptors --> actions
 * aop-type : add-before, add-after, override
-* bytecode
+
+
+Changes in version 1.6.0 (2012-05-02)
+---------------------------------------
+* 新增Proxy接口，针对底层方法调用的增强。
+* 新增ProxyFactory接口，生成底层方法代理的工厂接口。
+* ActionFactory接口中新增getProxyFactory()方法，获取生成底层方法代理的工厂接口。
+* 新增bytecode.javassist包，提供基于javassist的字节码增强。
+* 更新pom.xml，引入javassist-3.16.1-GA（可选的）。
+* DefaultActionFactory新增bytecode初始化属性，提供default基于反射和javassist选项。
+* 调整DefaultActionFactory类proxyFactory初始化属性。默认使用javassist增强；若无javassist包引入，则默认使用java反射。
+* DefaultProxy类新增Proxy变量，提供底层方法调用的增强。
+* DefaultProxy类的invoke(...)方法，捕获所有的Exception封装为InvocationProxyException抛出。
+* 调整Injector类的injectAction(...)方法，指定路径的Action的属性包含其类属性。
+* 修正InvocationProxyException，新增getSourceInvocationException()方法返回最初的InvocationProxyException。
+* 修正DefaultActionFactory的invokeAction(...)，抛出异常栈中最初的InvocationProxyException。
+* 新增jrouter.properties，jrouter-1.6的ActionFactory初始化属性配置。
+
 
 Changes in version 1.5.4 (2012-04-02)
+---------------------------------------
 * jrouter-1.5.xsd，<component-scan>标签去除原有include属性，新增includeExpression和excludeExpression属性，匹配过滤扫描类。
 * 引入AntPathMatcher，路径匹配工具。
 * 新增ClassScanner，类扫描工具。
@@ -109,7 +127,6 @@ Changes in version 1.5.0-SNAPSHOT (2011-07-30)
 
 Changes in version 1.4.6 (2011-05-23)
 ---------------------------------------
-
 * @Action无需强制指定name，默认为""，DefaultActionFactory判断为""则设置为其标注方法的名称。
 * 新增Action路径全匹配，可使用@Result(name = "*")做字符串结果的非完全匹配。
 * DefaultActionFactory类新增"invokeResult(...)"扩展方法处理非完全匹配；默认提供"type:location"格式的路径解析处理。
@@ -134,7 +151,6 @@ Changes in version 1.4.6 (2011-05-23)
 
 Changes in version 1.4.5 (2011-04-08)
 ---------------------------------------
-
 * 废除接口ActionInvocation中的"setResult(Result result)"方法。
 * 修正ActionProxy中拦截器集合变量名称interceptorStack为interceptors，同时修改其"setInterceptors(...)"和"getInterceptors()"方法。
 * 新增InvocationProxyException异常类。
@@ -149,7 +165,6 @@ No version 1.4.4 (2011-04-08)
 
 Changes in version 1.4.3 (2011-02-01)
 ---------------------------------------
-
 * jrouter.xsd中新增<xs:enumeration value="extension"/>特殊常量定义。
 * 新增Action路径的后缀名称设定。jrouter.xml中新增<constant name="extension" value="..." />元素。
 * DefaultActionFactory类新增extension变量及其"setter"和"getter"方法。
@@ -162,7 +177,6 @@ Changes in version 1.4.3 (2011-02-01)
 
 Changes in version 1.4.2 (2011-01-03)
 ---------------------------------------
-
 * 更新并修正DefaultActionFactory中"createActionProxy(...)"方法，去除生成Action路径首尾的''和'/'。
 * StringUtil中增加"trim(String src, char sep)"方法。
 * jrouter.xsd中新增<xs:element ref="include" />常量定义。
@@ -172,7 +186,6 @@ Changes in version 1.4.2 (2011-01-03)
 
 Changes in version 1.4.1 (2010-12-05)
 ---------------------------------------
-
 * 更新ActionProxy、InterceptorProxy、ResultTypeProxy的方法"invoke(...)"发生异常时封装异常本身，"getCause()"可能为null导致异常信息丢失。
 * 更新DefaultActionFactory的方法"invoke(...)"发生异常时封装异常本身，"getCause()"可能为null导致异常信息丢失。
 * 删除InvokeException类，更新JRouterException；所有用到的InvokeException改为JRouterException。
@@ -181,7 +194,6 @@ Changes in version 1.4.1 (2010-12-05)
 
 Changes in version 1.4 (2010-10-01)
 ---------------------------------------
-
 * 支持Maven。
 * 重写并规范pom.xml文件。
 * 更新@Namespace的value为name，使用@Namespace(name="...")。

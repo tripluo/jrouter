@@ -17,6 +17,7 @@
 package jrouter.impl;
 
 import java.lang.reflect.Method;
+import jrouter.ActionFactory;
 import jrouter.annotation.Interceptor;
 
 /**
@@ -42,14 +43,15 @@ public final class InterceptorProxy extends DefaultProxy {
     /**
      * 构造一个拦截器的代理类，包含指定的拦截器名称、拦截器调用参数的状态。
      *
+     * @param actionFactory 指定的ActionFactory。
      * @param interceptor 所代理的拦截器。
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      * @param requireAction 拦截器调用是否传递ActionInvocation参数。
      */
-    public InterceptorProxy(Interceptor interceptor, Method method, Object object,
-            boolean requireAction) {
-        super(method, object);
+    public InterceptorProxy(ActionFactory actionFactory, Interceptor interceptor, Method method,
+            Object object, boolean requireAction) {
+        super(method, object, actionFactory.getProxyFactory());
         this.interceptor = interceptor;
         this.name = interceptor.name().trim();
         this.requireAction = requireAction;

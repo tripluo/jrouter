@@ -27,19 +27,13 @@ import org.slf4j.LoggerFactory;
  */
 public class SampleInterceptor {
 
-    /**
-     * 日志
-     */
+    /** 日志 */
     private static final Logger LOG = LoggerFactory.getLogger(SampleInterceptor.class);
 
-    /**
-     * 计时拦截器
-     */
+    /** 计时拦截器 */
     public static final String TIMER = "timer";
 
-    /**
-     * 日志拦截器
-     */
+    /** 日志拦截器 */
     public static final String LOGGING = "logging";
 
     /**
@@ -75,14 +69,10 @@ public class SampleInterceptor {
      */
     @Interceptor(name = LOGGING)
     public static Object logging(ActionInvocation invocation) {
-
         LOG.info(invocation.getActionProxy().getPath() + " Starting at " + new Date());
-
         //invoke
         Object result = invocation.invoke();
-
         LOG.info(invocation.getActionProxy().getPath() + " Finishing at " + new Date());
-
         return result;
     }
 }

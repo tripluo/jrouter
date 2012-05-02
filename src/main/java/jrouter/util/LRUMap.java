@@ -31,7 +31,7 @@ public class LRUMap<K, V> extends LinkedHashMap<K, V> {
     private static final long serialVersionUID = 1L;
 
     /**
-     * the max number of key-value mappings contained in this map.
+     * The max number of key-value mappings contained in this map.
      */
     private final int maxEntries;
 
