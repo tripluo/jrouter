@@ -17,7 +17,6 @@
 package jrouter;
 
 import java.util.Arrays;
-import junit.framework.Assert;
 import jrouter.annotation.Action;
 import jrouter.annotation.Namespace;
 import jrouter.annotation.Parameter;
@@ -28,6 +27,7 @@ import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;
 import jrouter.result.DefaultResult;
 import jrouter.result.DemoResult;
+import junit.framework.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

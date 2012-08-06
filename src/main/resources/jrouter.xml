@@ -20,7 +20,7 @@
         <property name="bytecode" value="javassist" />
     </action-factory>
 
-    <!-- scan classes, use ',' as separate -->
+    <!-- scan classes only in root configuration, use ',' as separate -->
     <component-scan package="jrouter , jrouter.impl"
                     includeExpression="**.*Action"
                     excludeExpression="**.*Result, **.*Interceptor"
@@ -44,4 +44,8 @@
     <!-- include -->
     <!-- add included files -->
 
+    <!-- aop only in root configuration, use ',' as separate -->
+    <aop-config>
+        <aop-action matches="/**" type="add-after" interceptor-stacks="empty" interceptors="" />
+    </aop-config>
 </jrouter>

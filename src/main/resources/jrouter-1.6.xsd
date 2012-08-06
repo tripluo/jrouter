@@ -195,7 +195,6 @@
         </xsd:complexType>
     </xsd:element>
 
-    <!-- TODO -->
     <!-- aop -->
     <xsd:element name="aop-config">
         <xsd:annotation>
@@ -207,53 +206,9 @@
         </xsd:annotation>
         <xsd:complexType>
             <xsd:sequence>
-                <xsd:element minOccurs="0" maxOccurs="unbounded" ref="aop-interceptor-stack"/>
+                <!--<xsd:element minOccurs="0" maxOccurs="unbounded" ref="aop-interceptor-stack"/>-->
                 <xsd:element minOccurs="0" maxOccurs="unbounded" ref="aop-action"/>
             </xsd:sequence>
-        </xsd:complexType>
-    </xsd:element>
-
-    <xsd:element name="aop-interceptor-stack">
-        <xsd:annotation>
-            <xsd:documentation>
-                <![CDATA[
-                Modify the existed InterceptorStack with specified interceptors and InterceptorStack.
-                ]]>
-            </xsd:documentation>
-        </xsd:annotation>
-        <xsd:complexType>
-            <xsd:attribute name="matches" use="required">
-                <xsd:annotation>
-                    <xsd:documentation>
-                    <![CDATA[
-                    ]]>
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="interceptors">
-                <xsd:annotation>
-                    <xsd:documentation>
-                    <![CDATA[
-                    ]]>
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="interceptor-statck">
-                <xsd:annotation>
-                    <xsd:documentation>
-                    <![CDATA[
-                    ]]>
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
-            <xsd:attribute name="type" use="required" type="aop-type">
-                <xsd:annotation>
-                    <xsd:documentation>
-                    <![CDATA[
-                    ]]>
-                    </xsd:documentation>
-                </xsd:annotation>
-            </xsd:attribute>
         </xsd:complexType>
     </xsd:element>
 
@@ -261,7 +216,7 @@
         <xsd:annotation>
             <xsd:documentation>
                 <![CDATA[
-                Modify the existed action's InterceptorStack with specified interceptors and interceptorStatck.
+                Modify the existed matching actions' interceptors with specified interceptors and interceptor-stacks.
                 ]]>
             </xsd:documentation>
         </xsd:annotation>
@@ -270,6 +225,7 @@
                 <xsd:annotation>
                     <xsd:documentation>
                     <![CDATA[
+                    The matching path of actions'.
                     ]]>
                     </xsd:documentation>
                 </xsd:annotation>
@@ -278,14 +234,16 @@
                 <xsd:annotation>
                     <xsd:documentation>
                     <![CDATA[
+                    The comma-separated list of existed interceptors' names.
                     ]]>
                     </xsd:documentation>
                 </xsd:annotation>
             </xsd:attribute>
-            <xsd:attribute name="interceptor-statck">
+            <xsd:attribute name="interceptor-stacks">
                 <xsd:annotation>
                     <xsd:documentation>
                     <![CDATA[
+                    The comma-separated list of existed interceptor-stacks' names.
                     ]]>
                     </xsd:documentation>
                 </xsd:annotation>
@@ -294,6 +252,7 @@
                 <xsd:annotation>
                     <xsd:documentation>
                     <![CDATA[
+                    Type of aop operation.
                     ]]>
                     </xsd:documentation>
                 </xsd:annotation>

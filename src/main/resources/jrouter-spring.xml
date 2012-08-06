@@ -35,6 +35,8 @@
                 extension = .
                 <!-- optional default -->
                 actionCacheNumber = 10000
+                <!-- optional default -->
+                bytecode = javassist
             </value>
         </property>
 
@@ -76,6 +78,16 @@
         <property name="actions">
             <list>
                 <!-- the value can be the class name or the ref bean: -->
+            </list>
+        </property>
+        <property name="aopActions">
+            <list>
+                <bean class="jrouter.spring.AopActionBean">
+                    <property name="matches" value="/**"/>
+                    <property name="interceptorStackNames" value="empty"/>
+                    <property name="interceptorNames" value=""/>
+                    <property name="typeName" value="add-before"/>
+                </bean>
             </list>
         </property>
     </bean>

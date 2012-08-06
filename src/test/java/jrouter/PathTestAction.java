@@ -19,6 +19,7 @@ package jrouter;
 import jrouter.annotation.Action;
 import jrouter.impl.PathTreeTest;
 import static jrouter.impl.PathTreeTest.*;
+import jrouter.interceptor.SampleInterceptor;
 
 /**
  * PathTestAction。
@@ -27,12 +28,12 @@ import static jrouter.impl.PathTreeTest.*;
  */
 public class PathTestAction {
 
-    @Action(name = "/xx/yy/zz")
+    @Action(name = "/xx/yy/zz", interceptors = {SampleInterceptor.LOGGING})
     public String test0() {
         return PATHS[0];
     }
 
-    @Action(name = "/{k1}")
+    @Action(name = "/{k1}", interceptors = {SampleInterceptor.TIMER})
     public String test1() {
         return PATHS[1];
     }

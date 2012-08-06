@@ -69,10 +69,10 @@ public class SampleInterceptor {
      */
     @Interceptor(name = LOGGING)
     public static Object logging(ActionInvocation invocation) {
-        LOG.info(invocation.getActionProxy().getPath() + " Starting at " + new Date());
+        LOG.info("Starting action [{}] at {}.", invocation.getActionProxy().getPath(), new Date());
         //invoke
         Object result = invocation.invoke();
-        LOG.info(invocation.getActionProxy().getPath() + " Finishing at " + new Date());
+        LOG.info("Finishing action [{}] at {}.", invocation.getActionProxy().getPath(), new Date());
         return result;
     }
 }

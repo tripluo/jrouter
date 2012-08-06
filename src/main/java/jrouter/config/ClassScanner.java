@@ -37,7 +37,7 @@ class ClassScanner implements Serializable {
     private static final long serialVersionUID = 1L;
 
     /**
-     * 路径匹配器。
+     * Class路径匹配器。
      */
     private AntPathMatcher matcher = new AntPathMatcher(".");
 

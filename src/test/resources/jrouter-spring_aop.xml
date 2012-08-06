@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+    <description>jrouter与springframework集成的配置文件</description>
+
+    <!-- 使用annotation 自动注册bean, 并保证@Required,@Autowired的属性被注入 -->
+    <context:component-scan base-package="jrouter" />
+
+    <!-- test spring inject -->
+    <bean id="springInject" class="java.lang.String">
+        <constructor-arg type="String" value="spring inject"/>
+    </bean>
+
+    <!-- test action -->
+    <bean id="URLTestAction2" class="jrouter.URLTestAction2" />
+    <bean id="simpleAction" class="jrouter.SimpleAction" />
+
+    <!-- JRouter ActionFactory Test -->
+    <bean id="actionFactoryTest" class="jrouter.spring.DefaultActionFactoryBean">
+        <property name="actionFactoryClass" value="jrouter.impl.DefaultActionFactory"/>
+        <property name="actionFactoryProperties">
+            <value>
+                actionInvocationClass = jrouter.impl.DefaultActionInvocation
+                defaultInterceptorStack = empty
+                defaultResultType = empty
+                pathSeparator = /
+                extension = .
+                actionCacheNumber = 100000
+                bytecode = default
+            </value>
+        </property>
+        <!-- scan classes properties -->
+        <property name="classScannerProperties">
+            <list>
+                <value>
+                    package = jrouter
+                    includeExpression = **.*Interceptor, **.*InterceptorStack
+                    excludeExpression = jrouter.result.*
+                </value>
+            </list>
+        </property>
+        <property name="resultTypes">
+            <list>
+                <value>jrouter.result.DefaultResult</value>
+            </list>
+        </property>
+
+        <property name="actions">
+            <list>
+                <value>jrouter.PathTestAction</value>
+                <ref bean="simpleAction"/>
+            </list>
+        </property>
+
+        <property name="aopActions">
+            <list>
+                <bean class="jrouter.spring.AopActionBean">
+                    <property name="matches" value="/**"/>
+                    <property name="typeName" value="override"/>
+                </bean>
+                <bean class="jrouter.spring.AopActionBean">
+                    <property name="matches" value="/test/**"/>
+                    <property name="interceptorStackNames" value="demo"/>
+                    <property name="interceptorNames" value="springInject"/>
+                    <property name="typeName" value="add-after"/>
+                </bean>
+                <bean class="jrouter.spring.AopActionBean">
+                    <property name="matches" value="/test/param"/>
+                    <property name="interceptorNames" value="timer,timer,springInject"/>
+                    <property name="typeName" value="add-before"/>
+                </bean>
+            </list>
+        </property>
+
+    </bean>
+</beans>

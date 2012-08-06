@@ -22,6 +22,7 @@ import java.util.Properties;
 import jrouter.ActionFactory;
 import jrouter.JRouterException;
 import jrouter.ObjectFactory;
+import jrouter.config.AopAction;
 import jrouter.config.Configuration;
 import jrouter.util.ClassUtil;
 import jrouter.util.CollectionUtil;
@@ -82,6 +83,9 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
 
     /** 扫描类工具的顺序配置 */
     private List<Properties> classScannerProperties;
+
+    /** actions' aop */
+    private List<? extends AopAction> aopActions;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -105,9 +109,10 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
             configuration.load(configLocation.getURL());
         }
 
-        if (actionFactoryClass != null)
+        if (actionFactoryClass != null) {
+            LOG.debug("Set actionFactoryClass : " + actionFactoryClass);
             configuration.setActionFactoryClass(actionFactoryClass);
-
+        }
         configuration.addActionFactoryProperties((Map) actionFactoryProperties);
 
         //添加扫描工具属性
@@ -132,6 +137,10 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
         //TODO
         //configuration.setPathProperties(null);
 
+        //actions' aop
+        if (CollectionUtil.isNotEmpty(aopActions)) {
+            configuration.addAopActions(aopActions);
+        }
         return configuration.buildActionFactory();
     }
 
@@ -338,5 +347,14 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      */
     public void setClassScannerProperties(List<Properties> classScannerProperties) {
         this.classScannerProperties = classScannerProperties;
+    }
+
+    /**
+     * 设置Action的aop。
+     *
+     * @param aopActions Actions' Aop。
+     */
+    public void setAopActions(List<? extends AopAction> aopActions) {
+        this.aopActions = aopActions;
     }
 }

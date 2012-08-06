@@ -248,17 +248,13 @@ public class DefaultActionFactory implements ActionFactory {
      */
     private void setDefaultProxyFactory() {
         if (proxyFactory == null) {
-            boolean hasJavassist = false;
             try {
                 //check javassist jar
                 ClassUtil.loadClass("javassist.ClassPool");
-                hasJavassist = true;
-            } catch (ClassNotFoundException ex) {
-                LOG.info("No proxyFactory setting and no javassist jar found, use java reflect as default");
-            }
-            if (hasJavassist) {
                 proxyFactory = new JavassistProxyFactory();
                 LOG.info("No proxyFactory setting, use javassist as default : " + proxyFactory);
+            } catch (ClassNotFoundException ex) {
+                LOG.info("No proxyFactory setting and no javassist jar found, use java reflect as default");
             }
         }
     }
@@ -390,6 +386,7 @@ public class DefaultActionFactory implements ActionFactory {
         } else {
             //initiate matchParameters
             matchParameters = new HashMap<String, String>(2);
+            //get Action and fill matchParameters
             ap = actions.get(path, matchParameters);
 
             if (ap == null)

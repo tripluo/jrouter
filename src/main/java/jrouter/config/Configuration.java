@@ -25,8 +25,12 @@ import java.net.URL;
 import java.util.*;
 import javax.xml.parsers.DocumentBuilderFactory;
 import jrouter.ActionFactory;
+import jrouter.config.AopAction.Type;
 import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.DefaultActionProxy;
 import jrouter.impl.Injector;
+import jrouter.impl.InterceptorProxy;
+import jrouter.util.AntPathMatcher;
 import jrouter.util.ClassUtil;
 import jrouter.util.CollectionUtil;
 import jrouter.util.StringUtil;
@@ -130,82 +134,74 @@ public class Configuration implements Serializable {
 
     /** 配置文件中表示排除表达式的标签属性 */
     public static final String EXCLUDE_EXPRESSION = "excludeExpression";
+
+    /** 配置文件中表示aop配置的标签名 */
+    public static final String AOP_CONFIG = "aop-config";
+
+    /** 配置文件中表示针对action的aop配置标签属性 */
+    public static final String AOP_ACTION = "aop-action";
+
+    /** 配置文件中表示路径匹配的标签属性 */
+    public static final String MATCHES = "matches";
+
+    /** 配置文件中表示类型的标签属性 */
+    public static final String TYPE = "type";
+
+    /** 配置文件中表示拦截栈集合的标签属性 */
+    public static final String INTERCEPTOR_STACKS = "interceptor-stacks";
+
+    /** 配置文件中表示拦截器集合的标签属性 */
+    public static final String INTERCEPTORS = "interceptors";
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /*
-     * ActionFactory的类型，默热为DefaultActionFactory类型
-     */
+    /* ActionFactory的类型，默热为DefaultActionFactory类型 */
     private Class<? extends ActionFactory> actionFactoryClass = DefaultActionFactory.class;
 
-    /**
-     * ActionFactory的属性
-     */
+    /** ActionFactory的属性 */
     private Map<String, Object> actionFactoryProperties;
 
-    /**
-     * 组件扫描。
-     */
+    /** 组件扫描 */
     private List<ClassScanner> classScanners;
 
-    /**
-     * interceptors' class or object
-     */
+    /** interceptors' class or object */
     private Set<Object> interceptors;
 
-    /**
-     * interceptors' properties
-     */
+    /** interceptors' properties */
     private Map<Class<?>, Map<String, Object>> interceptorProperties;
 
-    /**
-     * interceptorStacks' class or object
-     */
+    /** interceptorStacks' class or object */
     private Set<Object> interceptorStacks;
 
-    /**
-     * interceptorStacks' properties
-     */
+    /** interceptorStacks' properties */
     private Map<Class<?>, Map<String, Object>> interceptorStackProperties;
 
-    /**
-     * resultTypes' class or object
-     */
+    /** resultTypes' class or object */
     private Set<Object> resultTypes;
 
-    /**
-     * resultTypes' properties
-     */
+    /** resultTypes' properties */
     private Map<Class<?>, Map<String, Object>> resultTypeProperties;
 
-    /**
-     * results' class or object
-     */
+    /** results' class or object */
     private Set<Object> results;
 
-    /**
-     * results' properties
-     */
+    /** results' properties */
     private Map<Class<?>, Map<String, Object>> resultProperties;
 
-    /**
-     * actions' class or object
-     */
+    /** actions' class or object */
     private Set<Object> actions;
 
-    /**
-     * actions' properties
-     */
+    /** actions' properties */
     private Map<Class<?>, Map<String, Object>> actionProperties;
 
-    /**
-     * path - action class map
-     */
+    /** path - action class map */
     private Map<String, Class<?>> pathActions;
 
-    /**
-     * path actions' properties
-     */
+    /** path actions' properties */
     private Map<String, Map<String, Object>> pathProperties;
+
+    /** actions' aop */
+    private List<AopAction> aopActions;
 
     /**
      * Constructor with initialization.
@@ -232,6 +228,7 @@ public class Configuration implements Serializable {
         pathActions = new LinkedHashMap<String, Class<?>>();
         pathProperties = new LinkedHashMap<String, Map<String, Object>>();
         classScanners = new ArrayList<ClassScanner>();
+        aopActions = new ArrayList<AopAction>();
     }
 
     /**
@@ -338,9 +335,6 @@ public class Configuration implements Serializable {
             System.out.println("--------------------------------------------------------------------------------");
     }
 
-//    public Configuration load(InputStream stream) throws ConfigurationException {
-//        return load(stream, "root");
-//    }
     /**
      * 从指定的InputStream对象中加载配置。
      *
@@ -374,7 +368,7 @@ public class Configuration implements Serializable {
                 //parse ActionFactory's properties
                 actionFactoryProperties = parseProperties(actionFactoryClass, list);
             } else if (length > 1) {
-                throw new ConfigurationException("More than one <" + ACTION_FACTORY + "> tag in setting.", null);
+                throw new ConfigurationException("More than one <" + ACTION_FACTORY + "> tag in : " + resourceName, null);
             }
 
             //parse "<component-scan>"
@@ -393,6 +387,10 @@ public class Configuration implements Serializable {
                 //add included files, use a hash set to avoid circular reference
                 parseInclude(resourceName, e.getAttribute(FILE), record);
             }
+
+            //parse "<aop-config>"
+            parseAop(root);
+
         } catch (ConfigurationException e) {
             throw e;
         } catch (Exception e) {
@@ -622,7 +620,7 @@ public class Configuration implements Serializable {
             String pkg = e.getAttribute(PACKAGE);
             String include = e.getAttribute(INCLUDE_EXPRESSION);
             String exclude = e.getAttribute(EXCLUDE_EXPRESSION);
-            LOG.info("Parse scan components package : [{}], includeExpression : [{}], excludeExpression : [{}]",
+            LOG.info("Parse <component-scan> : [package = {}, includeExpression = {}, excludeExpression = {}]",
                     new String[]{pkg, include, exclude});
             Map<String, String> props = new HashMap<String, String>(4);
             if (StringUtil.isNotBlank(pkg)) {
@@ -676,6 +674,42 @@ public class Configuration implements Serializable {
             }
         }
         return scanner;
+    }
+
+    /**
+     * 解析"<aop-config>"并添加aop属性。
+     *
+     * @param root 文档根节点。
+     */
+    private void parseAop(Element root) {
+        List<Element> aops = getChildNodesByTagName(root, AOP_CONFIG);
+        printSeparator(!aops.isEmpty());
+        char[] sep = {',', ';'};
+        for (Element aop : aops) {
+            List<Element> aas = getChildNodesByTagName(aop, AOP_ACTION);
+            for (Element e : aas) {
+                String matches = e.getAttribute(MATCHES);
+                String type = e.getAttribute(TYPE);
+                String stacks = e.getAttribute(INTERCEPTOR_STACKS);
+                String interceptors = e.getAttribute(INTERCEPTORS);
+                LOG.info("Parse <aop-action> : [matches = {}, type = {}, interceptor-stacks = {}, interceptors = {}]",
+                        new String[]{matches, type, stacks, interceptors});
+                AopAction aopAction = new AopAction();
+                aopAction.setMatches(matches);
+                aopAction.setType(Type.parseCode(type));
+                if (StringUtil.isNotBlank(stacks)) {
+                    List<String> list = new ArrayList<String>(4);
+                    CollectionUtil.stringToCollection(stacks, list, sep);
+                    aopAction.setInterceptorStacks(list);
+                }
+                if (StringUtil.isNotBlank(interceptors)) {
+                    List<String> list = new ArrayList<String>(4);
+                    CollectionUtil.stringToCollection(interceptors, list, sep);
+                    aopAction.setInterceptors(list);
+                }
+                aopActions.add(aopAction);
+            }
+        }
     }
 
     /**
@@ -914,7 +948,67 @@ public class Configuration implements Serializable {
                     Injector.putActionProperties(pathActionClass, pathName, allProps);
                 }
 
-                //aop TODO
+                //actions' aop
+                if (!aopActions.isEmpty()) {
+                    LOG.info("Starting Aop Action");
+                    AntPathMatcher matcher = new AntPathMatcher(defaultFactory.getPathSeparator() + "");
+                    //已经匹配的路径
+                    Set<String> existMatchPaths = new HashSet<String>();
+                    //倒序，最后匹配的路径优先
+                    for (int i = aopActions.size() - 1; i > -1; i--) {
+                        in:
+                        for (Map.Entry<String, DefaultActionProxy> e : defaultFactory.getActions().entrySet()) {
+                            AopAction aa = aopActions.get(i);
+                            String path = e.getKey();
+                            if (matcher.match(aa.getMatches(), path)) {
+                                if (existMatchPaths.contains(path))
+                                    continue in;
+                                existMatchPaths.add(path);
+                                //exist can't be null by DefaultActionFactory
+                                List<InterceptorProxy> exist = e.getValue().getInterceptorProxies();
+                                List<InterceptorProxy> news = new ArrayList<InterceptorProxy>();
+                                //TODO
+                                if (CollectionUtil.isNotEmpty(aa.getInterceptorStacks())) {
+                                    for (String stackName : aa.getInterceptorStacks()) {
+                                        if (defaultFactory.getInterceptorStacks().containsKey(stackName)) {
+                                            news.addAll(defaultFactory.getInterceptorStacks().get(stackName).getInterceptors());
+                                        } else {
+                                            LOG.warn("Can't find InterceptorStack [{}]", stackName);
+                                        }
+                                    }
+                                }
+                                if (CollectionUtil.isNotEmpty(aa.getInterceptors())) {
+                                    for (String interceptorName : aa.getInterceptors()) {
+                                        if (defaultFactory.getInterceptors().containsKey(interceptorName)) {
+                                            news.add(defaultFactory.getInterceptors().get(interceptorName));
+                                        } else {
+                                            LOG.warn("Can't find Interceptor [{}]", interceptorName);
+                                        }
+                                    }
+                                }
+                                String existName = interceptorsToString(exist);
+                                switch (aa.getType()) {
+                                    case ADD_BEFORE: {
+                                        exist.addAll(0, news);
+                                        break;
+                                    }
+                                    case ADD_AFTER: {
+                                        exist.addAll(news);
+                                        break;
+                                    }
+                                    case OVERRIDE: {
+                                        exist.clear();
+                                        exist.addAll(news);
+                                        break;
+                                    }
+                                }
+                                LOG.info("Aop Action [{}] interceptors {} -> {}, matches {}",
+                                        new String[]{path, existName, interceptorsToString(exist), aa.toString()});
+                            }
+                        }
+                    }
+                }
+
             }
         } catch (ConfigurationException e) {
             throw e;
@@ -984,6 +1078,29 @@ public class Configuration implements Serializable {
     @Deprecated
     public <T extends ActionFactory<?>> T getFactory() {
         return buildActionFactory();
+    }
+
+    /**
+     * 拦截器集合字符串显示名称。
+     *
+     * @param interceptors 拦截器集合。
+     *
+     * @return 显示名称。
+     */
+    private String interceptorsToString(List<InterceptorProxy> interceptors) {
+        if (interceptors == null)
+            return "null";
+        int iMax = interceptors.size() - 1;
+        if (iMax == -1)
+            return "[]";
+        StringBuilder msg = new StringBuilder();
+        msg.append('[');
+        for (int i = 0;; i++) {
+            msg.append(interceptors.get(i).getName());
+            if (i == iMax)
+                return msg.append(']').toString();
+            msg.append(", ");
+        }
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -1099,6 +1216,18 @@ public class Configuration implements Serializable {
         for (Map<String, String> props : scannerProperties) {
             classScanners.add(parseClassScanner(props));
         }
+        return this;
+    }
+
+    /**
+     * 添加Action Aop。
+     *
+     * @param aopActions Action Aop。
+     *
+     * @return 此配置对象的引用。
+     */
+    public Configuration addAopActions(Collection<? extends AopAction> aopActions) {
+        this.aopActions.addAll(aopActions);
         return this;
     }
 }

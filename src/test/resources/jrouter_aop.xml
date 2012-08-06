@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="../../main/resources/jrouter-1.6.xsd">
+
+    <action-factory class="jrouter.impl.DefaultActionFactory" >
+        <property name="defaultInterceptorStack" value="empty" />
+        <property name="defaultResultType" value="empty" />
+        <property name="extension" value="." />
+        <property name="actionCacheNumber" value="100000" />
+    </action-factory>
+
+    <!-- result -->
+    <result-type class="jrouter.result.DefaultResult" />
+
+    <!-- demo intercepror -->
+    <interceptor class="jrouter.interceptor.DemoInterceptor">
+        <property name="value" value="demo interceptor" />
+        <property name="number" value="10000" />
+        <property name="null" value="not supported" />
+    </interceptor>
+
+    <!-- demo result-type -->
+    <result-type class="jrouter.result.DemoResult">
+        <property name="value" value="demo result" />
+        <property name="null" value="not supported" />
+    </result-type>
+
+    <!-- demo result -->
+    <result class="jrouter.result.DemoResult" />
+
+    <!-- demo action -->
+    <action class="jrouter.SimpleAction">
+        <property name="string" value="admin" />
+        <property name="number" value="300" />
+        <property name="number" value="200" />
+        <property name="number" value="100" />
+        <property name="null" value="not supported" />
+
+        <path name="/test/inject2">
+            <property name="number" value="200" />
+        </path>
+    </action>
+
+    <!-- scan classes, use ',' as separate -->
+    <component-scan package="jrouter"
+                    excludeExpression="jrouter.result.*"/>
+
+    <!-- aop -->
+    <aop-config>
+        <aop-action matches="/**" type="override" interceptor-stacks="" interceptors="" />
+        <aop-action matches="/test/**" type="add-after" interceptor-stacks="demo" interceptors="springInject" />
+        <aop-action matches="/test/param" type="add-before" interceptors="timer,timer,springInject" />
+    </aop-config>
+</jrouter>

@@ -3,9 +3,16 @@ JROUTER CHANGELOG
 ==========================
 http://code.google.com/p/jrouter
 
-TODO
-* aop : interceptors --> actions
-* aop-type : add-before, add-after, override
+
+Changes in version 1.6.1 (2012-08-06)
+---------------------------------------
+* 新增AopAction类，对应"aop-action"标签属性。
+* Configuration类增加parseAop方法，实现对"aop-action"标签的解析。
+* 新增AopActionBean类，并于DefaultActionFactoryBean中添加对AopAction的属性配置。
+* jrouter-1.6.xsd中去除"aop-interceptor-stack"标签。
+* 新增对"aop-action"的测试用例。
+* 更新依赖包slf4j至 1.6.6.
+* 更新依赖包logback至 1.0.6.
 
 
 Changes in version 1.6.0 (2012-05-02)

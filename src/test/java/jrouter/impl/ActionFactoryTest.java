@@ -19,17 +19,17 @@ package jrouter.impl;
 import java.util.HashMap;
 import java.util.Map;
 import jrouter.ActionProxy;
-import org.junit.After;
 import jrouter.JRouterException;
 import jrouter.SimpleAction;
 import jrouter.config.Configuration;
-import jrouter.result.DefaultResult;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.SampleInterceptor;
+import jrouter.result.DefaultResult;
 import jrouter.result.DemoResult;
+import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * ActionFactoryTest对应SimpleAction的测试。
