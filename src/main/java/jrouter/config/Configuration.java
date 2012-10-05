@@ -621,7 +621,7 @@ public class Configuration implements Serializable {
             String include = e.getAttribute(INCLUDE_EXPRESSION);
             String exclude = e.getAttribute(EXCLUDE_EXPRESSION);
             LOG.info("Parse <component-scan> : [package = {}, includeExpression = {}, excludeExpression = {}]",
-                    new String[]{pkg, include, exclude});
+                    pkg, include, exclude);
             Map<String, String> props = new HashMap<String, String>(4);
             if (StringUtil.isNotBlank(pkg)) {
                 props.put(PACKAGE, pkg);
@@ -693,7 +693,7 @@ public class Configuration implements Serializable {
                 String stacks = e.getAttribute(INTERCEPTOR_STACKS);
                 String interceptors = e.getAttribute(INTERCEPTORS);
                 LOG.info("Parse <aop-action> : [matches = {}, type = {}, interceptor-stacks = {}, interceptors = {}]",
-                        new String[]{matches, type, stacks, interceptors});
+                        matches, type, stacks, interceptors);
                 AopAction aopAction = new AopAction();
                 aopAction.setMatches(matches);
                 aopAction.setType(Type.parseCode(type));
@@ -1003,7 +1003,7 @@ public class Configuration implements Serializable {
                                     }
                                 }
                                 LOG.info("Aop Action [{}] interceptors {} -> {}, matches {}",
-                                        new String[]{path, existName, interceptorsToString(exist), aa.toString()});
+                                        path, existName, interceptorsToString(exist), aa.toString());
                             }
                         }
                     }

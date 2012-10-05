@@ -16,6 +16,7 @@
  */
 package jrouter.impl;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -24,8 +25,7 @@ import java.util.*;
 import jrouter.*;
 import jrouter.annotation.*;
 import jrouter.bytecode.javassist.JavassistProxyFactory;
-import jrouter.util.ClassUtil;
-import jrouter.util.StringUtil;
+import jrouter.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,7 +135,7 @@ public class DefaultActionFactory implements ActionFactory {
         interceptors = new HashMap<String, InterceptorProxy>();
         interceptorStacks = new HashMap<String, InterceptorStackProxy>();
         actions = new PathTreeMap<DefaultActionProxy>(pathSeparator);
-        actionCache = java.util.Collections.synchronizedMap(new jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber));
+        actionCache = Collections.synchronizedMap(new jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber));
         resultTypes = new HashMap<String, ResultTypeProxy>();
         results = new HashMap<String, ResultProxy>();
 
@@ -356,7 +356,7 @@ public class DefaultActionFactory implements ActionFactory {
             throw e.getSourceInvocationException();
         }
         LOG.debug("Finish invoking Action [{}]; Parameters {}; Final result : [{}]",
-                new String[]{path, java.util.Arrays.toString(params), String.valueOf(res)});
+                path, java.util.Arrays.toString(params), String.valueOf(res));
         return res;
     }
 
@@ -393,7 +393,7 @@ public class DefaultActionFactory implements ActionFactory {
                 throw new JRouterException("No such Action : " + path);
 
             //put in cache
-            ace = new ActionCacheEntry(ap, matchParameters);
+            ace = new ActionCacheEntry(ap, Collections.unmodifiableMap(matchParameters));
             putActionCache(path, ace);
         }
 
@@ -636,6 +636,10 @@ public class DefaultActionFactory implements ActionFactory {
             //带@Interceptor的public/protected方法
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(Interceptor.class)) {
+                if (m.isAnnotationPresent(Ignore.class)) {
+                    LOG.info("Ignore Interceptor : " + MethodUtil.getMethod(m));
+                    continue;
+                }
                 m.setAccessible(true);
                 //static method
                 if (Modifier.isStatic(mod)) {
@@ -747,6 +751,10 @@ public class DefaultActionFactory implements ActionFactory {
             //带@ResultType的public/protected方法
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(ResultType.class)) {
+                if (m.isAnnotationPresent(Ignore.class)) {
+                    LOG.info("Ignore ResultType : " + MethodUtil.getMethod(m));
+                    continue;
+                }
                 m.setAccessible(true);
                 //static method
                 if (Modifier.isStatic(mod)) {
@@ -800,6 +808,10 @@ public class DefaultActionFactory implements ActionFactory {
             //带@Result的public/protected方法
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(Result.class)) {
+                if (m.isAnnotationPresent(Ignore.class)) {
+                    LOG.info("Ignore Result : " + MethodUtil.getMethod(m));
+                    continue;
+                }
                 m.setAccessible(true);
                 //static method
                 if (Modifier.isStatic(mod)) {
@@ -844,7 +856,7 @@ public class DefaultActionFactory implements ActionFactory {
             } //原有路径模糊匹配，继续添加新路径
             else {
                 LOG.warn("Exist matched path [{}] : {}, add [{}] : {}",
-                        new String[]{exist.getPath(), exist.getMethod(), aPath, ap.getMethod()});
+                        exist.getPath(), exist.getMethod(), aPath, ap.getMethod());
             }
 
         } else {
@@ -862,32 +874,57 @@ public class DefaultActionFactory implements ActionFactory {
     public void addActions(Object obj) {
         //判断传入参数为类或实例对象
         boolean isCls = obj instanceof Class;
-        Class cls = isCls ? (Class) obj : obj.getClass();
+        Class<?> cls = isCls ? (Class) obj : obj.getClass();
         Object invoker = isCls ? null : obj;
+
+        //declared methods
         Method[] ms = cls.getDeclaredMethods();
-        for (Method m : ms) {
-            int mod = m.getModifiers();
-            //带@Action的public/protected方法
-            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
-                    && m.isAnnotationPresent(Action.class)) {
-                m.setAccessible(true);
-                try {
-                    //static method
-                    if (Modifier.isStatic(mod)) {
-                        addAction(createActionProxy(m, null));
-                    } else {
-                        if (isCls && invoker == null) {
-                            invoker = objectFactory.newInstance(cls);
-                        }
-                        //the same object
-                        addAction(createActionProxy(m, invoker));
-                    }
-                } catch (IllegalAccessException e) {
-                    throw new JRouterException(e);
-                } catch (InvocationTargetException e) {
-                    throw new JRouterException(e);
+        List<Method> methods = new ArrayList<Method>(ms.length);
+        Namespace ns = cls.getAnnotation(Namespace.class);
+        if (ns != null && ns.autoIncluded()) {
+            for (Method m : ms) {
+                int mod = m.getModifiers();
+                //全部public/protected方法
+                if (Modifier.isPublic(mod) || Modifier.isProtected(mod)) {
+                    methods.add(m);
                 }
             }
+        } //no @Namespace
+        else {
+            for (Method m : ms) {
+                //指定带@Action方法
+                if (m.isAnnotationPresent(Action.class))
+                    methods.add(m);
+            }
+        }
+
+        for (Method m : methods) {
+            int mod = m.getModifiers();
+            //带@Action的public/protected方法
+//            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
+//                    && m.isAnnotationPresent(Action.class)) {
+            if (m.isAnnotationPresent(Ignore.class)) {
+                LOG.info("Ignore Action : " + MethodUtil.getMethod(m));
+                continue;
+            }
+            m.setAccessible(true);
+            try {
+                //static method
+                if (Modifier.isStatic(mod)) {
+                    addAction(createActionProxy(m, null));
+                } else {
+                    if (isCls && invoker == null) {
+                        invoker = objectFactory.newInstance(cls);
+                    }
+                    //the same object
+                    addAction(createActionProxy(m, invoker));
+                }
+            } catch (IllegalAccessException e) {
+                throw new JRouterException(e);
+            } catch (InvocationTargetException e) {
+                throw new JRouterException(e);
+            }
+//            }
         }
     }
 
@@ -1044,7 +1081,11 @@ public class DefaultActionFactory implements ActionFactory {
         String path = null;
         //not nullable Action
         Action action = method.getAnnotation(Action.class);
-        //Action名称可能为空字符串
+        //如果Action为null
+        if (action == null) {
+            action = EMPTY_ACTION;
+        }
+        //Action名称为空字符串
         String aname = action.name().trim();
         if ("".equals(aname)) {
             //Action名称为空字符串时取其方法的名称（区分大小写）
@@ -1142,14 +1183,14 @@ public class DefaultActionFactory implements ActionFactory {
         for (Parameter p : ps) {
             params.put(p.name(), p.value());
         }
-        ap.setActionParameters(params);
+        ap.setActionParameters(Collections.unmodifiableMap(params));
         //set results
         Result[] rs = action.results();
         Map<String, Result> res = new HashMap<String, Result>(rs.length);
         for (Result r : rs) {
             res.put(r.name(), r);
         }
-        ap.setResults(res);
+        ap.setResults(Collections.unmodifiableMap(res));
 
         return ap;
     }
@@ -1317,4 +1358,44 @@ public class DefaultActionFactory implements ActionFactory {
             this.matchParameters = matchParameters;
         }
     }
+    /**
+     * 默认空Action的实现。
+     */
+    private static final Action EMPTY_ACTION = new Action() {
+        @Override
+        public String name() {
+            return "";
+        }
+
+        @Override
+        public String interceptorStack() {
+            return "";
+        }
+
+        @Override
+        public String[] interceptors() {
+            return CollectionUtil.EMPTY_STRING_ARRAY;
+        }
+
+        @Override
+        public Result[] results() {
+            return new Result[0];
+        }
+
+        @Override
+        public Scope scope() {
+            return Scope.SINGLETON;
+        }
+
+        @Override
+        public Parameter[] parameters() {
+            return new Parameter[0];
+        }
+
+        @Override
+        public Class<? extends Annotation> annotationType() {
+            return Action.class;
+        }
+    };
+
 }

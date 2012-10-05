@@ -82,9 +82,8 @@ public class DefaultActionInvocation implements ActionInvocation {
         if (params == null || params.length == 0)
             params = this.params;
         setExecuted(true);
-        LOG.debug("Invoke Action [{}]; Parameters {} at : {}", new String[]{
-                    actionProxy.getPath(), java.util.Arrays.toString(params), actionProxy.getMethod()
-                });
+        LOG.debug("Invoke Action [{}]; Parameters {} at : {}",
+                actionProxy.getPath(), java.util.Arrays.toString(params), actionProxy.getMethod());
         //set invokeResult
         invokeResult = actionProxy.invoke(params);
         return invokeResult;

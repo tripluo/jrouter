@@ -18,6 +18,7 @@ package jrouter;
 
 import java.util.Arrays;
 import jrouter.annotation.Action;
+import jrouter.annotation.Ignore;
 import jrouter.annotation.Namespace;
 import jrouter.annotation.Parameter;
 import jrouter.annotation.Result;
@@ -38,7 +39,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see jrouter.impl.ActionFactoryTest
  * @see jrouter.spring.SpringObjectFactoryTest
  */
-@Namespace(name = "/test")
+@Namespace(name = "/test", autoIncluded = true)
 public class SimpleAction {
 
     /**
@@ -206,8 +207,27 @@ public class SimpleAction {
     }
 
     /**
+     * 测试autoIncluded。
+     *
+     * @see Namespace#autoIncluded()
+     */
+    public int autoIncluded() {
+        return 1;
+    }
+
+    /**
+     * 测试@Ignore。
+     */
+    @Action
+    @Ignore
+    public String ignore() {
+        return "ignore";
+    }
+
+    /**
      * 注入属性。
      */
+    @Ignore
     public void setNumber(int number) {
         LOG.info("Set number \"{}\" in {}", number, this);
         this.number = number;
@@ -216,6 +236,7 @@ public class SimpleAction {
     /**
      * 注入属性。
      */
+    @Ignore
     public void setString(String string) {
         LOG.info("Set string \"{}\" in {}", string, this);
         this.string = string;

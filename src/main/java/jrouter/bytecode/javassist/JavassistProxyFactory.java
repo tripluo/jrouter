@@ -1,4 +1,3 @@
-
 /*
  * Copyright (C) 2010-2111 sunjumper@163.com
  *
@@ -97,7 +96,6 @@ public class JavassistProxyFactory implements ProxyFactory {
             clazz.setSuperclass(classPool.getCtClass(JavassistProxy.class.getName()));
             //invoke method
             clazz.addMethod(createInovkeMethod(clazz, method));
-
         } finally {
             classPool.removeClassPath(classPath);
             classPool.clearImportedPackages();
@@ -121,16 +119,13 @@ public class JavassistProxyFactory implements ProxyFactory {
     private CtMethod createInovkeMethod(CtClass clazz, Method method) throws CannotCompileException {
         StringBuilder body = new StringBuilder("public Object invoke(Method m, Object obj, Object[] params){");
         Class<?> targetClass = method.getDeclaringClass();
-        body.append("Object res = null;");
         boolean voidMethod = void.class == method.getReturnType();
+        if (!voidMethod)
+            body.append("return ($w)");
         //static method needs to import class package to invoke by simple class name
         if (Modifier.isStatic(method.getModifiers())) {
-            if (!voidMethod)
-                body.append("res=");
             body.append(targetClass.getName());
         } else {
-            if (!voidMethod)
-                body.append("res=");
             body.append("((").append(targetClass.getName()).append(")obj)");
         }
         //invoke begin
@@ -149,7 +144,7 @@ public class JavassistProxyFactory implements ProxyFactory {
             body.append(")");
         }
         body.append(";");
-        body.append("return res;}");
+        body.append(voidMethod ? "return null;}" : "}");
         return CtNewMethod.make(body.toString(), clazz);
     }
 
@@ -162,7 +157,7 @@ public class JavassistProxyFactory implements ProxyFactory {
      * @return 转换后的名称。
      */
     private String getClassName(Class<?> clazz, String parameter) {
-        return clazz.isPrimitive()
+        return void.class != clazz && clazz.isPrimitive()
                 ? (clazz == boolean.class
                 ? "((Boolean)" + parameter + ").booleanValue()"
                 : "((Number)" + parameter + ")." + clazz.getCanonicalName() + "Value()")

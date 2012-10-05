@@ -60,4 +60,9 @@ public @interface Namespace {
      * @see jrouter.interceptor.DefaultInterceptorStack#EMPTY_INTERCEPTOR_STACK
      */
     String[] interceptors() default {};
+
+    /**
+     * 是否自动加载public/protected方法，默认不自动加载。
+     */
+    boolean autoIncluded() default false;
 }

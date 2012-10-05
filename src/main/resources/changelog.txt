@@ -4,6 +4,15 @@ JROUTER CHANGELOG
 http://code.google.com/p/jrouter
 
 
+Changes in version 1.6.2 (2012-10-05)
+---------------------------------------
+* 新增@Ignore，略过所注解方法不做处理。
+* @Namespace新增autoIncluded属性。标识是否自动加载public/protected方法，默认不自动加载。
+* 修正JavassistProxyFactory类创建代理类方法的返回值处理。
+* 更新依赖包slf4j至 1.7.1.
+* 更新依赖包logback至 1.0.7.
+
+
 Changes in version 1.6.1 (2012-08-06)
 ---------------------------------------
 * 新增AopAction类，对应"aop-action"标签属性。

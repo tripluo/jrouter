@@ -351,4 +351,27 @@ public class ActionFactoryTest {
         assertEquals("value3", ap.getActionParameter("test3"));
         assertArrayEquals(new String[]{"value3", "value33"}, ap.getActionParameterValues("test3"));
     }
+
+    /**
+     * 测试@Ignore。
+     */
+    @Test
+    public void test_ignore() {
+        String ignore = "test/ignore";
+        ActionProxy ap = factory.getActions().get(ignore);
+        assertNull(ap);
+    }
+
+    /**
+     * 测试@Namespace的autoIncluded属性。
+     *
+     * @see Namespace#autoIncluded()
+     */
+    @Test
+    public void test_autoIncluded() {
+        String included = "test/autoIncluded";
+        ActionProxy ap = factory.getActions().get(included);
+        assertNotNull(ap);
+        assertEquals(1, factory.invokeAction(included));
+    }
 }
