@@ -5,7 +5,7 @@
     <groupId>jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.3-SNAPSHOT</version>
+    <version>1.6.3</version>
     <name>JRouter</name>
     <url>http://code.google.com/p/jrouter/</url>
     <repositories>
