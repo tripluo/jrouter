@@ -5,7 +5,7 @@
     <groupId>jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.2</version>
+    <version>1.6.3-SNAPSHOT</version>
     <name>JRouter</name>
     <url>http://code.google.com/p/jrouter/</url>
     <repositories>
@@ -21,13 +21,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.1</version>
+            <version>1.7.2</version>
         </dependency>
         <!-- logback -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.7</version>
+            <version>1.0.9</version>
             <optional>true</optional>
         </dependency>
 
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.1</version>
+            <version>1.7.2</version>
             <optional>true</optional>
         </dependency>
 
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.16.1-GA</version>
+            <version>3.17.1-GA</version>
             <optional>true</optional>
         </dependency>
 
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.10</version>
+            <version>4.11</version>
             <scope>test</scope>
         </dependency>
         <!-- spring test -->
@@ -80,7 +80,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.0</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -112,7 +112,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>2.2</version>
+                <version>2.2.1</version>
                 <configuration>
                     <excludes>
                         <!--  排除logback.xml -->
@@ -124,7 +124,7 @@
     </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.1.2.RELEASE</spring.version>
+        <spring.version>3.2.1.RELEASE</spring.version>
     </properties>
     <licenses>
         <license>

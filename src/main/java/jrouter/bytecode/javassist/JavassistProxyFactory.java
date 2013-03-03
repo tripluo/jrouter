@@ -61,7 +61,7 @@ public class JavassistProxyFactory implements ProxyFactory {
             LOG.warn("Only public method can be proxied, no proxy at : " + MethodUtil.getFullMethod(method));
             return null;
         }
-        Class srcClass = method.getDeclaringClass();
+        Class<?> srcClass = method.getDeclaringClass();
         try {
             LOG.debug("Create JavassistProxy at : " + MethodUtil.getMethod(method));
             JavassistProxy proxy = (JavassistProxy) (createProxyClass(method).

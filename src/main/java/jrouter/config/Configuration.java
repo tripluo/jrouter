@@ -372,7 +372,7 @@ public class Configuration implements Serializable {
             }
 
             //parse "<component-scan>"
-            parseScanComponents(root);
+            parseScanComponentClasses(root);
 
             printSeparator(!list.isEmpty());
 
@@ -494,7 +494,7 @@ public class Configuration implements Serializable {
         //interceptor
         list = getChildNodesByTagName(root, INTERCEPTOR);
         for (Element e : list) {
-            Class cls = ClassUtil.loadClass(e.getAttribute(CLASS));
+            Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load Interceptor class : {}", cls);
             //add interceptors
             if (!interceptors.add(cls)) {
@@ -511,7 +511,7 @@ public class Configuration implements Serializable {
         //interceptor-stack
         list = getChildNodesByTagName(root, INTERCEPTOR_STACK);
         for (Element e : list) {
-            Class cls = ClassUtil.loadClass(e.getAttribute(CLASS));
+            Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load InterceptorStack class : {}", cls);
             //add interceptor stacks
             if (!interceptorStacks.add(cls)) {
@@ -529,7 +529,7 @@ public class Configuration implements Serializable {
         //result-type
         list = getChildNodesByTagName(root, RESULT_TYPE);
         for (Element e : list) {
-            Class cls = ClassUtil.loadClass(e.getAttribute(CLASS));
+            Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load ResultType class : {}", cls);
             //add result types
             if (!resultTypes.add(cls)) {
@@ -546,7 +546,7 @@ public class Configuration implements Serializable {
         //result
         list = getChildNodesByTagName(root, RESULT);
         for (Element e : list) {
-            Class cls = ClassUtil.loadClass(e.getAttribute(CLASS));
+            Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load Result class : {}", cls);
             //add results
             if (!results.add(cls)) {
@@ -566,7 +566,7 @@ public class Configuration implements Serializable {
             //action <property> nodes
             List<Element> propnodes = getChildNodesByTagName(e, PROPERTY);
 
-            Class cls = ClassUtil.loadClass(e.getAttribute(CLASS));
+            Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load Action class : {}", cls);
             //add results
             if (!actions.add(cls)) {
@@ -610,7 +610,7 @@ public class Configuration implements Serializable {
      *
      * @throws ClassNotFoundException 如果无法定位类。
      */
-    private void parseScanComponents(Element root) throws ClassNotFoundException {
+    private void parseScanComponentClasses(Element root) throws ClassNotFoundException {
         List<Element> list = getChildNodesByTagName(root, COMPONENT_SCAN);
         printSeparator(!list.isEmpty());
 
@@ -632,7 +632,7 @@ public class Configuration implements Serializable {
                     props.put(EXCLUDE_EXPRESSION, exclude);
                 }
                 //add a new ClassScanner for each <component-scan>
-                classScanners.add(parseClassScanner(props));
+                classScanners.add(parsecComponentClassScanner(props));
             } else {
                 LOG.warn("Property \"{}\" can't be empty for <component-scan>.", PACKAGE);
             }
@@ -646,7 +646,7 @@ public class Configuration implements Serializable {
      *
      * @return 扫描工具类。
      */
-    private ClassScanner parseClassScanner(Map<String, String> scannerProperties) {
+    private ClassScanner parsecComponentClassScanner(Map<String, String> scannerProperties) {
         ClassScanner scanner = new ClassScanner();
         char[] sep = {',', ';'};
         for (Map.Entry<String, String> e : scannerProperties.entrySet()) {
@@ -781,7 +781,7 @@ public class Configuration implements Serializable {
     private static Object newInstance(ActionFactory factory, Object obj) throws
             ClassNotFoundException {
         if (obj instanceof Class) {
-            obj = factory.getObjectFactory().newInstance((Class) obj);
+            obj = factory.getObjectFactory().newInstance((Class<?>) obj);
         } else if (obj instanceof String) {
             obj = factory.getObjectFactory().newInstance(ClassUtil.loadClass((String) obj));
         }
@@ -798,7 +798,7 @@ public class Configuration implements Serializable {
      *
      * @throws ConfigurationException 如果发生无效的配置。
      */
-    public <T extends ActionFactory<?>> T buildActionFactory() throws ConfigurationException {
+    public <T extends ActionFactory> T buildActionFactory() throws ConfigurationException {
         //create ActionFactory
         ActionFactory factory = createActionFactory(actionFactoryClass, actionFactoryProperties);
         printSeparator(!actionFactoryProperties.isEmpty());
@@ -827,9 +827,9 @@ public class Configuration implements Serializable {
             if (factory instanceof DefaultActionFactory) {
                 DefaultActionFactory defaultFactory = (DefaultActionFactory) factory;
 
-                //先加载配置指定的类，再加载自动搜索的类
-                //排除配置的类
-                Set<Class> specified = new HashSet<Class>();
+                //先加载指定配置的类，再加载自动搜索的类
+                //排除指定配置的类
+                Set<Class<?>> specified = new HashSet<Class<?>>();
 
                 //interceptor
                 for (Object obj : interceptors) {
@@ -938,7 +938,7 @@ public class Configuration implements Serializable {
                 //specified path action
                 for (Map.Entry<String, Map<String, Object>> e : pathProperties.entrySet()) {
                     String pathName = e.getKey();
-                    Class pathActionClass = pathActions.get(pathName);
+                    Class<?> pathActionClass = pathActions.get(pathName);
                     Map<String, Object> allProps = new LinkedHashMap<String, Object>();
                     //class properties
                     allProps.putAll(actionProperties.get(pathActionClass));
@@ -1030,7 +1030,7 @@ public class Configuration implements Serializable {
      *
      * @throws ConfigurationException 如果发生任何构造异常。
      */
-    protected <T extends ActionFactory<?>> T createActionFactory(
+    protected <T extends ActionFactory> T createActionFactory(
             Class<? extends ActionFactory> actionFactoryClass,
             Map<String, Object> actionFactoryProperties) throws ConfigurationException {
         ActionFactory factory = null;
@@ -1063,7 +1063,7 @@ public class Configuration implements Serializable {
      *
      * @param factory 未初始化属性的{@link ActionFactory}。
      */
-    protected void afterActionFactoryCreation(ActionFactory<?> factory) {
+    protected void afterActionFactoryCreation(ActionFactory factory) {
     }
 
     /**
@@ -1076,7 +1076,7 @@ public class Configuration implements Serializable {
      * @deprecated 由<code>{@link #buildActionFactory()}</code>取代。
      */
     @Deprecated
-    public <T extends ActionFactory<?>> T getFactory() {
+    public <T extends ActionFactory> T getFactory() {
         return buildActionFactory();
     }
 
@@ -1205,16 +1205,16 @@ public class Configuration implements Serializable {
     /**
      * 添加扫描配置。
      *
-     * @param scannerProperties 扫描配置
+     * @param scanProperties 扫描配置
      *
      * @return 此配置对象的引用。
      *
      * @see ClassScanner
-     * @see #parseClassScanner(java.util.Map)
+     * @see #parsecComponentClassScanner(java.util.Map)
      */
-    public Configuration addClassScannerProperties(Map<String, String>... scannerProperties) {
-        for (Map<String, String> props : scannerProperties) {
-            classScanners.add(parseClassScanner(props));
+    public Configuration addComponentClassScanProperties(Map<String, String>... scanProperties) {
+        for (Map<String, String> props : scanProperties) {
+            classScanners.add(parsecComponentClassScanner(props));
         }
         return this;
     }

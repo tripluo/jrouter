@@ -176,6 +176,7 @@ public class ActionFactoryTest {
         try {
             //测试调用时抛出异常
             ap.invoke();
+            fail("no exception");
         } catch (InvocationProxyException e) {
             assertNotNull(e);
             assertSame(ap, e.getTarget());
@@ -183,6 +184,7 @@ public class ActionFactoryTest {
         try {
             //测试调用时抛出异常
             factory.invokeAction(url3);
+            fail("no exception");
         } catch (InvocationProxyException e) {
             assertNotNull(e);
             //ActionFactory调用抛出异常，测试消除拦截器的递归调用对异常信息的扰乱。
@@ -288,6 +290,7 @@ public class ActionFactoryTest {
 
         try {
             factory.invokeAction(url1, "notype:/nolocation");
+            fail("no exception");
         } catch (JRouterException e) {
             assertNotNull(e);
         }
@@ -326,6 +329,7 @@ public class ActionFactoryTest {
         assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url, factory.invokeAction(url, DemoResult.DEMO_RESULT_NOT_FOUND));
         try {
             assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url, factory.invokeAction(url, DemoResult.DEMO_RESULT_EXCEPTION));
+            fail("no exception");
         } catch (InvocationProxyException e) {
             assertNotNull(e);
             assertTrue(e.getSource() instanceof RuntimeException);

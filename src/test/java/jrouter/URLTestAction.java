@@ -27,36 +27,26 @@ public class URLTestAction {
 
     @Action
     public String test100() {
-        return "/";
+        return "/test100";
     }
 
     @Action(name = "")
     public String test101() {
-        return "/";
+        return "/test101";
     }
 
     @Action(name = " ")
     public String test102() {
-        return "/";
+        return "/test102";
     }
 
     @Action(name = "    ")
     public String test103() {
-        return "/";
+        return "/test103";
     }
 
     @Action(name = "/")
     public String test104() {
-        return "/";
-    }
-
-    @Action(name = "//")
-    public String test105() {
-        return "/";
-    }
-
-    @Action(name = "//////")
-    public String test106() {
         return "/";
     }
 
@@ -120,7 +110,7 @@ public class URLTestAction {
         return "/test1/abc";
     }
 
-    @Action(name = "/test2/abc/")
+    @Action(name = "/test2//abc/")
     public String test402() {
         return "/test2/abc";
     }
@@ -132,16 +122,6 @@ public class URLTestAction {
 
     @Action(name = "   ///test4/abc   /")
     public String test404() {
-        return "/test4/abc";
-    }
-
-    @Action(name = "/test4/abc")
-    public String test405() {
-        return "/test4/abc";
-    }
-
-    @Action(name = "/test4/abc")
-    public String test406() {
         return "/test4/abc";
     }
 }

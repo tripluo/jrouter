@@ -16,17 +16,17 @@
  */
 package jrouter.impl;
 
-import jrouter.JRouterException;
 import java.util.HashMap;
 import java.util.Map;
-import org.junit.After;
-import jrouter.result.DefaultResult;
+import jrouter.JRouterException;
+import static jrouter.impl.PathTreeTest.*;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.SampleInterceptor;
+import jrouter.result.DefaultResult;
+import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
-import static jrouter.impl.PathTreeTest.*;
 
 /**
  * 测试路径匹配的Action。
@@ -120,6 +120,7 @@ public class PathActionFactoryTest {
 
         try {
             factory.invokeAction("/aa/zzz/c1/d1/e1/null/null/null");
+            fail("no exception");
         } catch (JRouterException e) {
             //no such Action
             assertNotNull(e);

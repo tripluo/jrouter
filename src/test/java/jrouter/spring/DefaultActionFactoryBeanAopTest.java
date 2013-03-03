@@ -17,7 +17,6 @@
 package jrouter.spring;
 
 import java.util.List;
-import jrouter.ActionFactory;
 import jrouter.impl.DefaultActionFactory;
 import jrouter.impl.InterceptorProxy;
 import static org.junit.Assert.*;

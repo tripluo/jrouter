@@ -48,6 +48,7 @@ public @interface Action {
 
     /**
      * Action名称，应保障其最终生成路径的唯一性。
+     * Action名称为空时，默认取其所在的方法名称（区分大小写）。
      *
      * @return Action名称。
      */

@@ -87,6 +87,7 @@ public class DefaultActionFactoryBeanTest {
     public void testURL() {
         try {
             factory.invokeAction("");
+            fail("no exception");
         } catch (JRouterException e) {
             assertNotNull(e);
         }
@@ -119,6 +120,7 @@ public class DefaultActionFactoryBeanTest {
     public void testURL2() {
         try {
             factory.invokeAction("");
+            fail("no exception");
         } catch (JRouterException e) {
             assertNotNull(e);
         }

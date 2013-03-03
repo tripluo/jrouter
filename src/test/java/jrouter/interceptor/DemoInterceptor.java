@@ -19,7 +19,7 @@ package jrouter.interceptor;
 import jrouter.ActionInvocation;
 import jrouter.annotation.Interceptor;
 import jrouter.annotation.InterceptorStack;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 

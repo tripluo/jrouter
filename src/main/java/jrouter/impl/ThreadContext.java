@@ -26,10 +26,10 @@ import jrouter.ActionInvocation;
 public class ThreadContext {
 
     /** Thread Safe */
-    protected static final ThreadLocal threadContext = new ThreadLocal();
+    protected static final ThreadLocal<ThreadContext> threadContext = new ThreadLocal<ThreadContext>();
 
     /** Action运行时上下文 */
-    private ActionInvocation actionInvocation;
+    private ActionInvocation<?> actionInvocation;
 
     /**
      * 构造一个ThreadContext。
@@ -51,6 +51,7 @@ public class ThreadContext {
      * 返回当前线程副本中的ThreadContext。
      *
      * @param <T> 存储在当前线程副本中变量的类型。
+     *
      * @return 前线程副本中的ThreadContext。
      */
     public static <T extends ThreadContext> T get() {
@@ -80,7 +81,7 @@ public class ThreadContext {
      *
      * @param actionInvocation Action运行时上下文。
      */
-    public static void setActionInvocation(ActionInvocation actionInvocation) {
+    public static void setActionInvocation(ActionInvocation<?> actionInvocation) {
         get().actionInvocation = actionInvocation;
     }
 }

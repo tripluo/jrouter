@@ -3,9 +3,9 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
-       http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+       http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
-       http://www.springframework.org/schema/context/spring-context-3.1.xsd">
+       http://www.springframework.org/schema/context/spring-context.xsd">
     <description>jrouter与springframework集成的配置文件</description>
 
     <!-- JRouter ActionFactory -->
@@ -41,11 +41,14 @@
         </property>
 
         <!-- scan classes properties -->
-        <property name="classScannerProperties">
+        <property name="componentClassScanProperties">
             <list>
                 <value>
+                    <!-- required -->
                     package = jrouter
+                    <!-- optional, if empty means all -->
                     includeExpression = jrouter.impl.**
+                    <!-- optional -->
                     excludeExpression = jrouter.result.**, jrouter.interceptor.**
                 </value>
             </list>
@@ -80,6 +83,19 @@
                 <!-- the value can be the class name or the ref bean: -->
             </list>
         </property>
+        <property name="componentBeanScanProperties">
+            <value>
+                <!-- required -->
+                includeComponentBeanExpression =
+                <!-- optional -->
+                excludeComponentBeanExpression =
+                <!-- optional -->
+                includeComponentClassExpression =
+                <!-- optional -->
+                excludeComponentClassExpression =
+            </value>
+        </property>
+
         <property name="aopActions">
             <list>
                 <bean class="jrouter.spring.AopActionBean">

@@ -28,10 +28,11 @@ import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;
 import jrouter.result.DefaultResult;
 import jrouter.result.DemoResult;
-import junit.framework.Assert;
+import org.junit.Assert;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  * SimpleAction。
@@ -39,6 +40,7 @@ import org.springframework.beans.factory.annotation.Autowired;
  * @see jrouter.impl.ActionFactoryTest
  * @see jrouter.spring.SpringObjectFactoryTest
  */
+@Component
 @Namespace(name = "/test", autoIncluded = true)
 public class SimpleAction {
 

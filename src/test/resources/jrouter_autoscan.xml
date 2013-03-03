@@ -43,5 +43,5 @@
 
     <!-- scan classes, use ',' as separate -->
     <component-scan package="jrouter"
-                    excludeExpression="jrouter.result.*"/>
+                    excludeExpression="jrouter.result.*, jrouter.TestDuplicate*.**"/>
 </jrouter>

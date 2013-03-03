@@ -22,9 +22,9 @@ import jrouter.InterceptorTestAction;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.SampleInterceptor;
 import org.junit.After;
+import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  * 测试Namespace和Action上的拦截器集合。

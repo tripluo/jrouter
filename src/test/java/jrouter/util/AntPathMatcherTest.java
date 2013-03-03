@@ -63,15 +63,16 @@ public class AntPathMatcherTest {
         assertTrue(matcher.match("*b", "bb"));
         assertFalse(matcher.match("*b", "ba"));
         assertTrue(matcher.match("*b", "abab"));
+        assertTrue(matcher.match("a*", "abcd"));
         assertTrue(matcher.match("a*c", "ac"));
         assertTrue(matcher.match("a*c", "abbbc"));
         assertTrue(matcher.match("a*cd*", "abcd"));
         assertTrue(matcher.match("a*cd*", "abbbcdeee"));
+        assertTrue(matcher.match("*c*", "abbbcdeee"));
 
         assertFalse(matcher.match("?", "/"));
         assertFalse(matcher.match("*", "/"));
         assertFalse(matcher.match("*", "abc/123"));
-
 
         assertTrue(matcher.match("/*", "/"));
         assertTrue(matcher.match("/???", "/abc"));
@@ -93,6 +94,7 @@ public class AntPathMatcherTest {
         assertTrue(matcher.match("/**/", "/abc/123"));
         assertTrue(matcher.match("/**", "/abc/123/456"));
         assertFalse(matcher.match("/*/", "/abc/123/456"));
+        assertFalse(matcher.match("/*/*", "/abc/123/456"));
         assertTrue(matcher.match("/**/", "/abc/123/456"));
         assertTrue(matcher.match("/**/*", "/abc/123/456"));
         assertTrue(matcher.match("/**/*/", "/abc/123/456"));
@@ -112,7 +114,8 @@ public class AntPathMatcherTest {
 
         assertFalse(matcher.match("/*/**Service", "/abc/123/456.Service"));
         assertFalse(matcher.match("**Service", "/abc/456.Service"));
-        assertFalse(matcher.match("**Service", "/abc/456.Service"));
+        assertFalse(matcher.match("**Service**", "/abc/456.Service"));
+        assertFalse(matcher.match("**Service**", "/abc/456.Service/123"));
         assertFalse(matcher.match("/**Service", "/abc/456.Service"));
         assertTrue(matcher.match("/*/*Service", "/abc/456.Service"));
 

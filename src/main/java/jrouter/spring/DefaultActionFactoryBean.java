@@ -16,14 +16,18 @@
  */
 package jrouter.spring;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import jrouter.ActionFactory;
 import jrouter.JRouterException;
 import jrouter.ObjectFactory;
 import jrouter.config.AopAction;
 import jrouter.config.Configuration;
+import jrouter.util.AntPathMatcher;
 import jrouter.util.ClassUtil;
 import jrouter.util.CollectionUtil;
 import org.slf4j.Logger;
@@ -62,7 +66,13 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     /** Configuration对象类型 */
     private Class<? extends Configuration> configurationClass = Configuration.class;
 
-    /** @see Configuration#actionFactoryProperties */
+    /** @see ActionFactory#getObjectFactory() */
+    private ObjectFactory objectFactory;
+
+    /**
+     * @see Configuration#actionFactoryProperties
+     * @see jrouter.impl.DefaultActionFactory#setActionFactoryProperties(java.util.Map)
+     */
     private Properties actionFactoryProperties = new Properties();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -81,12 +91,22 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     /* Action的bean名称和类名称的集合 */
     private List<Object> actions = null;
 
-    /** 扫描类工具的顺序配置 */
-    private List<Properties> classScannerProperties;
+    /**
+     * 扫描类工具的顺序配置，依次配置(包名/匹配包含/匹配排除)属性。
+     *
+     * @see Configuration#parsecComponentClassScanner(java.util.Map)
+     */
+    private List<Properties> componentClassScanProperties;
 
     /** actions' aop */
     private List<? extends AopAction> aopActions;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /** 根据匹配的name自动加载Bean，依次配置匹配(包含/排除)的beans' name属性。 */
+    private Properties componentBeanScanProperties;
+
+    /** ApplicationContext */
+    private ApplicationContext applicationContext;
 
     /**
      * 初始化ActionFactory。
@@ -100,6 +120,13 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
         afterActionFactoryCreation(actionFactory);
     }
 
+    /**
+     * 由注入的属性创建ActionFactory。
+     *
+     * @return ActionFactory
+     *
+     * @throws Exception 如果发生异常。
+     */
     protected ActionFactory buildActionFactory() throws Exception {
         LOG.info("Initiating JRouter ActionFactory at : " + new java.util.Date());
         configuration = configurationClass.newInstance();
@@ -113,14 +140,83 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
             LOG.debug("Set actionFactoryClass : " + actionFactoryClass);
             configuration.setActionFactoryClass(actionFactoryClass);
         }
+        if (objectFactory == null) {
+            //use default SpringObjectFactory
+            objectFactory = new SpringObjectFactory(applicationContext);
+        }
+        actionFactoryProperties.put("objectFactory", objectFactory);
         configuration.addActionFactoryProperties((Map) actionFactoryProperties);
 
         //添加扫描工具属性
-        if (classScannerProperties != null)
-            configuration.addClassScannerProperties(classScannerProperties.toArray(new Map[classScannerProperties.size()]));
+        if (componentClassScanProperties != null)
+            configuration.addComponentClassScanProperties(componentClassScanProperties.toArray(new Map[componentClassScanProperties.size()]));
 
         //convert string to class
         convertList(interceptors, interceptorStacks, resultTypes, results, actions);
+
+        if (CollectionUtil.isNotEmpty(componentBeanScanProperties)) {
+            char[] sep = {',', ';'};
+            //匹配包含bean名称的表达式
+            List<String> includeComponentBeanExpressions = new ArrayList<String>(2);
+            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentBeanExpression"), includeComponentBeanExpressions, sep);
+            //匹配排除bean名称的表达式
+            List<String> excludeComponentBeanExpressions = new ArrayList<String>(2);
+            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentBeanExpression"), excludeComponentBeanExpressions, sep);
+
+            //匹配包含class的表达式
+            List<String> includeComponentClassExpressions = new ArrayList<String>(2);
+            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentClassExpression"), includeComponentClassExpressions, sep);
+
+            //匹配排除class名称的表达式
+            List<String> excludeComponentClassExpressions = new ArrayList<String>(2);
+            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentClassExpression"), excludeComponentClassExpressions, sep);
+
+            AntPathMatcher matcher = new AntPathMatcher(".");
+            String[] beanNames = applicationContext.getBeanDefinitionNames();
+            Set<String> includes = new LinkedHashSet<String>();
+            out:
+            for (String name : beanNames) {
+                for (String excludeComponentBeanExpression : excludeComponentBeanExpressions) {
+                    if (matcher.match(excludeComponentBeanExpression, name)) {
+                        continue out;
+                    }
+                }
+                for (String includeComponentBeanExpression : includeComponentBeanExpressions) {
+                    if (matcher.match(includeComponentBeanExpression, name)) {
+                        includes.add(name);
+                    }
+                }
+            }
+            //add include beans
+            out:
+            for (String includeName : includes) {
+                try {
+                    Object bean = applicationContext.getBean(includeName);
+                    String clsName = bean.getClass().getName();
+                    for (String excludeComponentClassExpression : excludeComponentClassExpressions) {
+                        //exclude class
+                        if (matcher.match(excludeComponentClassExpression, clsName)) {
+                            continue out;
+                        }
+                    }
+                    if (CollectionUtil.isNotEmpty(includeComponentClassExpressions)) {
+                        for (String includeComponentClassExpression : includeComponentClassExpressions) {
+                            if (matcher.match(includeComponentClassExpression, clsName)) {
+                                //only add matched-class bean
+                                addComponentToList(bean, interceptors, interceptorStacks, resultTypes, results, actions);
+                                continue out;
+                            }
+                        }
+                    } else {
+                        //if no includeComponentClassExpression, means allow all
+                        addComponentToList(bean, interceptors, interceptorStacks, resultTypes, results, actions);
+                    }
+                } catch (BeansException e) {
+                    //ignore
+                    LOG.warn("Can't get bean : " + includeName);
+                }
+            }
+        }
 
         //set configuration
         if (CollectionUtil.isNotEmpty(interceptors))
@@ -145,6 +241,25 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     }
 
     /**
+     * Add matched bean.
+     *
+     * @param bean matched bean.
+     * @param listArray the array of list.
+     */
+    private void addComponentToList(Object bean, List... listArray) {
+        out:
+        for (List<Object> componentList : listArray) {
+            if (CollectionUtil.isNotEmpty(componentList)) {
+                for (Object exist : componentList) {
+                    if (bean.getClass() == (exist instanceof Class ? exist : exist.getClass()))
+                        continue out;
+                }
+                componentList.add(bean);
+            }
+        }
+    }
+
+    /**
      * convert the
      * <code>String</code> element of the list into
      * <code>Class</code>.
@@ -154,12 +269,12 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      * @throws ClassNotFoundException If the class was not found.
      */
     private static void convertList(List... listArray) throws ClassNotFoundException {
-        for (List list : listArray) {
-            if (CollectionUtil.isNotEmpty(list)) {
-                for (int i = 0; i < list.size(); i++) {
-                    Object obj = list.get(i);
+        for (List componentList : listArray) {
+            if (CollectionUtil.isNotEmpty(componentList)) {
+                for (int i = 0; i < componentList.size(); i++) {
+                    Object obj = componentList.get(i);
                     if (obj instanceof String) {
-                        list.set(i, ClassUtil.loadClass((String) obj));
+                        componentList.set(i, ClassUtil.loadClass((String) obj));
                     }
                 }
             }
@@ -225,7 +340,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
-        setObjectFactory(new SpringObjectFactory(applicationContext));
+        this.applicationContext = applicationContext;
     }
 
     /**
@@ -275,6 +390,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      * @param actionFactoryProperties ActionFactory的属性映射集合。
      *
      * @see Configuration#addActionFactoryProperties(java.util.Map)
+     * @see jrouter.impl.DefaultActionFactory#setActionFactoryProperties(java.util.Map)
      */
     public void setActionFactoryProperties(Properties actionFactoryProperties) {
         this.actionFactoryProperties = actionFactoryProperties;
@@ -289,9 +405,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      * @see ActionFactory#getObjectFactory()
      */
     public void setObjectFactory(ObjectFactory objectFactory) {
-        if (objectFactory != null) {
-            actionFactoryProperties.put("objectFactory", objectFactory);
-        }
+        this.objectFactory = objectFactory;
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -341,12 +455,24 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     }
 
     /**
+     * @see #setComponentClassScanProperties(java.util.List)
+     *
+     * @deprecated
+     */
+    @Deprecated
+    public void setClassScannerProperties(List<Properties> classScannerProperties) {
+        this.setComponentClassScanProperties(classScannerProperties);
+    }
+
+    /**
      * 设置扫描类工具的顺序配置。
      *
      * @param classScannerProperties 扫描类工具的顺序配置集合。
+     *
+     * @see Configuration#parsecComponentClassScanner(java.util.Map)
      */
-    public void setClassScannerProperties(List<Properties> classScannerProperties) {
-        this.classScannerProperties = classScannerProperties;
+    public void setComponentClassScanProperties(List<Properties> componentClassScanProperties) {
+        this.componentClassScanProperties = componentClassScanProperties;
     }
 
     /**
@@ -356,5 +482,15 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      */
     public void setAopActions(List<? extends AopAction> aopActions) {
         this.aopActions = aopActions;
+    }
+
+    /**
+     * 设置匹配包含/排除的beans' name属性。
+     *
+     * @param componentBeanScanProperties 匹配包含/排除的beans' name属性。
+     *
+     */
+    public void setComponentBeanScanProperties(Properties componentBeanScanProperties) {
+        this.componentBeanScanProperties = componentBeanScanProperties;
     }
 }

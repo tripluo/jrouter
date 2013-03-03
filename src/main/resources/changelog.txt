@@ -3,6 +3,12 @@ JROUTER CHANGELOG
 ==========================
 http://code.google.com/p/jrouter
 
+Changes in version 1.6.3 (2013-03-03)
+---------------------------------------
+* 更改DefaultActionFactory添加重复项时输出警告信息为抛出异常。
+* 更改DefaultActionFactoryBean新增通过bean及class查找/过滤加载Action。
+* 更新依赖包javassist至 3.17.1-GA.
+
 
 Changes in version 1.6.2 (2012-10-05)
 ---------------------------------------

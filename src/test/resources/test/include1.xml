@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../../main/resources/jrouter-1.6.xsd">
-
-
     <!-- action -->
     <action class="jrouter.URLTestAction" />
-
     <!-- include -->
     <include file="test/include2.xml" />
 </jrouter>

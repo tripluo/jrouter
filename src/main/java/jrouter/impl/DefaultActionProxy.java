@@ -178,7 +178,7 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
 
     @Override
     public List<Interceptor> getInterceptors() {
-        List<Interceptor> is = new java.util.ArrayList(interceptors.size());
+        List<Interceptor> is = new java.util.ArrayList<Interceptor>(interceptors.size());
         for (InterceptorProxy ip : interceptors) {
             is.add(ip.getInterceptor());
         }

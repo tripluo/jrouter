@@ -1,4 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
 <jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../main/resources/jrouter-1.6.xsd">
 
@@ -7,12 +6,6 @@
         <property name="defaultResultType" value="empty" />
         <property name="extension" value="." />
     </action-factory>
-    <!-- constant -->
-    <!--
-    <constant name="DefaultInterceptorStack" value="empty" />
-    <constant name="DefaultResultType" value="empty" />
-    <constant name="extension" value="do" />
-    -->
 
     <!-- interceptor -->
     <interceptor class="jrouter.interceptor.SampleInterceptor" />

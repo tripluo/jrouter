@@ -79,5 +79,9 @@ public class DefaultActionFactoryBeanScanComponentTest {
         assertNull(factory.getResults().get(DemoResult.DEMO_RESULT_NOT_FOUND));
         assertNull(factory.getResults().get(DemoResult.DEMO_RESULT_EXCEPTION));
 
+        //see @Component in SimpleAction
+        assertNotNull(factory.getActions().get("/test/simple"));
+        //see @Component PathTestAction
+        assertNull(factory.getActions().get("/xx/yy/zz"));
     }
 }

@@ -37,7 +37,8 @@ import org.slf4j.LoggerFactory;
  * {@link Action}对象根据其{@link Action#scope()}属性判断是否单例。
  * </p>
  * <p>
- * DefaultActionFactory中的{@link Action}、{@link Interceptor}拦截器、{@link InterceptorStack}拦截栈及{@link ResultType}结果类型的集合在初始化时加载完成，
+ * DefaultActionFactory中的{@link Action}、{@link Interceptor}拦截器、{@link InterceptorStack}拦截栈、
+ * {@link ResultType}结果类型、{@link Result}结果对象及的集合在初始化时加载完成，
  * 之后任何情况下DefaultActionFactory不再执行集合的修改和删除操作。对返回集合进行的修改和删除需自行保证其线程安全性。
  * </p>
  */
@@ -132,15 +133,17 @@ public class DefaultActionFactory implements ActionFactory {
      * @param properties 指定的初始化数据键值映射。
      */
     public DefaultActionFactory(Map<String, Object> properties) {
-        interceptors = new HashMap<String, InterceptorProxy>();
-        interceptorStacks = new HashMap<String, InterceptorStackProxy>();
-        actions = new PathTreeMap<DefaultActionProxy>(pathSeparator);
-        actionCache = Collections.synchronizedMap(new jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber));
-        resultTypes = new HashMap<String, ResultTypeProxy>();
-        results = new HashMap<String, ResultProxy>();
-
         //initiate properties
         setActionFactoryProperties(properties);
+
+        interceptors = new HashMap<String, InterceptorProxy>();
+        interceptorStacks = new HashMap<String, InterceptorStackProxy>();
+
+        actions = new PathTreeMap<DefaultActionProxy>(pathSeparator);
+        actionCache = Collections.synchronizedMap(new jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber));
+
+        resultTypes = new HashMap<String, ResultTypeProxy>();
+        results = new HashMap<String, ResultProxy>();
     }
 
     /**
@@ -299,7 +302,7 @@ public class DefaultActionFactory implements ActionFactory {
         }
 
         //create ActionInvocation
-        ActionInvocation invocation = createActionInvocation(path, params);
+        ActionInvocation<?> invocation = createActionInvocation(path, params);
 
         //invoke
         Object res = null;
@@ -368,7 +371,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return Action调用时的上下文对象。
      */
-    protected ActionInvocation createActionInvocation(String path, Object... params) {
+    protected ActionInvocation<?> createActionInvocation(String path, Object... params) {
         //cache
         ActionCacheEntry ace = null;
         if (actionCacheNumber > 0)
@@ -415,7 +418,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return 调用ResultType后的结果。
      */
-    private Object invokeByResult(ActionInvocation invocation, Result result) {
+    private Object invokeByResult(ActionInvocation<?> invocation, Result result) {
         String type = result.type();
         //default result type
         if (StringUtil.isEmpty(type))
@@ -446,7 +449,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @see #invokeByResult
      */
-    private Object invokeByString(ActionInvocation invocation, Result result, String pathinfo) {
+    private Object invokeByString(ActionInvocation<?> invocation, Result result, String pathinfo) {
         //default values
         String type = defaultResultType;
         String loc = null;
@@ -544,7 +547,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return 非字符串对象。
      */
-    protected Object invokeObjectResult(ActionInvocation invocation, Object res) {
+    protected Object invokeObjectResult(ActionInvocation<?> invocation, Object res) {
         LOG.warn("Invoking Object Result [{}] and return directly at : {}", res, invocation.getActionProxy().getMethod());
         return res;
     }
@@ -558,7 +561,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return 结果字符串。
      */
-    protected Object invokeUndefinedResult(ActionInvocation invocation, String resInfo) {
+    protected Object invokeUndefinedResult(ActionInvocation<?> invocation, String resInfo) {
         LOG.warn("Invoking undefined String Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethod());
         //throw new JRouterException("No match Result [" + resInfo + "] at " + ap.getMethod(), ap);
         //不作处理直接跳过，直接返回调用结果字符串
@@ -610,7 +613,7 @@ public class DefaultActionFactory implements ActionFactory {
             throw new IllegalArgumentException("Null name of Interceptor : " + ip.getMethod());
 
         if (interceptors.containsKey(name)) {
-            LOG.warn("Duplicate Interceptor [" + name + "] : "
+            throw new JRouterException("Duplicate Interceptor [" + name + "] : "
                     + ip.getMethod() + " override "
                     + interceptors.get(name).getMethod());
         } else {
@@ -628,7 +631,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     public void addInterceptors(Object obj) {
         boolean isCls = obj instanceof Class;
-        Class cls = isCls ? (Class) obj : obj.getClass();
+        Class<?> cls = isCls ? (Class) obj : obj.getClass();
         Object invoker = isCls ? null : obj;
         Method[] ms = cls.getDeclaredMethods();
         for (Method m : ms) {
@@ -667,7 +670,7 @@ public class DefaultActionFactory implements ActionFactory {
             throw new IllegalArgumentException("Null name of InterceptorStack : " + isp.getFieldName());
 
         if (interceptorStacks.containsKey(name)) {
-            LOG.warn("Duplicate InterceptorStack [" + name + "] : "
+            throw new JRouterException("Duplicate InterceptorStack [" + name + "] : "
                     + isp.getFieldName() + " override "
                     + interceptorStacks.get(name).getFieldName());
         } else {
@@ -685,7 +688,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     public void addInterceptorStacks(Object obj) {
         boolean isCls = obj instanceof Class;
-        Class cls = isCls ? (Class) obj : obj.getClass();
+        Class<?> cls = isCls ? (Class) obj : obj.getClass();
         Object invoker = isCls ? null : obj;
         Field[] fs = cls.getDeclaredFields();
         //TODO 是否成员变量
@@ -725,7 +728,7 @@ public class DefaultActionFactory implements ActionFactory {
             throw new IllegalArgumentException("Null type of ResultType : " + rtp.getMethod());
 
         if (resultTypes.containsKey(type)) {
-            LOG.warn("Duplicate ResultType [" + type + "] : "
+            throw new JRouterException("Duplicate ResultType [" + type + "] : "
                     + rtp.getMethod() + " override "
                     + resultTypes.get(type).getMethod());
         } else {
@@ -743,7 +746,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     public void addResultTypes(Object obj) {
         boolean isCls = obj instanceof Class;
-        Class cls = isCls ? (Class) obj : obj.getClass();
+        Class<?> cls = isCls ? (Class) obj : obj.getClass();
         Object invoker = isCls ? null : obj;
         Method[] ms = cls.getDeclaredMethods();
         for (Method m : ms) {
@@ -782,7 +785,7 @@ public class DefaultActionFactory implements ActionFactory {
             throw new IllegalArgumentException("Null name of Result : " + rp.getMethod());
 
         if (results.containsKey(name)) {
-            LOG.warn("Duplicate Result [" + name + "] : "
+            throw new JRouterException("Duplicate Result [" + name + "] : "
                     + rp.getMethod() + " override "
                     + results.get(name).getMethod());
         } else {
@@ -800,7 +803,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     public void addResults(Object obj) {
         boolean isCls = obj instanceof Class;
-        Class cls = isCls ? (Class) obj : obj.getClass();
+        Class<?> cls = isCls ? (Class) obj : obj.getClass();
         Object invoker = isCls ? null : obj;
         Method[] ms = cls.getDeclaredMethods();
         for (Method m : ms) {
@@ -848,17 +851,23 @@ public class DefaultActionFactory implements ActionFactory {
         DefaultActionProxy newAction = actions.get(aPath);
 
         if (exist != null) {
-            //原有路径与新添加路径为完全相等的路径
+            //新增与原有完全相等的路径
             if (exist.getPath().equals(newAction.getPath())) {
-                LOG.warn("Duplicate Action [" + aPath + "] : "
+                throw new JRouterException("Duplicate path Action [" + aPath + "] : "
                         + ap.getMethod() + " override "
                         + exist.getMethod());
-            } //原有路径模糊匹配，继续添加新路径
+            } //新增与原有相同的匹配路径，考虑匹配级别是否相同???
+            //TODO
+            //            else if (0 == PathTree.compareMathedPath(newAction.getPath(), exist.getPath())) {
+            //                throw new JRouterException("Duplicate matched path Action [" + aPath + "] : "
+            //                        + ap.getMethod() + " override "
+            //                        + exist.getMethod());
+            //            }
+            //原有路径模糊匹配，继续添加新路径；或反之
             else {
                 LOG.warn("Exist matched path [{}] : {}, add [{}] : {}",
                         exist.getPath(), exist.getMethod(), aPath, ap.getMethod());
             }
-
         } else {
             LOG.info("Add Action [{}] at : {}", aPath, ap.getMethod());
         }

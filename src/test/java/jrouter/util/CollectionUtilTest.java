@@ -16,8 +16,8 @@
  */
 package jrouter.util;
 
-import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Test;
 
 /**
  * CollectionUtilTest。
@@ -32,6 +32,7 @@ public class CollectionUtilTest {
 
         char[] sep = {',', '|'};
 
+        assertArrayEquals(new String[0], CollectionUtil.stringToCollection(null, null, sep).toArray());
         assertArrayEquals(new String[]{""}, CollectionUtil.stringToCollection("", null).toArray());
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection("a", null).toArray());
         assertArrayEquals(new String[]{"a,bb"}, CollectionUtil.stringToCollection("a,bb", null).toArray());
@@ -45,7 +46,6 @@ public class CollectionUtilTest {
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection(",a", null, sep).toArray());
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection("a,", null, sep).toArray());
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection("  a,,,", null, sep).toArray());
-
 
         assertArrayEquals(new String[]{"a", "b"}, CollectionUtil.stringToCollection("a,b", null, sep).toArray());
         assertArrayEquals(new String[]{"a", "b"}, CollectionUtil.stringToCollection("a,, b   ", null, sep).toArray());
@@ -75,6 +75,7 @@ public class CollectionUtilTest {
 
         char[] sep = {',', '|'};
 
+        assertEquals("{}", CollectionUtil.stringToMap(null, null, sep).toString());
         assertEquals("{}", CollectionUtil.stringToMap("", null).toString());
         assertEquals("{}", CollectionUtil.stringToMap("a", null).toString());
         assertEquals("{}", CollectionUtil.stringToMap("a=a", null).toString());

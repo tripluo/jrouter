@@ -100,14 +100,15 @@ public class ActionFactory3Test {
 
         try {
             factory1.invokeAction("");
+            fail("no exception");
         } catch (JRouterException e) {
             assertNotNull(e);
         }
 
-        assertEquals("/", factory1.invokeAction("/test100" + extension1));
-        assertEquals("/", factory1.invokeAction("/test101" + extension1));
-        assertEquals("/", factory1.invokeAction("/test102" + extension1));
-        assertEquals("/", factory1.invokeAction("/test103" + extension1));
+        assertEquals("/test100", factory1.invokeAction("/test100" + extension1));
+        assertEquals("/test101", factory1.invokeAction("/test101" + extension1));
+        assertEquals("/test102", factory1.invokeAction("/test102" + extension1));
+        assertEquals("/test103", factory1.invokeAction("/test103" + extension1));
 
         assertEquals("/", factory1.invokeAction("/"));
         assertEquals("/a", factory1.invokeAction("/a" + extension1));
@@ -136,9 +137,9 @@ public class ActionFactory3Test {
      */
     @Test
     public void testURL2() {
-
         try {
             factory2.invokeAction("");
+            fail("no exception");
         } catch (JRouterException e) {
             assertNotNull(e);
         }

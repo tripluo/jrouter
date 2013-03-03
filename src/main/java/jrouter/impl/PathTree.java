@@ -141,7 +141,7 @@ class PathTree<T> implements Serializable {
      */
     PathTree(char pathSeparator) {
         this.pathSeparator = pathSeparator;
-        root = new TreeNode(pathSeparator + "", null);
+        root = new TreeNode<T>(pathSeparator + "", null);
         root.code = 1;
     }
 
@@ -298,7 +298,7 @@ class PathTree<T> implements Serializable {
         int max = current.get(0).code;
         int index = 0;
         for (int i = 1, size = current.size(); i < size; i++) {
-            TreeNode tr = current.get(i);
+            TreeNode<T> tr = current.get(i);
             if (tr.code > max) {
                 max = tr.code;
                 index = i;
@@ -318,7 +318,7 @@ class PathTree<T> implements Serializable {
     /*
      * 将路径数组按照指定的路径码（二进制标识）填充进链表。
      */
-    private void fillMatchParameters(TreeNode matcher, String[] paths,
+    private void fillMatchParameters(TreeNode<T> matcher, String[] paths,
             Map<String, String> matchParameters) {
         if (matchParameters != null) {
             /**
@@ -331,8 +331,8 @@ class PathTree<T> implements Serializable {
             matchParameters.put(i - 1 + "", paths[i - 1]);
             }
             }
-             *
-             */
+            *
+            */
 
             IndexKey[] iks = matcher.indexKeys;
             if (iks != null) {
@@ -514,7 +514,7 @@ class PathTree<T> implements Serializable {
             //未创建子路径节点集合
             if (children == null) {
                 children = new HashMap<String, TreeNode<T>>();
-                TreeNode newNode = new TreeNode(child, null);
+                TreeNode<T> newNode = new TreeNode<T>(child, null);
                 //set the new child node and put it in the children nodes
                 setChildNode(newNode, paths);
                 children.put(newNode.path, newNode);
@@ -523,10 +523,10 @@ class PathTree<T> implements Serializable {
             }
 
             //查找子节点路径，如果路径包含键匹配，则查找路径为'*'
-            TreeNode old = children.get(isMatchKay(child) ? SINGLE_MATCH : child);
+            TreeNode<T> old = children.get(isMatchKay(child) ? SINGLE_MATCH : child);
             //子节点集合未包含此节点
             if (old == null) {
-                TreeNode newNode = new TreeNode(child, null);
+                TreeNode<T> newNode = new TreeNode<T>(child, null);
                 //set the new child node and put it in the children nodes
                 setChildNode(newNode, paths);
                 children.put(newNode.path, newNode);
@@ -552,7 +552,7 @@ class PathTree<T> implements Serializable {
             //未创建子路径节点集合
             if (children == null) {
                 children = new HashMap<String, TreeNode<T>>();
-                TreeNode newNode = new TreeNode(child, value);
+                TreeNode<T> newNode = new TreeNode<T>(child, value);
                 //set the new child node and put it in the children nodes
                 setChildNode(newNode, paths);
                 children.put(newNode.path, newNode);
@@ -561,10 +561,10 @@ class PathTree<T> implements Serializable {
             }
 
             //查找子节点路径，如果路径包含键匹配，则查找路径为'*'
-            TreeNode old = children.get(isMatchKay(child) ? SINGLE_MATCH : child);
+            TreeNode<T> old = children.get(isMatchKay(child) ? SINGLE_MATCH : child);
             //子节点集合未包含此节点
             if (old == null) {
-                TreeNode newNode = new TreeNode(child, value);
+                TreeNode<T> newNode = new TreeNode<T>(child, value);
                 //set the new child node and put it in the children nodes
                 setChildNode(newNode, paths);
                 children.put(newNode.path, newNode);
@@ -574,7 +574,7 @@ class PathTree<T> implements Serializable {
             /*
              * 覆盖原节点的值，并返回原有的值，如果原节点没有值返回 null
              */
-            T oldValue = (T) old.value;
+            T oldValue = old.value;
             old.value = value;
             //重新设置索引/索引/值数组
             setLeafIndexKeys(old, paths);
@@ -588,7 +588,7 @@ class PathTree<T> implements Serializable {
          * @param child 子节点。
          * @param paths 子节点全路径解析后的路径字符串数组。
          */
-        private void setChildNode(TreeNode child, String[] paths) {
+        private void setChildNode(TreeNode<T> child, String[] paths) {
             String childPath = child.path;
             //if child path is '*'
             child.code = (code << 1);
@@ -620,7 +620,7 @@ class PathTree<T> implements Serializable {
          * @param leaf 叶子节点。
          * @param paths 节点全路径解析后的路径字符串数组。
          */
-        private void setLeafIndexKeys(TreeNode leaf, String paths[]) {
+        private void setLeafIndexKeys(TreeNode<T> leaf, String paths[]) {
             //仅叶子节点有相关联的值才添加索引/值数组
             if (leaf.value != null) {
                 List<IndexKey> keys = new ArrayList<IndexKey>(paths.length);

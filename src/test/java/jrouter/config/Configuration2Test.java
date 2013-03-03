@@ -77,8 +77,8 @@ public class Configuration2Test extends Assert {
      * 测试循环引用异常。
      */
     @Test(expected = ConfigurationException.class)
-    public void test_load2() {
+    public void test_loadError() {
         config = new Configuration();
-        config.load("/jrouter_error.xml").buildActionFactory();
+        config.load("/jrouter_error.xml");
     }
 }

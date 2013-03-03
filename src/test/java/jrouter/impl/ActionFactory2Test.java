@@ -17,9 +17,13 @@
 package jrouter.impl;
 
 import jrouter.JRouterException;
+import jrouter.TestDuplicate;
+import jrouter.URLTestAction;
 import jrouter.interceptor.DefaultInterceptorStack;
+import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;
 import jrouter.result.DefaultResult;
+import jrouter.result.DemoResult;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -72,17 +76,17 @@ public class ActionFactory2Test {
      */
     @Test
     public void testURL() {
-
         try {
             factory.invokeAction("");
+            fail("no exception");
         } catch (JRouterException e) {
             assertNotNull(e);
         }
 
-        assertEquals("/", factory.invokeAction("/test100"));
-        assertEquals("/", factory.invokeAction("/test101"));
-        assertEquals("/", factory.invokeAction("/test102"));
-        assertEquals("/", factory.invokeAction("/test103"));
+        assertEquals("/test100", factory.invokeAction("/test100"));
+        assertEquals("/test101", factory.invokeAction("/test101"));
+        assertEquals("/test102", factory.invokeAction("/test102"));
+        assertEquals("/test103", factory.invokeAction("/test103"));
 
         assertEquals("/", factory.invokeAction("/"));
         assertEquals("/a", factory.invokeAction("/a"));
@@ -114,6 +118,7 @@ public class ActionFactory2Test {
 
         try {
             factory.invokeAction("");
+            fail("no exception");
         } catch (JRouterException e) {
             assertNotNull(e);
         }
@@ -137,5 +142,62 @@ public class ActionFactory2Test {
         assertEquals("/url_test2/abc", factory.invokeAction("/url_test2/abc"));
         assertEquals("/url_test3/abc", factory.invokeAction("/url_test3/abc"));
         assertEquals("/url_test4/abc", factory.invokeAction("/url_test4/abc"));
+    }
+
+    /**
+     * 测试添加重复Action时抛出异常。
+     */
+    @Test
+    public void test_duplicateError() {
+        try {
+            factory.addActions(TestDuplicate.DuplicateAction1.class);
+            fail("no exception");
+        } catch (JRouterException e) {
+            assertTrue(e.getMessage().startsWith("Duplicate path Action "));
+        }
+        try {
+            factory.addActions(TestDuplicate.DuplicateAction2.class);
+            fail("no exception");
+        } catch (JRouterException e) {
+            assertTrue(e.getMessage().startsWith("Duplicate path Action "));
+        }
+        try {
+            factory.addActions(TestDuplicate.DuplicateAction3.class);
+            fail("no exception");
+        } catch (JRouterException e) {
+            assertTrue(e.getMessage().startsWith("Duplicate path Action "));
+        }
+////////////////////////////////////////////////////////////////////////////////
+        factory.addInterceptors(DemoInterceptor.class);
+        try {
+            factory.addInterceptors(TestDuplicate.DuplicateInterceptor1.class);
+            fail("no exception");
+        } catch (JRouterException e) {
+            assertTrue(e.getMessage().startsWith("Duplicate Interceptor "));
+        }
+
+        factory.addInterceptorStacks(DemoInterceptor.class);
+        try {
+            factory.addInterceptorStacks(TestDuplicate.DuplicateInterceptor1.class);
+            fail("no exception");
+        } catch (JRouterException e) {
+            assertTrue(e.getMessage().startsWith("Duplicate InterceptorStack "));
+        }
+////////////////////////////////////////////////////////////////////////////////
+
+        factory.addResultTypes(DemoResult.class);
+        try {
+            factory.addResultTypes(TestDuplicate.DuplicateResult1.class);
+            fail("no exception");
+        } catch (JRouterException e) {
+            assertTrue(e.getMessage().startsWith("Duplicate ResultType "));
+        }
+        factory.addResults(DemoResult.class);
+        try {
+            factory.addResults(TestDuplicate.DuplicateResult1.class);
+            fail("no exception");
+        } catch (JRouterException e) {
+            assertTrue(e.getMessage().startsWith("Duplicate Result "));
+        }
     }
 }

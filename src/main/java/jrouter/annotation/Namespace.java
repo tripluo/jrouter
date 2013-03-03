@@ -62,7 +62,9 @@ public @interface Namespace {
     String[] interceptors() default {};
 
     /**
-     * 是否自动加载public/protected方法，默认不自动加载。
+     * 是否自动加载定义类所有public/protected方法，默认不自动加载。
+     *
+     * @return 是否自动加载所定义类的public/protected方法，默认不自动加载。
      */
     boolean autoIncluded() default false;
 }

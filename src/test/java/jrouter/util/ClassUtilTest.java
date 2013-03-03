@@ -49,6 +49,7 @@ public class ClassUtilTest {
         ClassUtil.loadClass("jrouter.annotation.Action");
         try {
             ClassUtil.loadClass("jrouter.ActionFactory_Null");
+            fail("no exception");
         } catch (ClassNotFoundException e) {
             assertNotNull(e);
         }

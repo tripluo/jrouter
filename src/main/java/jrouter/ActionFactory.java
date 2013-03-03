@@ -20,10 +20,8 @@ import java.util.Map;
 
 /**
  * ActionFactory接口。
- *
- * @param <T> Action调用结果的类型。
  */
-public interface ActionFactory<T> {
+public interface ActionFactory {
 
     /**
      * 返回创建对象的工厂对象。
@@ -42,6 +40,7 @@ public interface ActionFactory<T> {
     /**
      * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。
      *
+     * @param <T> 调用Action的结果类型。
      * @param key Action的映射路径。
      * @param params 用于Action的调用参数。
      *
@@ -49,7 +48,7 @@ public interface ActionFactory<T> {
      *
      * @throws JRouterException 如果发生调用错误。
      */
-    T invokeAction(String key, Object... params) throws JRouterException;
+    <T> T invokeAction(String key, Object... params) throws JRouterException;
 
     /**
      * 移除ActionFactory中所有关联关系。
@@ -61,47 +60,37 @@ public interface ActionFactory<T> {
     /**
      * 返回Action集合。
      *
-     * @param <V> Action代理类的类型。
-     *
      * @return Action集合。
      */
-     <V extends ActionProxy> Map<String, V> getActions();
+    Map<String, ? extends ActionProxy> getActions();
 
     /**
      * 返回拦截器集合。
      *
-     * @param <V> 拦截器代理类的类型。
-     *
      * @return 拦截器集合。
      */
-     <V extends AbstractProxy> Map<String, V> getInterceptors();
+    Map<String, ? extends AbstractProxy> getInterceptors();
 
     /**
      * 返回拦截栈集合。
      *
-     * @param <V> 拦截栈代理类的类型。
-     *
      * @return 拦截栈集合。
      */
-     <V> Map<String, V> getInterceptorStacks();
+    Map<String, ?> getInterceptorStacks();
 
     /**
      * 返回结果类型集合。
      *
-     * @param <V> 结果类型代理类的类型。
-     *
      * @return 结果类型集合。
      */
-     <V extends AbstractProxy> Map<String, V> getResultTypes();
+    Map<String, ? extends AbstractProxy> getResultTypes();
 
     /**
      * 返回结果对象集合。
      *
-     * @param <V> 结果对象代理类的类型。
-     *
      * @return 结果对象集合。
      */
-     <V extends AbstractProxy> Map<String, V> getResults();
+    Map<String, ? extends AbstractProxy> getResults();
 
     /**
      * 返回默认拦截栈名称。

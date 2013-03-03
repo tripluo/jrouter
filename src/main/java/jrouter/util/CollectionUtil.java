@@ -129,7 +129,7 @@ public class CollectionUtil {
      *
      * @return 数组为null或者为空则返回{@code true}。
      */
-    public static <T> boolean isEmpty(T... a) {
+    public static <T> boolean isEmpty(T[] a) {
         return a == null || a.length == 0;
     }
 
@@ -141,7 +141,7 @@ public class CollectionUtil {
      *
      * @return 数组不为null且不为空则返回{@code true}。
      */
-    public static <T> boolean isNotEmpty(T... a) {
+    public static <T> boolean isNotEmpty(T[] a) {
         return !(a == null || a.length == 0);
     }
 
@@ -167,6 +167,30 @@ public class CollectionUtil {
      */
     public static boolean isNotEmpty(Collection<?> collection) {
         return !(collection == null || collection.isEmpty());
+    }
+
+    /**
+     *
+     * 判断Map是否不为空。
+     *
+     * @param map 待检测的Map。
+     *
+     * @return Map不为null且不为空则返回{@code true}。
+     */
+    public static boolean isEmpty(Map<?, ?> map) {
+        return map == null || map.isEmpty();
+    }
+
+    /**
+     *
+     * 判断Map是否不为空。
+     *
+     * @param map 待检测的Map。
+     *
+     * @return Map不为null且不为空则返回{@code true}。
+     */
+    public static boolean isNotEmpty(Map<?, ?> map) {
+        return !(map == null || map.isEmpty());
     }
 
     /**
@@ -220,25 +244,28 @@ public class CollectionUtil {
     /**
      * 依照指定的字符解析字符串至指定类型的集合。
      * 如果指定的集合为 null，则默认设置为{@link ArrayList}集合类型；
-     * 如果字符分隔数组为空，则直接返回包含原字符串的原集合。
+     * 如果原字符串为 null，则直接返回集合；
+     * 如果字符分隔数组为空，则直接返回包含原字符串的集合。
      *
      * @param <T> 指定的集合类型。
-     * @param src 原字符串。
+     * @param source 原字符串。
      * @param collection 指定类型的集合。
      * @param sep 指定的字符分隔数组。
      *
      * @return 解析后的字符串集合。
      */
-    public static <T extends Collection<String>> T stringToCollection(String src,
+    public static <T extends Collection<String>> T stringToCollection(String source,
             Collection<String> collection, char... sep) {
         if (collection == null)
             collection = new ArrayList<String>();
-        if (sep.length == 0) {
-            collection.add(src);
+        if (source == null) {
             return (T) collection;
         }
-
-        char[] chars = src.toCharArray();
+        if (sep.length == 0) {
+            collection.add(source);
+            return (T) collection;
+        }
+        char[] chars = source.toCharArray();
         int i = 0;
         int point = 0;
         int end = 0;
@@ -275,24 +302,25 @@ public class CollectionUtil {
 
     /**
      * 依照指定的字符解析字符串("key=value 或 key:value")至指定类型的键值映射。
-     * 如果指定的映射为 null，则默认设置为{@link LinkedHashMap}映射类型；如果字符分隔数组为空，则直接返回原映射。
+     * 如果指定的映射为 null，则默认设置为{@link LinkedHashMap}映射类型；
+     * 如果字符分隔数组为空，则直接返回映射。
      *
      * @param <T> 指定的映射类型。
-     * @param src 原字符串。
+     * @param source 原字符串。
      * @param map 指定类型的映射。
      * @param sep 指定的字符分隔数组。
      *
      * @return 解析后的字符串键值映射。
      */
-    public static <T extends Map<String, String>> T stringToMap(String src, Map<String, String> map,
+    public static <T extends Map<String, String>> T stringToMap(String source, Map<String, String> map,
             char... sep) {
         if (map == null)
             map = new LinkedHashMap<String, String>();
-        if (sep.length == 0) {
+        if (StringUtil.isEmpty(source) || sep.length == 0) {
             return (T) map;
         }
 
-        char[] chars = src.toCharArray();
+        char[] chars = source.toCharArray();
 
         int i = 0;
         int point = 0;

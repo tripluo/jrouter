@@ -16,10 +16,10 @@
  */
 package jrouter.result;
 
-import junit.framework.Assert;
 import jrouter.ActionInvocation;
 import jrouter.annotation.Result;
 import jrouter.annotation.ResultType;
+import org.junit.Assert;
 
 /**
  * DemoResult。
@@ -30,10 +30,10 @@ public class DemoResult {
     public static final String DEMO_RESULT_TYPE = "demo";
 
     /** result not found */
-    public static final String DEMO_RESULT_NOT_FOUND = "resultNotFound";
+    public static final String DEMO_RESULT_NOT_FOUND = "demoResultNotFound";
 
     /** result exception */
-    public static final String DEMO_RESULT_EXCEPTION = "resultException";
+    public static final String DEMO_RESULT_EXCEPTION = "demoResultException";
 
     //注入的属性
     private String value;

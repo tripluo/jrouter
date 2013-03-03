@@ -20,12 +20,14 @@ import jrouter.annotation.Action;
 import jrouter.impl.PathTreeTest;
 import static jrouter.impl.PathTreeTest.*;
 import jrouter.interceptor.SampleInterceptor;
+import org.springframework.stereotype.Component;
 
 /**
  * PathTestAction。
  *
  * @see PathTreeTest#PATHS
  */
+@Component
 public class PathTestAction {
 
     @Action(name = "/xx/yy/zz", interceptors = {SampleInterceptor.LOGGING})

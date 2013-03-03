@@ -67,7 +67,7 @@ class ClassScanner implements Serializable {
         Iterator<Class<?>> it = includes.iterator();
         out:
         while (it.hasNext()) {
-            Class cls = it.next();
+            Class<?> cls = it.next();
             //exclude interface, no public class and no default constructors
             if (cls.isInterface()
                     || Modifier.isAbstract(cls.getModifiers())
