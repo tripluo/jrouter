@@ -178,6 +178,6 @@ public class AopAction implements Serializable {
 
     @Override
     public String toString() {
-        return "AopAction{" + "matches=" + matches + ", interceptorStacks=" + interceptorStacks + ", interceptors=" + interceptors + ", type=" + type.getCode() + '}';
+        return "AopAction{" + "matches=" + matches + ", interceptorStacks=" + interceptorStacks + ", interceptors=" + interceptors + ", type=" + (type == null ? null : type.getCode()) + '}';
     }
 }

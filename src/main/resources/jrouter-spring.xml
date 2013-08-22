@@ -13,8 +13,6 @@
         <!-- optional default:null -->
         <property name="configLocation" value="classpath:jrouter.xml" />
         <!-- optional default -->
-        <property name="configurationClass" value="jrouter.config.Configuration"/>
-        <!-- optional default -->
         <property name="actionFactoryClass" value="jrouter.impl.DefaultActionFactory"/>
         <!-- optional default -->
         <property name="objectFactory">

@@ -133,7 +133,7 @@ public class JavassistProxyFactory implements ProxyFactory {
         Class<?>[] parameterTypes = method.getParameterTypes();
         //no parameters method
         if (parameterTypes.length == 0) {
-            body.append(method.getName()).append("()").toString();
+            body.append(method.getName()).append("()");
         } else {
             body.append(method.getName()).append("(");
             for (int i = 0; i < parameterTypes.length - 1; i++) {

@@ -614,8 +614,6 @@ public class Configuration implements Serializable {
         List<Element> list = getChildNodesByTagName(root, COMPONENT_SCAN);
         printSeparator(!list.isEmpty());
 
-        //separator
-        char[] sep = {',', ';'};
         for (Element e : list) {
             String pkg = e.getAttribute(PACKAGE);
             String include = e.getAttribute(INCLUDE_EXPRESSION);
@@ -1008,8 +1006,9 @@ public class Configuration implements Serializable {
                         }
                     }
                 }
-
             }
+            //give subclasses a chance to prepare factory
+            afterActionFactoryBuild(factory);
         } catch (ConfigurationException e) {
             throw e;
         } catch (Exception e) {
@@ -1064,6 +1063,15 @@ public class Configuration implements Serializable {
      * @param factory 未初始化属性的{@link ActionFactory}。
      */
     protected void afterActionFactoryCreation(ActionFactory factory) {
+    }
+
+    /**
+     * 用于子类继承, 在构造好ActionFactory后执行设置其一些特定的操作。
+     * 默认情况下不做任何处理。
+     *
+     * @param factory 未初始化属性的{@link ActionFactory}。
+     */
+    protected void afterActionFactoryBuild(ActionFactory factory) {
     }
 
     /**

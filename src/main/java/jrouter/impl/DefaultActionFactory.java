@@ -193,11 +193,9 @@ public class DefaultActionFactory implements ActionFactory {
                     LOG.info("Set pathSeparator : " + this.pathSeparator);
                 }
             } else if ("extension".equalsIgnoreCase(name)) {
-                if (value != null) {
-                    //设置路径后缀名称，不为null，可设置为空串
-                    this.extension = strValue;
-                    LOG.info("Set extension : " + this.extension);
-                }
+                //设置路径后缀名称，不为null，可设置为空串
+                this.extension = strValue;
+                LOG.info("Set extension : " + this.extension);
             } else if ("actionCacheNumber".equalsIgnoreCase(name)) {
                 actionCacheNumber = Integer.parseInt(strValue);
                 LOG.info("Set actionCacheNumber : " + this.actionCacheNumber);
@@ -224,7 +222,7 @@ public class DefaultActionFactory implements ActionFactory {
                     LOG.info("Set proxyFactory : " + this.proxyFactory);
                 }
             } else {
-                LOG.warn("Unknown property \"{}\" : {}", name, value);
+                LOG.warn("Ignore unknown property \"{}\" : {}", name, value);
             }
         }
         //default objectFactory

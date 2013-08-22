@@ -3,10 +3,18 @@ JROUTER CHANGELOG
 ==========================
 http://code.google.com/p/jrouter
 
+Changes in version 1.6.4 (2013-08-22)
+---------------------------------------
+* 更新Configuration，新增afterActionFactoryBuild(...)钩子方法。
+* 更新DefaultActionFactoryBean，修改configurationClass类的注入为Configuration对象的注入，与spring更好的集成。
+* 更新依赖包javassist至 3.18.0-GA.
+* 更新依赖包slf4j至 1.7.5.
+
+
 Changes in version 1.6.3 (2013-03-03)
 ---------------------------------------
 * 更改DefaultActionFactory添加重复项时输出警告信息为抛出异常。
-* 更改DefaultActionFactoryBean新增通过bean及class查找/过滤加载Action。
+* 更改DefaultActionFactoryBean新增通过bean及class查找/过滤加载组件。
 * 更新依赖包javassist至 3.17.1-GA.
 
 

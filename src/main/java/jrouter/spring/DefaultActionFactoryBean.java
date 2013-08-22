@@ -36,6 +36,7 @@ import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
@@ -63,7 +64,12 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     /** Configuration对象 */
     private Configuration configuration;
 
-    /** Configuration对象类型 */
+    /**
+     * Configuration对象类型
+     *
+     * @deprecated since 1.6.4
+     */
+    @Deprecated
     private Class<? extends Configuration> configurationClass = Configuration.class;
 
     /** @see ActionFactory#getObjectFactory() */
@@ -129,7 +135,9 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      */
     protected ActionFactory buildActionFactory() throws Exception {
         LOG.info("Initiating JRouter ActionFactory at : " + new java.util.Date());
-        configuration = configurationClass.newInstance();
+        if (configuration == null) {
+            configuration = new SpringConfiguration(applicationContext);
+        }
         //不保证ActionFactory属性的重复加载
         if (configLocation != null) {
             LOG.debug("Load configuration : " + configLocation.getURL());
@@ -360,13 +368,38 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      * @param configurationClass 指定的Configuration类型。
      *
      * @see jrouter.config.Configuration
+     * @see #setConfiguration(jrouter.config.Configuration)
+     *
+     * @deprecated since 1.6.4
      */
+    @Deprecated
     public void setConfigurationClass(Class<? extends Configuration> configurationClass) {
         if (configurationClass == null || !Configuration.class.isAssignableFrom(configurationClass)) {
             throw new IllegalArgumentException(
                     "'configurationClass' must be assignable to [jrouter.config.Configuration]");
         }
         this.configurationClass = (Class<? extends Configuration>) configurationClass;
+    }
+
+    /**
+     * 设置指定的Configuration。
+     *
+     * @param configuration 指定的Configuration。
+     */
+    public void setConfiguration(Configuration configuration) {
+        this.configuration = configuration;
+    }
+
+    /**
+     * Get the JRouter Configuration object used to build the ActionFactory.
+     *
+     * @return the JRouter Configuration object used to build the ActionFactory.
+     */
+    public final Configuration getConfiguration() {
+        if (this.configuration == null) {
+            throw new IllegalStateException("Configuration not initialized yet");
+        }
+        return this.configuration;
     }
 
     /**
@@ -492,5 +525,33 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      */
     public void setComponentBeanScanProperties(Properties componentBeanScanProperties) {
         this.componentBeanScanProperties = componentBeanScanProperties;
+    }
+
+    /**
+     * Configuration for springframework's DI.
+     */
+    private static class SpringConfiguration extends Configuration {
+
+        /** ApplicationContext */
+        private ApplicationContext applicationContext;
+
+        /**
+         * 构造一个指定ApplicationContext的对象。
+         *
+         * @param applicationContext ApplicationContext对象。
+         */
+        public SpringConfiguration(ApplicationContext applicationContext) {
+            this.applicationContext = applicationContext;
+        }
+
+        @Override
+        public void afterActionFactoryCreation(ActionFactory actionFactory) {
+            applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(actionFactory, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+        }
+
+        @Override
+        protected void afterActionFactoryBuild(ActionFactory actionFactory) {
+            applicationContext.getAutowireCapableBeanFactory().initializeBean(actionFactory, null);
+        }
     }
 }

@@ -20,7 +20,6 @@
 
     <!-- JRouter ActionFactory Test -->
     <bean id="actionFactoryTest" class="jrouter.spring.DefaultActionFactoryBean">
-        <property name="configurationClass" value="jrouter.config.Configuration"/>
         <!-- load from xml first -->
         <property name="configLocation" value="classpath:jrouter_test.xml" />
         <property name="actionFactoryProperties">

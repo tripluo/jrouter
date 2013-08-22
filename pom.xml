@@ -5,7 +5,7 @@
     <groupId>jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.3</version>
+    <version>1.6.4</version>
     <name>JRouter</name>
     <url>http://code.google.com/p/jrouter/</url>
     <repositories>
@@ -21,13 +21,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.2</version>
+            <version>1.7.5</version>
         </dependency>
         <!-- logback -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.0.9</version>
+            <version>1.0.13</version>
             <optional>true</optional>
         </dependency>
 
@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.2</version>
+            <version>1.7.5</version>
             <optional>true</optional>
         </dependency>
 
@@ -55,7 +55,7 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.17.1-GA</version>
+            <version>3.18.0-GA</version>
             <optional>true</optional>
         </dependency>
 
@@ -80,7 +80,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.1</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -124,7 +124,7 @@
     </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>3.2.1.RELEASE</spring.version>
+        <spring.version>3.2.4.RELEASE</spring.version>
     </properties>
     <licenses>
         <license>
