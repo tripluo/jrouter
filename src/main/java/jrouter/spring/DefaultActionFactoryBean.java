@@ -500,7 +500,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     /**
      * 设置扫描类工具的顺序配置。
      *
-     * @param classScannerProperties 扫描类工具的顺序配置集合。
+     * @param componentClassScanProperties 扫描类工具的顺序配置集合。
      *
      * @see Configuration#parsecComponentClassScanner(java.util.Map)
      */
@@ -533,7 +533,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     private static class SpringConfiguration extends Configuration {
 
         /** ApplicationContext */
-        private ApplicationContext applicationContext;
+        private final ApplicationContext applicationContext;
 
         /**
          * 构造一个指定ApplicationContext的对象。

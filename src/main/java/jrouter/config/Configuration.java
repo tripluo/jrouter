@@ -23,7 +23,10 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import jrouter.ActionFactory;
 import jrouter.config.AopAction.Type;
 import jrouter.impl.DefaultActionFactory;
@@ -39,6 +42,11 @@ import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.xml.sax.EntityResolver;
+import org.xml.sax.ErrorHandler;
+import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
 
 /**
  * 启动jrouter容器的入口配置类。
@@ -49,7 +57,8 @@ import org.w3c.dom.Node;
  * }。
  * </p>
  *
- * <p> 通常如下使用：
+ * <p>
+ * 通常如下使用：
  * <code><blockquote><pre>
  * Configuration config = new Configuration().load(URL url);
  * ActionFactory factory = config.buildActionFactory();
@@ -69,6 +78,11 @@ public class Configuration implements Serializable {
 ////////////////////////////////////////////////////////////////////////////////
 //                           xml配置文件元素                                   //
 ////////////////////////////////////////////////////////////////////////////////
+    /**
+     * JAXP attribute used to configure the schema language for validation.
+     */
+    private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+
     /** 默认xml文件的名称 */
     public static final String JROUTER_XML = "jrouter.xml";
 
@@ -293,12 +307,6 @@ public class Configuration implements Serializable {
     }
 
     /**
-     * TODO
-     */
-    private void validate() {
-    }
-
-    /**
      * 从指定资源获取URL。
      *
      * @param resource 资源文件名。
@@ -336,6 +344,74 @@ public class Configuration implements Serializable {
     }
 
     /**
+     * 解析xml配置文件。
+     */
+    private static class DocumentLoader {
+
+        /* SAX 错误处理对象 */
+        static ErrorHandler ERROR_HANDLER = new ErrorHandler() {
+
+            @Override
+            public void warning(SAXParseException ex) throws SAXException {
+                LOG.warn("Ignored XML validation warning", ex);
+            }
+
+            @Override
+            public void error(SAXParseException ex) throws SAXException {
+                throw ex;
+            }
+
+            @Override
+            public void fatalError(SAXParseException ex) throws SAXException {
+                throw ex;
+            }
+        };
+
+        /* 用于解析实体的对象 */
+        static EntityResolver ENTITY_RESOLVER = new EntityResolver() {
+
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws
+                    SAXException, IOException {
+                if (systemId != null) {
+                    InputSource source = new InputSource(getResource(JROUTER_XSD).openStream());
+                    source.setPublicId(publicId);
+                    source.setSystemId(JROUTER_XSD);
+                    return source;
+                }
+                return null;
+            }
+        };
+
+        /**
+         * 将给定 InputStream 的内容解析为一个 XML 文档，并且返回一个新的 DOM <code>Document</code> 对象。
+         *
+         * @param stream 包含要解析内容的 InputStream。
+         *
+         * @return <code>Document</code> 对象。
+         */
+        private static Document loadDocument(InputStream stream) throws ParserConfigurationException,
+                SAXException, IOException {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setValidating(true);
+            try {
+                factory.setAttribute(JAXP_SCHEMA_LANGUAGE, XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            } catch (IllegalArgumentException ex) {
+                // Happens if the parser does not support JAXP 1.2
+                throw new ConfigurationException(
+                        "Unable to validate using XSD: Your JAXP provider [" + factory
+                        + "] does not support XML Schema. Are you running on Java 1.4 with Apache Crimson? "
+                        + "Upgrade to Apache Xerces (or Java 1.5) for full XSD support.", ex);
+            }
+            DocumentBuilder docBuilder = factory.newDocumentBuilder();
+            docBuilder.setEntityResolver(ENTITY_RESOLVER);
+            docBuilder.setErrorHandler(ERROR_HANDLER);
+            return docBuilder.parse(stream);
+        }
+    }
+
+    /**
      * 从指定的InputStream对象中加载配置。
      *
      * @param stream 指定的InputStream。
@@ -348,7 +424,7 @@ public class Configuration implements Serializable {
     protected Configuration load(InputStream stream, String resourceName) throws
             ConfigurationException {
         try {
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stream);
+            Document doc = DocumentLoader.loadDocument(stream);
             //root node : <jrouter>
             Element root = doc.getDocumentElement();
 
@@ -451,7 +527,7 @@ public class Configuration implements Serializable {
         record.put(includeFile, from);
 
         try {
-            Document doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stream);
+            Document doc = DocumentLoader.loadDocument(stream);
             Element root = doc.getDocumentElement();
 
             //add properties

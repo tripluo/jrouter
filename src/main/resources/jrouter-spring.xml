@@ -51,7 +51,6 @@
                 </value>
             </list>
         </property>
-
         <property name="interceptors">
             <list>
                 <!-- the value can be the class name or the ref bean: -->
