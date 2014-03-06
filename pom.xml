@@ -7,14 +7,7 @@
     <packaging>jar</packaging>
     <version>1.6.5</version>
     <name>JRouter</name>
-    <url>http://code.google.com/p/jrouter/</url>
-    <repositories>
-        <repository>
-            <id>JRouter</id>
-            <name>JRouter Repository</name>
-            <url>http://jrouter.googlecode.com/svn/repository</url>
-        </repository>
-    </repositories>
+    <url>http://git.oschina.net/sundancer/jrouter/</url>
 
     <dependencies>
         <!-- slf4j -->
@@ -134,9 +127,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:svn:http://jrouter.googlecode.com/svn/trunk/</connection>
-        <developerConnection>scm:svn:https://jrouter.googlecode.com/svn/trunk/</developerConnection>
-        <url>http://code.google.com/p/jrouter/source/browse</url>
+        <connection>scm:git:git@git.oschina.net:sundancer/jrouter.git</connection>
+        <developerConnection>scm:git:git@git.oschina.net:sundancer/jrouter.git</developerConnection>
+        <url>http://git.oschina.net/sundancer/jrouter/</url>
     </scm>
     <developers>
         <developer>
