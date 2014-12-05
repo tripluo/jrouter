@@ -11,7 +11,7 @@
     <!-- JRouter ActionFactory -->
     <bean id="actionFactory" class="jrouter.spring.DefaultActionFactoryBean">
         <!-- optional default:null -->
-        <property name="configLocation" value="classpath:jrouter.xml" />
+        <property name="configLocation" value="classpath:jrouter.xml"/>
         <!-- optional default -->
         <property name="actionFactoryClass" value="jrouter.impl.DefaultActionFactory"/>
         <!-- optional default -->
@@ -21,8 +21,8 @@
         <!-- optional default -->
         <property name="actionFactoryProperties">
             <value>
-                <!-- optional default:null -->
-                actionInvocationClass = jrouter.impl.DefaultActionInvocation
+                <!-- optional default:null deprecated since 1.6.6 -->
+                <!--actionInvocationClass = jrouter.impl.DefaultActionInvocation-->
                 <!-- optional default:null -->
                 defaultInterceptorStack = empty
                 <!-- optional default:null -->
@@ -35,6 +35,8 @@
                 actionCacheNumber = 10000
                 <!-- optional default -->
                 bytecode = javassist
+                <!-- optional default -->
+                converterFactory = jrouter.impl.LastPadParameterFactory
             </value>
         </property>
 

@@ -23,6 +23,7 @@ import jrouter.annotation.Namespace;
 import jrouter.annotation.Parameter;
 import jrouter.annotation.Result;
 import jrouter.annotation.Scope;
+import jrouter.impl.DefaultActionInvocation;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;
@@ -181,9 +182,9 @@ public class SimpleAction {
      * 测试Action的注入属性。
      */
     @Action(interceptorStack = DemoInterceptor.DEMO,
-    results = {
-        @Result(name = "*", type = DemoResult.DEMO_RESULT_TYPE)
-    })
+            results = {
+                @Result(name = "*", type = DemoResult.DEMO_RESULT_TYPE)
+            })
     public String inject() {
         Assert.assertEquals("admin", string);
         Assert.assertEquals(100, number);
@@ -215,6 +216,28 @@ public class SimpleAction {
      */
     public int autoIncluded() {
         return 1;
+    }
+
+    /**
+     * 测试LastPadParameter。
+     *
+     * @see jrouter.impl.LastPadParameterFactory
+     */
+    @Action
+    public String lastPadParameter(ActionInvocation invocation) {
+        Assert.assertNotNull(invocation);
+        return invocation.getActionProxy().getPath();
+    }
+
+    /**
+     * 测试LastPadParameter。
+     *
+     * @see jrouter.impl.LastPadParameterFactory
+     */
+    @Action
+    public String lastPadParameter2(String test, DefaultActionInvocation invocation) {
+        Assert.assertNotNull(invocation);
+        return test + invocation.getActionProxy().getPath();
     }
 
     /**

@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
@@ -8,7 +9,7 @@
     <description>jrouter与springframework集成的配置文件</description>
 
     <!-- 使用annotation 自动注册bean, 并保证@Required,@Autowired的属性被注入 -->
-    <context:component-scan base-package="jrouter" />
+    <context:component-scan base-package="jrouter"/>
 
     <!-- test spring inject -->
     <bean id="springInject" class="java.lang.String">
@@ -16,7 +17,7 @@
     </bean>
 
     <!-- test action -->
-    <bean id="URLTestAction2" class="jrouter.URLTestAction2" />
+    <bean id="URLTestAction2" class="jrouter.URLTestAction2"/>
 
     <!-- JRouter ActionFactory Test -->
     <bean id="actionFactoryTest" class="jrouter.spring.DefaultActionFactoryBean">
@@ -26,7 +27,6 @@
         </property>
         <property name="actionFactoryProperties">
             <value>
-                actionInvocationClass = jrouter.impl.DefaultActionInvocation
                 defaultInterceptorStack = empty
                 defaultResultType = empty
                 pathSeparator = /

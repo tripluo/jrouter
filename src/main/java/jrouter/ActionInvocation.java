@@ -16,6 +16,7 @@
  */
 package jrouter;
 
+import jrouter.annotation.Dynamic;
 import jrouter.annotation.Result;
 
 /**
@@ -23,6 +24,7 @@ import jrouter.annotation.Result;
  *
  * @param <T> Action调用结果的类型。
  */
+@Dynamic
 public interface ActionInvocation<T> {
 
     /**
@@ -90,9 +92,30 @@ public interface ActionInvocation<T> {
     void setInvokeResult(Object result);
 
     /**
+     * 设置Action调用完成后将执行的结果对象。
+     *
+     * @param result 指定的结果对象。
+     */
+    void setResult(Result result);
+
+    /**
      * 返回Action调用完成后将执行的结果对象，若Action尚未调用则返回null。
      *
      * @return 结果对象。
      */
     Result getResult();
+
+    /**
+     * 设置Action运行时上下文中的底层方法参数的转换器。
+     *
+     * @param parameterConverter 底层方法参数的转换器。
+     */
+    void setParameterConverter(ParameterConverter parameterConverter);
+
+    /**
+     * 返回当前Action运行时上下文中的底层方法参数的转换器。
+     *
+     * @return 底层方法参数的转换器。
+     */
+    ParameterConverter getParameterConverter();
 }

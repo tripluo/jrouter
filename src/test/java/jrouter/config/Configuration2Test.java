@@ -17,6 +17,7 @@
 package jrouter.config;
 
 import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.LastPadParameterFactory;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;
@@ -49,12 +50,13 @@ public class Configuration2Test extends Assert {
         config = new Configuration();
         factory = config.load("/jrouter_test.xml").buildActionFactory();
         assertNotNull(factory);
-        assertSame(jrouter.impl.DefaultActionInvocation.class, factory.getActionInvocationClass());
         assertEquals("empty", factory.getDefaultInterceptorStack());
         assertEquals("empty", factory.getDefaultResultType());
         assertEquals(100000, factory.getActionCacheNumber());
         assertEquals(".", factory.getExtension());
         assertEquals('/', factory.getPathSeparator());
+
+        assertEquals(LastPadParameterFactory.class, factory.getConverterFactory().getClass());
 
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.LOGGING));
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.TIMER));

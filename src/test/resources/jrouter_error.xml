@@ -1,21 +1,21 @@
 <jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../main/resources/jrouter-1.6.xsd">
 
-    <action-factory class="jrouter.impl.DefaultActionFactory" >
-        <property name="defaultInterceptorStack" value="empty" />
-        <property name="defaultResultType" value="empty" />
-        <property name="extension" value="." />
+    <action-factory class="jrouter.impl.DefaultActionFactory">
+        <property name="defaultInterceptorStack" value="empty"/>
+        <property name="defaultResultType" value="empty"/>
+        <property name="extension" value="."/>
     </action-factory>
 
     <!-- interceptor -->
-    <interceptor class="jrouter.interceptor.SampleInterceptor" />
+    <interceptor class="jrouter.interceptor.SampleInterceptor"/>
 
     <!-- interceptor-stack -->
-    <interceptor-stack class="jrouter.interceptor.DefaultInterceptorStack" />
+    <interceptor-stack class="jrouter.interceptor.DefaultInterceptorStack"/>
 
     <!-- result-type -->
-    <result-type class="jrouter.result.DefaultResult" />
+    <result-type class="jrouter.result.DefaultResult"/>
 
     <!-- include -->
-    <include file="test/include1.xml" />
+    <include file="test/include1.xml"/>
 </jrouter>

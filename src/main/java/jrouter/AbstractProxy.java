@@ -34,12 +34,6 @@ public abstract class AbstractProxy {
     private boolean singleton = true;
 
     /**
-     * 未指定方法及其对象的构造方法。
-     */
-    public AbstractProxy() {
-    }
-
-    /**
      * 指定方法及其对象的构造方法。
      *
      * @param method 指定的方法。
@@ -76,11 +70,20 @@ public abstract class AbstractProxy {
     public abstract Object invoke(Object... params) throws JRouterException;
 
     /**
+     * 返回调用方法。
+     *
+     * @return 调用方法。
+     */
+    public Method getMethod() {
+        return method;
+    }
+
+    /**
      * 返回调用方法的描述信息。
      *
      * @return 调用方法的描述信息。
      */
-    public String getMethod() {
+    public String getMethodInfo() {
         return MethodUtil.getMethod(method);
     }
 

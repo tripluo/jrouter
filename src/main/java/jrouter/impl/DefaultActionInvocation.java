@@ -22,13 +22,17 @@ import java.util.Map;
 import jrouter.ActionFactory;
 import jrouter.ActionInvocation;
 import jrouter.ActionProxy;
+import jrouter.ParameterConverter;
+import jrouter.annotation.Dynamic;
 import jrouter.annotation.Result;
+import jrouter.util.MethodUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Action运行时上下文的默认代理类，记录了Action运行时的状态、调用参数、拦截器、结果对象、ActionFactory等信息。
  */
+@Dynamic
 public class DefaultActionInvocation implements ActionInvocation {
 
     /** 日志 */
@@ -38,19 +42,19 @@ public class DefaultActionInvocation implements ActionInvocation {
     protected boolean executed = false;
 
     /** ActionFactory */
-    private ActionFactory actionFactory;
+    private final ActionFactory actionFactory;
 
     /** DefaultActionProxy */
-    private DefaultActionProxy actionProxy;
+    private final DefaultActionProxy actionProxy;
 
     /** interceptors reference */
-    private List<InterceptorProxy> interceptors;
+    private final List<InterceptorProxy> interceptors;
 
     /** recursion invoke index */
     private int _index = 0;
 
     /** 方法调用的参数 */
-    private Object[] params;
+    private final Object[] params;
 
     /** 方法调用后的结果 */
     private Object invokeResult;
@@ -60,6 +64,10 @@ public class DefaultActionInvocation implements ActionInvocation {
 
     /** Action路径的参数匹配映射 */
     private Map<String, String> actionPathParameters;
+
+    /** 底层方法参数的转换器 */
+    @Dynamic
+    private ParameterConverter parameterConverter;
 
     /**
      * 构造一个Action运行时上下文的代理类，包含指定的ActionFactory、ActionProxy、Action路径的参数匹配映射及调用参数。
@@ -73,7 +81,18 @@ public class DefaultActionInvocation implements ActionInvocation {
         this.actionFactory = actionFactory;
         this.actionProxy = actionProxy;
         this.params = params;
-        interceptors = actionProxy.getInterceptorProxies();
+        this.interceptors = actionProxy.getInterceptorProxies();
+    }
+
+    /**
+     * 在调用Action之前初始化参数转换器（如果已设置参数转换器则不调用），通过继承提供在Action调用时传递自定义的参数转换。
+     *
+     * @return 初始化后的参数转换器或已设置的参数转换器。
+     */
+    protected ParameterConverter buildParameterConverterBeforeActionInvocation() {
+        if (actionFactory.getConverterFactory() != null)
+            parameterConverter = actionFactory.getConverterFactory().getParameterConverter(this);
+        return parameterConverter;
     }
 
     @Override
@@ -83,9 +102,9 @@ public class DefaultActionInvocation implements ActionInvocation {
             params = this.params;
         setExecuted(true);
         LOG.debug("Invoke Action [{}]; Parameters {} at : {}",
-                actionProxy.getPath(), java.util.Arrays.toString(params), actionProxy.getMethod());
+                actionProxy.getPath(), java.util.Arrays.toString(params), actionProxy.getMethodInfo());
         //set invokeResult
-        invokeResult = actionProxy.invoke(params);
+        invokeResult = MethodUtil.invoke(actionProxy, parameterConverter, params);
         return invokeResult;
     }
 
@@ -94,11 +113,15 @@ public class DefaultActionInvocation implements ActionInvocation {
         if (executed) {
             throw new IllegalStateException("Action [" + actionProxy.getPath() + "] has already been executed");
         }
+        if (parameterConverter == null) {
+            parameterConverter = buildParameterConverterBeforeActionInvocation();
+        }
         //recursive invoke
         if (interceptors != null && _index < interceptors.size()) {
             final InterceptorProxy interceptor = interceptors.get(_index++);
-            LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethod());
-            invokeResult = interceptor.isRequireAction() ? interceptor.invoke(this) : interceptor.invoke();
+            LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
+            //pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
+            invokeResult = MethodUtil.invoke(interceptor, parameterConverter);
         } else {
             //action invoke
             if (!executed) {
@@ -147,12 +170,8 @@ public class DefaultActionInvocation implements ActionInvocation {
         return actionProxy;
     }
 
-    /**
-     * 设置结果对象。
-     *
-     * @param result 指定的结果对象。
-     */
-    void setResult(Result result) {
+    @Override
+    public void setResult(Result result) {
         this.result = result;
     }
 
@@ -171,7 +190,7 @@ public class DefaultActionInvocation implements ActionInvocation {
     }
 
     /**
-     * 未完成
+     * TODO
      *
      * 返回Action路径匹配的键值映射，不包含任何匹配的键值则返回空映射。
      *
@@ -179,6 +198,16 @@ public class DefaultActionInvocation implements ActionInvocation {
      */
     public Map<String, String> getActionPathParameters() {
         return actionPathParameters;
+    }
+
+    @Override
+    public void setParameterConverter(ParameterConverter parameterConverter) {
+        this.parameterConverter = parameterConverter;
+    }
+
+    @Override
+    public ParameterConverter getParameterConverter() {
+        return this.parameterConverter;
     }
 
     /**

@@ -26,13 +26,14 @@ import jrouter.annotation.ResultType;
 public final class ResultTypeProxy extends DefaultProxy {
 
     /** 结果类型的名称 */
-    private String type;
+    private final String type;
 
     /** 结果类型 */
-    private ResultType resultType;
+    private final ResultType resultType;
 
     /** 是否传递ActionInvocation参数 */
-    private boolean requireAction;
+    @Deprecated
+    private final boolean requireAction;
 
     /**
      * 构造一个结果类型的代理类，包含指定的结果类型、代理的方法及方法的对象。
@@ -73,6 +74,8 @@ public final class ResultTypeProxy extends DefaultProxy {
      * 结果类型调用是否传递ActionInvocation参数。
      *
      * @return 结果类型的调用是否传递ActionInvocation参数。
+     *
+     * @deprecated since 1.6.6
      */
     public boolean isRequireAction() {
         return requireAction;

@@ -27,10 +27,11 @@ import jrouter.annotation.ResultType;
 public final class ResultProxy extends DefaultProxy {
 
     /** 是否传递ActionInvocation参数 */
-    private boolean requireAction;
+    @Deprecated
+    private final boolean requireAction;
 
     /** 结果对象 */
-    private Result result;
+    private final Result result;
 
     /** 结果对象相应的结果类型 未完成 */
     private ResultType resultType;
@@ -64,6 +65,8 @@ public final class ResultProxy extends DefaultProxy {
      * 判断拦截器调用是否传递ActionInvocation参数。
      *
      * @return 拦截器调用是否传递ActionInvocation参数。
+     *
+     * @deprecated since 1.6.6
      */
     public boolean isRequireAction() {
         return requireAction;

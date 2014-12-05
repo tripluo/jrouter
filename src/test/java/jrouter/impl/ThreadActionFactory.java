@@ -20,7 +20,7 @@ import java.util.Map;
 import jrouter.ActionInvocation;
 
 /**
- * ThreadActionFactory to restore the ActionInvocation pre thread。
+ * ThreadActionFactory restores the ActionInvocation pre thread。
  */
 public class ThreadActionFactory extends DefaultActionFactory {
 

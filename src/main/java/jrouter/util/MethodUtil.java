@@ -19,6 +19,9 @@ package jrouter.util;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import jrouter.AbstractProxy;
+import jrouter.ActionInvocation;
+import jrouter.ParameterConverter;
 
 /**
  * Method工具类。
@@ -29,8 +32,8 @@ public class MethodUtil {
     public static final String CGLIB_CLASS_SEPARATOR = "$$";
 
     /** @see java.lang.reflect.Method#LANGUAGE_MODIFIERS */
-    private static final int LANGUAGE_MODIFIERS =
-            Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE
+    private static final int LANGUAGE_MODIFIERS
+            = Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE
             | Modifier.ABSTRACT | Modifier.STATIC | Modifier.FINAL
             | Modifier.SYNCHRONIZED | Modifier.NATIVE;
 
@@ -178,5 +181,36 @@ public class MethodUtil {
         } catch (Exception e) {
             return "<" + e + ">";
         }
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 提供AbstractProxy子对象通过参数转换器调用底层方法。
+     *
+     * @param proxy AbstractProxy子对象。
+     * @param converter 转换底层方法调用参数的转换器。
+     * @param params 用于方法调用的参数。
+     *
+     * @return AbstractProxy子对象底层方法调用后的结果。
+     *
+     * @see AbstractProxy#invoke(java.lang.Object...)
+     */
+    public static Object invoke(AbstractProxy proxy, ParameterConverter converter, Object... params) {
+        return converter == null ? proxy.invoke(params) : proxy.invoke(converter.convert(proxy.getMethod(), proxy, params));
+    }
+
+    /**
+     * 提供AbstractProxy子对象通过Action运行时上下文的参数转换器调用底层方法。
+     *
+     * @param proxy AbstractProxy子对象。
+     * @param invocation Action运行时上下文对象。
+     * @param params 用于方法调用的参数。
+     *
+     * @return AbstractProxy子对象底层方法调用后的结果。
+     *
+     * @see #invoke(jrouter.AbstractProxy, jrouter.ParameterConverter, java.lang.Object...)
+     */
+    public static Object invoke(AbstractProxy proxy, ActionInvocation invocation, Object... params) {
+        return invoke(proxy, invocation.getParameterConverter(), params);
     }
 }

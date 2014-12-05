@@ -33,9 +33,16 @@ public interface ActionFactory {
     /**
      * 返回创建方法代理对象的工厂对象。
      *
-     * @return 方法代理对象的工厂对象。
+     * @return 创建方法代理对象的工厂对象。
      */
     ProxyFactory getProxyFactory();
+
+    /**
+     * 返回创建底层方法转换器的工厂对象。
+     *
+     * @return 创建底层方法转换器的工厂对象。
+     */
+    ConverterFactory getConverterFactory();
 
     /**
      * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。

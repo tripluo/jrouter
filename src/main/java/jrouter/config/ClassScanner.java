@@ -39,7 +39,7 @@ class ClassScanner implements Serializable {
     /**
      * Class路径匹配器。
      */
-    private AntPathMatcher matcher = new AntPathMatcher(".");
+    private final AntPathMatcher matcher = new AntPathMatcher(".");
 
     /**
      * 包含的包或类。

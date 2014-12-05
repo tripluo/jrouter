@@ -3,6 +3,26 @@ JROUTER CHANGELOG
 ==========================
 http://code.google.com/p/jrouter
 
+Changes in version 1.6.6 (2014-12-06)
+---------------------------------------
+* 新增@Dynamic，指示经常需要根据条件创建新对象的接口、类或成员变量。
+* 新增ParameterConverter接口，针对底层方法调用参数的转换。
+* 新增ConverterFactory接口，生成底层方法调用参数转换器的工厂接口。
+* 新增LastPadParameterFactory类，提供追加最后一个参数的转换类及工厂类。
+* ActionFactory接口新增getConverterFactory()方法，返回创建方法代理对象的工厂对象。
+* ActionInvocation接口新增setParameterConverter()/getParameterConverter()方法，设置/返回Action运行时底层方法参数的转换器。
+* ActionInvocation接口新增setResult()方法，设置Action调用完成后将执行的结果对象。
+* DefaultActionInvocation新增buildParameterConverterBeforeActionInvocation()方法，通过继承提供在Action调用时传递自定义的参数转换。
+* DefaultActionFactory新增converterFactory初始化属性，默认提供LastPadParameterFactory实现。
+* 配置jrouter.properties/jrouter.xml文件删除actionInvocationClass属性，添加converterFactory属性。
+* 重构AbstractProxy类getMethod()返回底层方法对象，getMethodInfo()返回底层方法的描述信息。
+* 废除DefaultActionFactory的actionInvocationClass变量及getActionInvocationClass()方法。
+* 废除InterceptorProxy/ResultProxy/ResultTypeProxy的requireAction属性及isRequireAction()方法。
+* 完善DefaultActionFactory的converterFactory属性的测试。
+* 更新依赖包slf4j至 1.7.7
+* 更新依赖包springframework至 4.1.2.
+
+
 Changes in version 1.6.5 (2014-02-26)
 ---------------------------------------
 * 加入jrouter.xml配置文件解析错误验证。

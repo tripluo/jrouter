@@ -48,12 +48,13 @@ public class ActionFactoryTest {
     @Before
     public void init() {
         factory = initiateConfiguration().buildActionFactory();
-        assertSame(jrouter.impl.DefaultActionInvocation.class, factory.getActionInvocationClass());
         assertEquals("empty", factory.getDefaultInterceptorStack());
         assertEquals("empty", factory.getDefaultResultType());
         assertEquals(100000, factory.getActionCacheNumber());
         assertEquals(".", factory.getExtension());
         assertEquals('/', factory.getPathSeparator());
+        assertEquals(LastPadParameterFactory.class, factory.getConverterFactory().getClass());
+
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.LOGGING));
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.TIMER));
     }
@@ -69,8 +70,6 @@ public class ActionFactoryTest {
     @Test
     public void test_createActionFactory() {
         Map<String, Object> props = new HashMap<String, Object>();
-        //set ActionInvocationClass
-        props.put("actionInvocationClass", DefaultActionInvocation.class);
         //set extension
         props.put("extension", ".do");
         factory = new DefaultActionFactory(props);
@@ -326,6 +325,8 @@ public class ActionFactoryTest {
     @Test
     public void test_resultNotFound() {
         String url = "/test/resultNotFound";
+        assertTrue(factory.getResults().containsKey(DemoResult.DEMO_RESULT_NOT_FOUND));
+        assertTrue(factory.getResults().containsKey(DemoResult.DEMO_RESULT_EXCEPTION));
         assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url, factory.invokeAction(url, DemoResult.DEMO_RESULT_NOT_FOUND));
         try {
             assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url, factory.invokeAction(url, DemoResult.DEMO_RESULT_EXCEPTION));
@@ -377,5 +378,19 @@ public class ActionFactoryTest {
         ActionProxy ap = factory.getActions().get(included);
         assertNotNull(ap);
         assertEquals(1, factory.invokeAction(included));
+    }
+
+    /**
+     * 测试ActionFactory的converterFactory属性。
+     *
+     * @see DefaultActionFactory#converterFactory
+     * @see jrouter.impl.LastPadParameterFactory
+     */
+    @Test
+    public void test_lastPadParameter() {
+        String lastPadParameter = "/test/lastPadParameter";
+        String lastPadParameter2 = "/test/lastPadParameter2";
+        assertEquals(lastPadParameter, factory.invokeAction(lastPadParameter));
+        assertEquals("path" + lastPadParameter2, factory.invokeAction(lastPadParameter2, "path"));
     }
 }

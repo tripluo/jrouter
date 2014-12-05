@@ -28,17 +28,18 @@ public final class InterceptorProxy extends DefaultProxy {
     /**
      * 拦截器的名称
      */
-    private String name;
+    private final String name;
 
     /**
      * 拦截器
      */
-    private Interceptor interceptor;
+    private final Interceptor interceptor;
 
     /**
      * 是否传递ActionInvocation参数
      */
-    private boolean requireAction;
+    @Deprecated
+    private final boolean requireAction;
 
     /**
      * 构造一个拦截器的代理类，包含指定的拦截器名称、拦截器调用参数的状态。
@@ -79,6 +80,8 @@ public final class InterceptorProxy extends DefaultProxy {
      * 判断拦截器调用是否传递ActionInvocation参数。
      *
      * @return 拦截器调用是否传递ActionInvocation参数。
+     *
+     * @deprecated since 1.6.6
      */
     public boolean isRequireAction() {
         return requireAction;

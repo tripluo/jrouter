@@ -37,16 +37,16 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
     private static final Logger LOG = LoggerFactory.getLogger(DefaultActionProxy.class);
 
     /** ActionFactory */
-    private ActionFactory actionFactory;
+    private final ActionFactory actionFactory;
 
     /** 命名空间 */
-    private String namespace;
+    private final String namespace;
 
     /** 全路径 */
-    private String path;
+    private final String path;
 
     /** Action */
-    private Action action;
+    private final Action action;
 
     /**
      * 未完成
@@ -94,7 +94,7 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
         if (action != null) {
             switch (action.scope()) {
                 case SINGLETON:
-                    LOG.debug("Get singleton ActionProxy [{}] at : {}", this, getMethod());
+                    LOG.debug("Get singleton ActionProxy [{}] at : {}", this, getMethodInfo());
                     return this;
                 case PROTOTYPE: {
                     if (object != null) {
@@ -104,7 +104,7 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
                             Injector.injectAction(path, invoker);
                             DefaultActionProxy ap = this.clone();
                             ap.object = invoker;
-                            LOG.debug("Get prototype ActionProxy [{}] at : {}", ap, getMethod());
+                            LOG.debug("Get prototype ActionProxy [{}] at : {}", ap, getMethodInfo());
                             return ap;
                         } catch (IllegalAccessException e) {
                             throw new InvocationProxyException(e, this);

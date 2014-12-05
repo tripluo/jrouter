@@ -110,5 +110,5 @@ public interface ActionProxy {
      *
      * @return 调用方法的描述信息。
      */
-    String getMethod();
+    String getMethodInfo();
 }

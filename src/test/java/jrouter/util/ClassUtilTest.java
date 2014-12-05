@@ -32,8 +32,8 @@ public class ClassUtilTest {
         assertEquals(0, ClassUtil.getClasses().size());
         assertEquals(0, ClassUtil.getClasses("").size());
 
-        assertEquals(9, ClassUtil.getClasses("jrouter.annotation").size());
-        assertEquals(9, ClassUtil.getClasses("jrouter.annotation", "jrouter.annotation").size());
+        assertEquals(10, ClassUtil.getClasses("jrouter.annotation").size());
+        assertEquals(10, ClassUtil.getClasses("jrouter.annotation", "jrouter.annotation").size());
 
         //包含测试类、内部类，不做个数验证
         assertTrue(!ClassUtil.getClasses("jrouter.impl").isEmpty());

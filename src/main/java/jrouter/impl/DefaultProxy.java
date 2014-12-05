@@ -46,12 +46,6 @@ public class DefaultProxy extends AbstractProxy {
     private Proxy proxy;
 
     /**
-     * 未指定方法及其对象的构造方法。
-     */
-    public DefaultProxy() {
-    }
-
-    /**
      * 指定方法及其对象的构造方法。
      *
      * @param method 指定的方法。

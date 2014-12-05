@@ -804,6 +804,23 @@ public class Configuration implements Serializable {
         }
         return eles;
     }
+
+    /**
+     * TODO
+     *
+     * @param element
+     * @param attribute
+     *
+     * @return
+     */
+    private String getTrimmedToNullString(Element element, String attribute) {
+        String str = element.getAttribute(attribute);
+        if (str != null)
+            str = str.trim();
+        if (str != null && str.length() == 0)
+            str = null;
+        return str;
+    }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**

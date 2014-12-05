@@ -29,7 +29,7 @@ public class AopActionBean extends AopAction {
     private static final long serialVersionUID = 1L;
 
     /** 分隔符 */
-    private char[] sep = {',', ';'};
+    private final char[] sep = {',', ';'};
 
     /**
      * 设置指定的拦截栈集合。

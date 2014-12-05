@@ -38,8 +38,6 @@ public class PathActionFactoryTest {
     @Before
     public void init() {
         Map<String, Object> props = new HashMap<String, Object>();
-        //set ActionInvocationClass
-        props.put("actionInvocationClass", DefaultActionInvocation.class);
         //set extension
         props.put("extension", "");
         //default result

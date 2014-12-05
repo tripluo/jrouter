@@ -18,7 +18,6 @@ package jrouter.impl;
 
 import jrouter.JRouterException;
 import jrouter.TestDuplicate;
-import jrouter.URLTestAction;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;

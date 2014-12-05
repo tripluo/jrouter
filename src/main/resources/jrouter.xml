@@ -3,40 +3,42 @@
          xsi:noNamespaceSchemaLocation="jrouter-1.6.xsd">
 
     <!-- optional default -->
-    <action-factory class="jrouter.impl.DefaultActionFactory" >
+    <action-factory class="jrouter.impl.DefaultActionFactory">
         <!-- optional default:null -->
-        <property name="defaultInterceptorStack" value="empty" />
+        <property name="defaultInterceptorStack" value="empty"/>
         <!-- optional default:null -->
-        <property name="defaultResultType" value="empty" />
+        <property name="defaultResultType" value="empty"/>
+        <!-- optional default deprecated since 1.6.6 -->
+        <!--<property name="actionInvocationClass" value="jrouter.impl.DefaultActionInvocation"/>-->
         <!-- optional default -->
-        <property name="actionInvocationClass" value="jrouter.impl.DefaultActionInvocation" />
+        <property name="pathSeparator" value="/"/>
         <!-- optional default -->
-        <property name="pathSeparator" value="/" />
+        <property name="extension" value="."/>
         <!-- optional default -->
-        <property name="extension" value="." />
+        <property name="actionCacheNumber" value="10000"/>
         <!-- optional default -->
-        <property name="actionCacheNumber" value="10000" />
+        <property name="bytecode" value="javassist"/>
         <!-- optional default -->
-        <property name="bytecode" value="javassist" />
+        <property name="converterFactory" value="jrouter.impl.LastPadParameterFactory"/>
     </action-factory>
 
     <!-- scan classes only in root configuration, use ',' as separate -->
     <component-scan package="jrouter , jrouter.impl"
                     includeExpression="**.*Action"
                     excludeExpression="**.*Result, **.*Interceptor"
-                    />
+    />
 
     <!-- interceptor -->
-    <interceptor class="jrouter.interceptor.SampleInterceptor" />
+    <interceptor class="jrouter.interceptor.SampleInterceptor"/>
 
     <!-- interceptor-stack -->
-    <interceptor-stack class="jrouter.interceptor.DefaultInterceptorStack" />
+    <interceptor-stack class="jrouter.interceptor.DefaultInterceptorStack"/>
 
     <!-- result-type -->
-    <result-type class="jrouter.result.DefaultResult" />
+    <result-type class="jrouter.result.DefaultResult"/>
 
     <!-- result -->
-    <result class="jrouter.result.DefaultResult" />
+    <result class="jrouter.result.DefaultResult"/>
 
     <!-- actions -->
     <!-- add action tags -->
@@ -46,6 +48,6 @@
 
     <!-- aop only in root configuration, use ',' as separate -->
     <aop-config>
-        <aop-action matches="/**" type="add-after" interceptor-stacks="empty" interceptors="" />
+        <aop-action matches="/**" type="add-after" interceptor-stacks="empty" interceptors=""/>
     </aop-config>
 </jrouter>

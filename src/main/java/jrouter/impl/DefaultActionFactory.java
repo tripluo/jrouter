@@ -64,7 +64,10 @@ public class DefaultActionFactory implements ActionFactory {
 
     /**
      * Action运行时上下文的类型，用于传递上下文参数时的界限判断。未指定参数类型即null时表示允许ActionInvocation类型的任意子类。
+     *
+     * @deprecated since 1.6.6
      */
+    @Deprecated
     private Class<? extends ActionInvocation> actionInvocationClass;
 
     /**
@@ -92,9 +95,14 @@ public class DefaultActionFactory implements ActionFactory {
     private ObjectFactory objectFactory;
 
     /**
-     * 生成底层方法代理的工厂对象。
+     * 创建底层方法代理的工厂对象。
      */
     private ProxyFactory proxyFactory = null;
+
+    /**
+     * 创建底层方法转换器的工厂对象。
+     */
+    private ConverterFactory converterFactory = null;
 ////////////////////////////////////////////////////////////////////////////////
 
     /**
@@ -160,6 +168,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     private void setActionFactoryProperties(Map<String, Object> properties) {
         boolean setBytecode = false;
+        Class<? extends ConverterFactory> converterFactoryClass = null;
         for (Map.Entry<String, Object> e : properties.entrySet()) {
             String name = e.getKey();
             Object value = e.getValue();
@@ -169,17 +178,20 @@ public class DefaultActionFactory implements ActionFactory {
             }
             //string value
             String strValue = value.toString().trim();
-            if ("actionInvocationClass".equalsIgnoreCase(name)) {
-                try {
-                    //设置Action运行时上下文的类型
-                    actionInvocationClass = value instanceof Class
-                            ? (Class) value
-                            : (Class<? extends ActionInvocation>) ClassUtil.loadClass(strValue);
-                } catch (ClassNotFoundException ex) {
-                    LOG.error("Can't set ActionInvocationClass of class : " + strValue);
-                    throw new JRouterException(ex);
-                }
-            } else if ("defaultInterceptorStack".equalsIgnoreCase(name)) {
+            //TODO
+//            if ("actionInvocationClass".equalsIgnoreCase(name)) {
+//                try {
+//                    //设置Action运行时上下文的类型
+//                    actionInvocationClass = value instanceof Class
+//                            ? (Class) value
+//                            : (Class<? extends ActionInvocation>) ClassUtil.loadClass(strValue);
+//                    LOG.info("Set actionInvocationClass : " + strValue);
+//                } catch (ClassNotFoundException ex) {
+//                    LOG.error("Can't set ActionInvocationClass of class : " + strValue);
+//                    throw new JRouterException(ex);
+//                }
+//            } else
+            if ("defaultInterceptorStack".equalsIgnoreCase(name)) {
                 //设置默认拦截栈名称
                 this.defaultInterceptorStack = strValue;
                 LOG.info("Set defaultInterceptorStack : " + defaultInterceptorStack);
@@ -201,7 +213,7 @@ public class DefaultActionFactory implements ActionFactory {
                 LOG.info("Set actionCacheNumber : " + this.actionCacheNumber);
             } else if ("objectFactory".equalsIgnoreCase(name)) {
                 //设置创建对象的工厂对象
-                this.objectFactory = (ObjectFactory) value;
+                this.objectFactory = (ObjectFactory) value; //throw exception if not matched
                 LOG.info("Set objectFactory : " + this.objectFactory);
             } else if ("bytecode".equalsIgnoreCase(name)) {
                 setBytecode = true;
@@ -215,11 +227,27 @@ public class DefaultActionFactory implements ActionFactory {
                         LOG.info("Set proxyFactory : " + this.proxyFactory);
                     } else {
                         setBytecode = false;
-                        LOG.info("Unknown bytecode property : " + strValue);
+                        LOG.warn("Unknown bytecode property : " + strValue);
                     }
                 } else {
+                    //throw exception if not matched
                     proxyFactory = (ProxyFactory) value;
                     LOG.info("Set proxyFactory : " + this.proxyFactory);
+                }
+            } else if ("converterFactory".equalsIgnoreCase(name)) {
+                if (value instanceof String) {
+                    try {
+                        converterFactoryClass = (Class<ConverterFactory>) ClassUtil.loadClass(strValue);
+                    } catch (ClassNotFoundException ex) {
+                        LOG.error("Can't set ConverterFactory of class : " + strValue);
+                        throw new JRouterException(ex);
+                    }
+                } else if (value instanceof Class) {
+                    converterFactoryClass = (Class) value;
+                } else {
+                    //throw exception if not matched
+                    converterFactory = (ConverterFactory) value;
+                    LOG.info("Set converterFactory : " + this.converterFactory);
                 }
             } else {
                 LOG.warn("Ignore unknown property \"{}\" : {}", name, value);
@@ -230,6 +258,8 @@ public class DefaultActionFactory implements ActionFactory {
         //default proxyFactory
         if (!setBytecode)
             setDefaultProxyFactory();
+        //set converterFactory using objectFactory
+        setConverterFactory(converterFactoryClass);
     }
 
     /**
@@ -257,6 +287,25 @@ public class DefaultActionFactory implements ActionFactory {
             } catch (ClassNotFoundException ex) {
                 LOG.info("No proxyFactory setting and no javassist jar found, use java reflect as default");
             }
+        }
+    }
+
+    /**
+     * Set converterFactory using objectFactory, use LastPadParameterFactory as default
+     * if converterFactory is not set.
+     *
+     * @param converterFactoryClass ConverterFactory.class
+     */
+    private void setConverterFactory(Class<? extends ConverterFactory> converterFactoryClass) {
+        if (converterFactoryClass != null) {
+            converterFactory = objectFactory.newInstance(converterFactoryClass);
+            LOG.info("Set converterFactory : " + this.converterFactory);
+        }
+        //finally check if converterFactory is still not set
+        if (converterFactory == null) {
+            //default converterFactory
+            converterFactory = new LastPadParameterFactory();
+            LOG.info("No converterFactory setting, use default : " + this.converterFactory);
         }
     }
 
@@ -301,11 +350,10 @@ public class DefaultActionFactory implements ActionFactory {
 
         //create ActionInvocation
         ActionInvocation<?> invocation = createActionInvocation(path, params);
-
         //invoke
         Object res = null;
         try {
-            res = invocation.invoke(params);
+            res = invocation.invoke(invocation.getParameters());
             LOG.debug("Get invoked Action [{}] result : [{}]", path, res);
             //result is string
             if (res instanceof String) {
@@ -329,7 +377,7 @@ public class DefaultActionFactory implements ActionFactory {
                 else if (results.containsKey(resInfo)) {
                     ResultProxy rp = results.get(resInfo);
                     //ResultProxy直接调用
-                    Object rr = rp.invoke(rp.isRequireAction() ? invocation : null);
+                    Object rr = MethodUtil.invoke(rp, invocation);
                     if (rr != null)
                         res = rr;
 
@@ -425,14 +473,12 @@ public class DefaultActionFactory implements ActionFactory {
         ResultTypeProxy rtp = resultTypes.get(type);
         if (rtp == null)
             throw new JRouterException("No such ResultType [" + type + "] at : "
-                    + invocation.getActionProxy().getMethod());
+                    + invocation.getActionProxy().getMethodInfo());
 
-        if (rtp.isRequireAction()) {
-            ((DefaultActionInvocation) invocation).setResult(result);
-        }
-        LOG.debug("Invoke ResultType [{}] at : {}", type, rtp.getMethod());
+        invocation.setResult(result);
+        LOG.debug("Invoke ResultType [{}] at : {}", type, rtp.getMethodInfo());
         //结果类型调用
-        return rtp.invoke(rtp.isRequireAction() ? invocation : null);
+        return MethodUtil.invoke(rtp, invocation);
     }
 
     /**
@@ -546,7 +592,7 @@ public class DefaultActionFactory implements ActionFactory {
      * @return 非字符串对象。
      */
     protected Object invokeObjectResult(ActionInvocation<?> invocation, Object res) {
-        LOG.warn("Invoking Object Result [{}] and return directly at : {}", res, invocation.getActionProxy().getMethod());
+        LOG.warn("Invoking Object Result [{}] and return directly at : {}", res, invocation.getActionProxy().getMethodInfo());
         return res;
     }
 
@@ -560,8 +606,8 @@ public class DefaultActionFactory implements ActionFactory {
      * @return 结果字符串。
      */
     protected Object invokeUndefinedResult(ActionInvocation<?> invocation, String resInfo) {
-        LOG.warn("Invoking undefined String Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethod());
-        //throw new JRouterException("No match Result [" + resInfo + "] at " + ap.getMethod(), ap);
+        LOG.warn("Invoking undefined String Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethodInfo());
+        //throw new JRouterException("No match Result [" + resInfo + "] at " + ap.getMethodInfo(), ap);
         //不作处理直接跳过，直接返回调用结果字符串
         return resInfo;
     }
@@ -608,14 +654,14 @@ public class DefaultActionFactory implements ActionFactory {
         String name = ip.getName();
 
         if (StringUtil.isBlank(name))
-            throw new IllegalArgumentException("Null name of Interceptor : " + ip.getMethod());
+            throw new IllegalArgumentException("Null name of Interceptor : " + ip.getMethodInfo());
 
         if (interceptors.containsKey(name)) {
             throw new JRouterException("Duplicate Interceptor [" + name + "] : "
-                    + ip.getMethod() + " override "
-                    + interceptors.get(name).getMethod());
+                    + ip.getMethodInfo() + " override "
+                    + interceptors.get(name).getMethodInfo());
         } else {
-            LOG.info("Add Interceptor [{}] at : {} ", name, ip.getMethod());
+            LOG.info("Add Interceptor [{}] at : {} ", name, ip.getMethodInfo());
         }
         interceptors.put(name, ip);
     }
@@ -723,14 +769,14 @@ public class DefaultActionFactory implements ActionFactory {
     public void addResultType(ResultTypeProxy rtp) {
         String type = rtp.getType();
         if (StringUtil.isBlank(type))
-            throw new IllegalArgumentException("Null type of ResultType : " + rtp.getMethod());
+            throw new IllegalArgumentException("Null type of ResultType : " + rtp.getMethodInfo());
 
         if (resultTypes.containsKey(type)) {
             throw new JRouterException("Duplicate ResultType [" + type + "] : "
-                    + rtp.getMethod() + " override "
-                    + resultTypes.get(type).getMethod());
+                    + rtp.getMethodInfo() + " override "
+                    + resultTypes.get(type).getMethodInfo());
         } else {
-            LOG.info("Add ResultType [{}] at : {}", type, rtp.getMethod());
+            LOG.info("Add ResultType [{}] at : {}", type, rtp.getMethodInfo());
         }
         resultTypes.put(type, rtp);
     }
@@ -780,14 +826,14 @@ public class DefaultActionFactory implements ActionFactory {
     public void addResult(ResultProxy rp) {
         String name = rp.getResult().name();
         if (StringUtil.isBlank(name))
-            throw new IllegalArgumentException("Null name of Result : " + rp.getMethod());
+            throw new IllegalArgumentException("Null name of Result : " + rp.getMethodInfo());
 
         if (results.containsKey(name)) {
             throw new JRouterException("Duplicate Result [" + name + "] : "
-                    + rp.getMethod() + " override "
-                    + results.get(name).getMethod());
+                    + rp.getMethodInfo() + " override "
+                    + results.get(name).getMethodInfo());
         } else {
-            LOG.info("Add Result [{}] : {}", name, rp.getMethod());
+            LOG.info("Add Result [{}] : {}", name, rp.getMethodInfo());
         }
         results.put(name, rp);
     }
@@ -839,7 +885,7 @@ public class DefaultActionFactory implements ActionFactory {
         String aPath = ap.getPath();
 
         if (StringUtil.isBlank(aPath))
-            throw new IllegalArgumentException("Null path of Action : " + ap.getMethod());
+            throw new IllegalArgumentException("Null path of Action : " + ap.getMethodInfo());
 
         //可能存在模糊匹配 或者 完全相等的路径
         DefaultActionProxy exist = actions.get(aPath);
@@ -852,22 +898,22 @@ public class DefaultActionFactory implements ActionFactory {
             //新增与原有完全相等的路径
             if (exist.getPath().equals(newAction.getPath())) {
                 throw new JRouterException("Duplicate path Action [" + aPath + "] : "
-                        + ap.getMethod() + " override "
-                        + exist.getMethod());
+                        + ap.getMethodInfo() + " override "
+                        + exist.getMethodInfo());
             } //新增与原有相同的匹配路径，考虑匹配级别是否相同???
             //TODO
             //            else if (0 == PathTree.compareMathedPath(newAction.getPath(), exist.getPath())) {
             //                throw new JRouterException("Duplicate matched path Action [" + aPath + "] : "
-            //                        + ap.getMethod() + " override "
-            //                        + exist.getMethod());
+            //                        + ap.getMethodInfo() + " override "
+            //                        + exist.getMethodInfo());
             //            }
             //原有路径模糊匹配，继续添加新路径；或反之
             else {
                 LOG.warn("Exist matched path [{}] : {}, add [{}] : {}",
-                        exist.getPath(), exist.getMethod(), aPath, ap.getMethod());
+                        exist.getPath(), exist.getMethodInfo(), aPath, ap.getMethodInfo());
             }
         } else {
-            LOG.info("Add Action [{}] at : {}", aPath, ap.getMethod());
+            LOG.info("Add Action [{}] at : {}", aPath, ap.getMethodInfo());
         }
     }
 
@@ -946,20 +992,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     private InterceptorProxy createInterceptorProxy(Method method, Object obj) {
         Interceptor interceptor = method.getAnnotation(Interceptor.class);
-        Class[] params = method.getParameterTypes();
-
-        //check interceptor invoke args
-        boolean requireAction = false;
-        //interceptor代理的方法无参数或参数仅为ActionInvocation或其子类
-        if (params.length == 0) {
-            requireAction = false;
-        } //未指定actionInvocationClass参数类型时允许ActionInvocation任意子类；否则为actionInvocationClass的父类
-        else if (isProxyMethod(params)) {
-            requireAction = true;
-        } else {
-            throw new IllegalArgumentException("Illegal arguments in Interceptor : " + method);
-        }
-        return new InterceptorProxy(this, interceptor, method, obj, requireAction);
+        return new InterceptorProxy(this, interceptor, method, obj, true);
     }
 
     /**
@@ -1017,19 +1050,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     private ResultTypeProxy createResultTypeProxy(Method method, Object obj) {
         ResultType resultType = method.getAnnotation(ResultType.class);
-        Class[] params = method.getParameterTypes();
-
-        boolean requireAction = false;
-        //ResultType代理的方法无参数或参数仅为ActionInvocation或其子类
-        if (params.length == 0) {
-            requireAction = false;
-        } else if (isProxyMethod(params)) {
-            requireAction = true;
-        } else {
-            throw new IllegalArgumentException("Illegal arguments in ResultType : " + method);
-        }
-
-        return new ResultTypeProxy(this, resultType, method, obj, requireAction);
+        return new ResultTypeProxy(this, resultType, method, obj, true);
     }
 
     /**
@@ -1042,33 +1063,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     private ResultProxy createResultProxy(Method method, Object obj) {
         Result res = method.getAnnotation(Result.class);
-        Class[] params = method.getParameterTypes();
-
-        boolean requireAction = false;
-        //ResultType代理的方法无参数或参数仅为ActionInvocation或其子类
-        if (params.length == 0) {
-            requireAction = false;
-        } else if (isProxyMethod(params)) {
-            requireAction = true;
-        } else {
-            throw new IllegalArgumentException("Illegal arguments in Result : " + method);
-        }
-        return new ResultProxy(this, res, method, obj, requireAction);
-    }
-
-    /**
-     * 判断代理方法的参数是否合法；仅允许无参数方法或仅ActionInvocation类型参数的方法。未指定参数类型时允许ActionInvocation类型的任意子类；否则为{@link #actionInvocationClass}的父类。
-     *
-     * @param params 代理方法的参数类型。
-     *
-     * @return 所代理的方法合法返回true，否则为false。
-     */
-    private boolean isProxyMethod(Class[] params) {
-        if (params.length > 1)
-            return false;
-        return params.length == 0 ? true : actionInvocationClass == null
-                ? ActionInvocation.class.isAssignableFrom(params[0])
-                : params[0].isAssignableFrom(actionInvocationClass);
+        return new ResultProxy(this, res, method, obj, true);
     }
 
     /**
@@ -1124,7 +1119,7 @@ public class DefaultActionFactory implements ActionFactory {
 
         //void method
         if (void.class == method.getReturnType())
-            LOG.warn("Mapping [{}] void method at : {}", ap.getPath(), ap.getMethod());
+            LOG.warn("Mapping [{}] void method at : {}", ap.getPath(), ap.getMethodInfo());
 
         //interceptorStack
         String stackName = action.interceptorStack().trim();
@@ -1142,7 +1137,7 @@ public class DefaultActionFactory implements ActionFactory {
             for (String name : action.interceptors()) {
                 InterceptorProxy ip = interceptors.get(name);
                 if (ip == null) {
-                    LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethod());
+                    LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
                 } else {
                     inters.add(ip);
                 }
@@ -1166,7 +1161,7 @@ public class DefaultActionFactory implements ActionFactory {
                     for (String name : ns.interceptors()) {
                         InterceptorProxy ip = interceptors.get(name);
                         if (ip == null) {
-                            LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethod());
+                            LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
                         } else {
                             inters.add(ip);
                         }
@@ -1213,7 +1208,7 @@ public class DefaultActionFactory implements ActionFactory {
             DefaultActionProxy ap) {
         InterceptorStackProxy isp = interceptorStacks.get(stackName);
         if (isp == null) {
-            LOG.warn("No such InterceptorStack [{}] at : {}", stackName, ap.getMethod());
+            LOG.warn("No such InterceptorStack [{}] at : {}", stackName, ap.getMethodInfo());
         } else {
             if (isp.getInterceptors() != null)
                 interceptors.addAll(isp.getInterceptors());
@@ -1292,9 +1287,12 @@ public class DefaultActionFactory implements ActionFactory {
      * Action运行时上下文的类型。
      *
      * @return Action运行时上下文的类型。
+     *
+     * @deprecated since 1.6.6
      */
+    @Deprecated
     public Class<? extends ActionInvocation> getActionInvocationClass() {
-        return actionInvocationClass;
+        throw new UnsupportedOperationException("Not supported since jrouter 1.6.6.");
     }
 
     /**
@@ -1314,6 +1312,11 @@ public class DefaultActionFactory implements ActionFactory {
     @Override
     public ProxyFactory getProxyFactory() {
         return proxyFactory;
+    }
+
+    @Override
+    public ConverterFactory getConverterFactory() {
+        return converterFactory;
     }
 
     /**

@@ -26,7 +26,7 @@ public class InvocationProxyException extends JRouterException {
     private static final long serialVersionUID = 1L;
 
     /** 定位异常发生对象 */
-    private Object target;
+    private final Object target;
 
     /**
      * 构造一个包含指定原因和异常发生对象的InvocationException。
