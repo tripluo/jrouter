@@ -22,31 +22,27 @@ import java.util.regex.Pattern;
 /**
  * PathMatcher implementation for Ant-style path patterns. Examples are provided below.
  *
- * <p>Part of this mapping code has been kindly borrowed from <a href="http://ant.apache.org">Apache Ant</a>.
+ * <p>
+ * Part of this mapping code has been kindly borrowed from <a href="http://ant.apache.org">Apache Ant</a>.
  *
- * <p>The mapping matches URLs using the following rules:<br> <ul> <li>? matches one character</li> <li>* matches zero
+ * <p>
+ * The mapping matches URLs using the following rules:<br> <ul> <li>? matches one character</li> <li>* matches zero
  * or more characters</li> <li>** matches zero or more 'directories' in a path</li> </ul>
  *
- * <p>Some examples:<br> <ul> <li><code>com/t?st.jsp</code> - matches
- * <code>com/test.jsp</code> but also
- * <code>com/tast.jsp</code> or
- * <code>com/txst.jsp</code></li> <li><code>com/*.jsp</code> - matches all
- * <code>.jsp</code> files in the
- * <code>com</code> directory</li> <li><code>com/&#42;&#42;/test.jsp</code> - matches all
- * <code>test.jsp</code> files underneath the
- * <code>com</code> path</li> <li><code>org/springframework/&#42;&#42;/*.jsp</code>
- * - matches all
- * <code>.jsp</code> files underneath the
- * <code>org/springframework</code> path</li>
- * <li><code>org/&#42;&#42;/servlet/bla.jsp</code> - matches
- * <code>org/springframework/servlet/bla.jsp</code> but also
- * <code>org/springframework/testing/servlet/bla.jsp</code> and
- * <code>org/servlet/bla.jsp</code></li> </ul>
+ * <p>
+ * Some examples:<br> <ul> <li>{@code com/t?st.jsp} - matches {@code com/test.jsp} but also
+ * {@code com/tast.jsp} or {@code com/txst.jsp}</li> <li>{@code com/*.jsp} - matches all
+ * {@code .jsp} files in the {@code com} directory</li> <li>{@code com/&#42;&#42;/test.jsp} - matches all
+ * {@code test.jsp} files underneath the {@code com} path</li> <li>{@code org/springframework/&#42;&#42;/*.jsp}
+ * - matches all {@code .jsp} files underneath the {@code org/springframework} path</li>
+ * <li>{@code org/&#42;&#42;/servlet/bla.jsp} - matches {@code org/springframework/servlet/bla.jsp} but also
+ * {@code org/springframework/testing/servlet/bla.jsp} and {@code org/servlet/bla.jsp}</li> </ul>
  *
  * @author Alef Arendsen
  * @author Juergen Hoeller
  * @author Rob Harrop
  * @author Arjen Poutsma
+ * @author Rossen Stoyanchev
  * @since 16.07.2003
  */
 public class AntPathMatcher {
@@ -80,7 +76,8 @@ public class AntPathMatcher {
      * Does the given
      * <code>path</code> represent a pattern that can be matched
      * by an implementation of this interface?
-     * <p>If the return value is
+     * <p>
+     * If the return value is
      * <code>false</code>, then the {@link #match}
      * method does not have to be used because direct equality comparisons
      * on the static path Strings will lead to the same result.
@@ -117,7 +114,8 @@ public class AntPathMatcher {
      * Match the given
      * <code>path</code> against the corresponding part of the given
      * <code>pattern</code>, according to this PathMatcher's matching strategy.
-     * <p>Determines whether the pattern at least matches as far as the given base
+     * <p>
+     * Determines whether the pattern at least matches as far as the given base
      * path goes, assuming that a full path may then match as well.
      *
      * @param pattern the pattern to match against
@@ -165,11 +163,11 @@ public class AntPathMatcher {
 
         // Match all elements up to the first **
         while (pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd) {
-            String patDir = pattDirs[pattIdxStart];
-            if ("**".equals(patDir)) {
+            String pattDir = pattDirs[pattIdxStart];
+            if ("**".equals(pattDir)) {
                 break;
             }
-            if (!matchStrings(patDir, pathDirs[pathIdxStart], uriTemplateVariables)) {
+            if (!matchStrings(pattDir, pathDirs[pathIdxStart], uriTemplateVariables)) {
                 return false;
             }
             pattIdxStart++;
@@ -204,11 +202,11 @@ public class AntPathMatcher {
 
         // up to last '**'
         while (pattIdxStart <= pattIdxEnd && pathIdxStart <= pathIdxEnd) {
-            String patDir = pattDirs[pattIdxEnd];
-            if (patDir.equals("**")) {
+            String pattDir = pattDirs[pattIdxEnd];
+            if (pattDir.equals("**")) {
                 break;
             }
-            if (!matchStrings(patDir, pathDirs[pathIdxEnd], uriTemplateVariables)) {
+            if (!matchStrings(pattDir, pathDirs[pathIdxEnd], uriTemplateVariables)) {
                 return false;
             }
             pattIdxEnd--;
@@ -274,79 +272,52 @@ public class AntPathMatcher {
     }
 
     /**
-     * Tests whether or not a string matches against a pattern. The pattern may contain two special
-     * characters:<br> '*' means zero or more characters<br> '?' means one and only one character
+     * Tests whether or not a string matches against a pattern.
      *
-     * @param pattern pattern to match against. Must not be
-     * <code>null</code>.
-     * @param str string which must be matched against the pattern. Must not be
-     * <code>null</code>.
+     * @param pattern the pattern to match against (never {@code null})
+     * @param str the String which must be matched against the pattern (never {@code null})
      *
-     * @return
-     * <code>true</code> if the string matches against the pattern, or
-     * <code>false</code> otherwise.
+     * @return {@code true} if the string matches against the pattern, or {@code false} otherwise
      */
     private boolean matchStrings(String pattern, String str,
             Map<String, String> uriTemplateVariables) {
-        AntPathStringMatcher matcher = new AntPathStringMatcher(pattern, str, uriTemplateVariables);
-        return matcher.matchStrings();
+        AntPathStringMatcher matcher = new AntPathStringMatcher(pattern);;
+        return matcher.matchStrings(str, uriTemplateVariables);
     }
 
     /**
-     * Given a pattern and a full path, determine the pattern-mapped part. <p>For example: <ul>
-     * <li>'
-     * <code>/docs/cvs/commit.html</code>' and '
-     * <code>/docs/cvs/commit.html</code> -> ''</li> <li>'
-     * <code>/docs/*</code>' and '
-     * <code>/docs/cvs/commit</code> -> '
-     * <code>cvs/commit</code>'</li> <li>'
-     * <code>/docs/cvs/*.html</code>' and '
-     * <code>/docs/cvs/commit.html</code> -> '
-     * <code>commit.html</code>'</li> <li>'
-     * <code>/docs/**</code>' and '
-     * <code>/docs/cvs/commit</code> -> '
-     * <code>cvs/commit</code>'</li> <li>'
-     * <code>/docs/**\/*.html</code>' and '
-     * <code>/docs/cvs/commit.html</code> -> '
-     * <code>cvs/commit.html</code>'</li> <li>'
-     * <code>/*.html</code>' and '
-     * <code>/docs/cvs/commit.html</code> -> '
-     * <code>docs/cvs/commit.html</code>'</li> <li>'
-     * <code>*.html</code>' and '
-     * <code>/docs/cvs/commit.html</code> -> '
-     * <code>/docs/cvs/commit.html</code>'</li> <li>'
-     * <code>*</code>' and '
-     * <code>/docs/cvs/commit.html</code> -> '
-     * <code>/docs/cvs/commit.html</code>'</li> </ul> <p>Assumes that {@link #match} returns
-     * <code>true</code> for '
-     * <code>pattern</code>' and '
-     * <code>path</code>', but does <strong>not</strong> enforce this.
+     * Given a pattern and a full path, determine the pattern-mapped part.
+     * <p>
+     * For example: <ul>
+     * <li>'{@code /docs/cvs/commit.html}' and '{@code /docs/cvs/commit.html} -> ''</li>
+     * <li>'{@code /docs/*}' and '{@code /docs/cvs/commit} -> '{@code cvs/commit}'</li>
+     * <li>'{@code /docs/cvs/*.html}' and '{@code /docs/cvs/commit.html} -> '{@code commit.html}'</li>
+     * <li>'{@code /docs/**}' and '{@code /docs/cvs/commit} -> '{@code cvs/commit}'</li>
+     * <li>'{@code /docs/**\/*.html}' and '{@code /docs/cvs/commit.html} -> '{@code cvs/commit.html}'</li>
+     * <li>'{@code /*.html}' and '{@code /docs/cvs/commit.html} -> '{@code docs/cvs/commit.html}'</li>
+     * <li>'{@code *.html}' and '{@code /docs/cvs/commit.html} -> '{@code /docs/cvs/commit.html}'</li>
+     * <li>'{@code *}' and '{@code /docs/cvs/commit.html} -> '{@code /docs/cvs/commit.html}'</li> </ul>
+     * <p>
+     * Assumes that {@link #match} returns {@code true} for '{@code pattern}' and '{@code path}', but
+     * does <strong>not</strong> enforce this.
      */
     public String extractPathWithinPattern(String pattern, String path) {
         String[] patternParts = StringUtil.tokenizeToStringArray(pattern, this.pathSeparator);
         String[] pathParts = StringUtil.tokenizeToStringArray(path, this.pathSeparator);
-
         StringBuilder builder = new StringBuilder();
+        boolean pathStarted = false;
 
-        // Add any path parts that have a wildcarded pattern part.
-        int puts = 0;
-        for (int i = 0; i < patternParts.length; i++) {
-            String patternPart = patternParts[i];
-            if ((patternPart.indexOf('*') > -1 || patternPart.indexOf('?') > -1) && pathParts.length >= i + 1) {
-                if (puts > 0 || (i == 0 && !pattern.startsWith(this.pathSeparator))) {
-                    builder.append(this.pathSeparator);
+        for (int segment = 0; segment < patternParts.length; segment++) {
+            String patternPart = patternParts[segment];
+            if (patternPart.indexOf('*') > -1 || patternPart.indexOf('?') > -1) {
+                for (; segment < pathParts.length; segment++) {
+                    if (pathStarted || (segment == 0 && !pattern.startsWith(this.pathSeparator))) {
+                        builder.append(this.pathSeparator);
+                    }
+                    builder.append(pathParts[segment]);
+                    pathStarted = true;
                 }
-                builder.append(pathParts[i]);
-                puts++;
             }
-        }
-
-        // Append any trailing path parts.
-        for (int i = patternParts.length; i < pathParts.length; i++) {
-            if (puts > 0 || i > 0) {
-                builder.append(this.pathSeparator);
-            }
-            builder.append(pathParts[i]);
         }
 
         return builder.toString();
@@ -360,21 +331,20 @@ public class AntPathMatcher {
     }
 
     /**
-     * Combines two patterns into a new pattern that is returned. <p>This implementation simply
-     * concatenates the two patterns, unless the first pattern contains a file extension match (such
-     * as {@code *.html}. In that case, the second pattern should be included in the first, or an {@code IllegalArgumentException}
-     * is thrown. <p>For example: <table> <tr><th>Pattern 1</th><th>Pattern
-     * 2</th><th>Result</th></tr> <tr><td>/hotels</td><td>{@code
+     * Combines two patterns into a new pattern that is returned.
+     * <p>
+     * This implementation simply concatenates the two patterns, unless the first pattern
+     * contains a file extension match (such as {@code *.html}. In that case, the second pattern
+     * should be included in the first, or an {@code IllegalArgumentException} is thrown.
+     * <p>
+     * For example: <table>
+     * <tr><th>Pattern 1</th><th>Pattern 2</th><th>Result</th></tr> <tr><td>/hotels</td><td>{@code
      * null}</td><td>/hotels</td></tr> <tr><td>{@code null}</td><td>/hotels</td><td>/hotels</td></tr>
-     * <tr><td>/hotels</td><td>/bookings</td><td>/hotels/bookings</td></tr>
-     * <tr><td>/hotels</td><td>bookings</td><td>/hotels/bookings</td></tr>
-     * <tr><td>/hotels/*</td><td>/bookings</td><td>/hotels/bookings</td></tr>
-     * <tr><td>/hotels/&#42;&#42;</td><td>/bookings</td><td>/hotels/&#42;&#42;/bookings</td></tr>
-     * <tr><td>/hotels</td><td>{hotel}</td><td>/hotels/{hotel}</td></tr>
-     * <tr><td>/hotels/*</td><td>{hotel}</td><td>/hotels/{hotel}</td></tr>
+     * <tr><td>/hotels</td><td>/bookings</td><td>/hotels/bookings</td></tr> <tr><td>/hotels</td><td>bookings</td><td>/hotels/bookings</td></tr>
+     * <tr><td>/hotels/*</td><td>/bookings</td><td>/hotels/bookings</td></tr> <tr><td>/hotels/&#42;&#42;</td><td>/bookings</td><td>/hotels/&#42;&#42;/bookings</td></tr>
+     * <tr><td>/hotels</td><td>{hotel}</td><td>/hotels/{hotel}</td></tr> <tr><td>/hotels/*</td><td>{hotel}</td><td>/hotels/{hotel}</td></tr>
      * <tr><td>/hotels/&#42;&#42;</td><td>{hotel}</td><td>/hotels/&#42;&#42;/{hotel}</td></tr>
-     * <tr><td>/*.html</td><td>/hotels.html</td><td>/hotels.html</td></tr>
-     * <tr><td>/*.html</td><td>/hotels</td><td>/hotels.html</td></tr>
+     * <tr><td>/*.html</td><td>/hotels.html</td><td>/hotels.html</td></tr> <tr><td>/*.html</td><td>/hotels</td><td>/hotels.html</td></tr>
      * <tr><td>/*.html</td><td>/*.txt</td><td>IllegalArgumentException</td></tr> </table>
      *
      * @param pattern1 the first pattern
@@ -440,12 +410,15 @@ public class AntPathMatcher {
 
     /**
      * Given a full path, returns a {@link Comparator} suitable for sorting patterns in order of
-     * explicitness. <p>The returned
+     * explicitness.
+     * <p>
+     * The returned
      * <code>Comparator</code> will {@linkplain java.util.Collections#sort(java.util.List,
      * java.util.Comparator) sort} a list so that more specific patterns (without uri templates or
      * wild cards) come before generic patterns. So given a list with the following patterns: <ol> <li><code>/hotels/new</code></li> <li><code>/hotels/{hotel}</code></li> <li><code>/hotels/*</code></li>
      * </ol> the returned comparator will sort this list so that the order will be as indicated.
-     * <p>The full path given as parameter is used to test for exact matches. So when the given path
+     * <p>
+     * The full path given as parameter is used to test for exact matches. So when the given path
      * is {@code /hotels/2}, the pattern {@code /hotels/2} will be sorted before {@code /hotels/1}.
      *
      * @param path the full path to use for comparison
@@ -456,6 +429,20 @@ public class AntPathMatcher {
         return new AntPatternComparator(path);
     }
 
+    /**
+     * The default {@link Comparator} implementation returned by
+     * {@link #getPatternComparator(String)}.
+     * <p>
+     * In order, the most "generic" pattern is determined by the following:
+     * <ul>
+     * <li>if it's null or a capture all pattern (i.e. it is equal to "/**")</li>
+     * <li>if the other pattern is an actual match</li>
+     * <li>if it's a catch-all pattern (i.e. it ends with "**"</li>
+     * <li>if it's got more "*" than the other pattern</li>
+     * <li>if it's got more "{foo}" than the other pattern</li>
+     * <li>if it's shorter than the other pattern</li>
+     * </ul>
+     */
     private static class AntPatternComparator implements Comparator<String> {
 
         private final String path;
@@ -535,40 +522,28 @@ public class AntPathMatcher {
     }
 
     /**
-     * Package-protected helper class for {@link AntPathMatcher}. Tests whether or not a string
-     * matches against a pattern using a regular expression.
-     *
-     * <p>The pattern may contain special characters: '*' means zero or more characters; '?' means
-     * one and only one character; '{' and '}' indicate a URI template pattern.
-     *
-     * @author Arjen Poutsma
-     * @since 3.0
+     * Tests whether or not a string matches against a pattern via a {@link Pattern}.
+     * <p>
+     * The pattern may contain special characters: '*' means zero or more characters; '?' means one and
+     * only one character; '{' and '}' indicate a URI template pattern. For example <tt>/users/{user}</tt>.
      */
-    static class AntPathStringMatcher {
+    /**
+     * Tests whether or not a string matches against a pattern via a {@link Pattern}.
+     * <p>
+     * The pattern may contain special characters: '*' means zero or more characters; '?' means one and
+     * only one character; '{' and '}' indicate a URI template pattern. For example <tt>/users/{user}</tt>.
+     */
+    protected static class AntPathStringMatcher {
 
-        private static final Pattern GLOB_PATTERN = Pattern.compile("\\?|\\*|\\{([^/]+?)\\}");
+        private static final Pattern GLOB_PATTERN = Pattern.compile("\\?|\\*|\\{((?:\\{[^/]+?\\}|[^/{}]|\\\\[{}])+?)\\}");
 
         private static final String DEFAULT_VARIABLE_PATTERN = "(.*)";
 
         private final Pattern pattern;
 
-        private String str;
-
         private final List<String> variableNames = new LinkedList<String>();
 
-        private final Map<String, String> uriTemplateVariables;
-
-        /**
-         * Construct a new instance of the
-         * <code>AntPatchStringMatcher</code>.
-         */
-        AntPathStringMatcher(String pattern, String str, Map<String, String> uriTemplateVariables) {
-            this.str = str;
-            this.uriTemplateVariables = uriTemplateVariables;
-            this.pattern = createPattern(pattern);
-        }
-
-        private Pattern createPattern(String pattern) {
+        public AntPathStringMatcher(String pattern) {
             StringBuilder patternBuilder = new StringBuilder();
             Matcher m = GLOB_PATTERN.matcher(pattern);
             int end = 0;
@@ -583,20 +558,20 @@ public class AntPathMatcher {
                     int colonIdx = match.indexOf(':');
                     if (colonIdx == -1) {
                         patternBuilder.append(DEFAULT_VARIABLE_PATTERN);
-                        variableNames.add(m.group(1));
+                        this.variableNames.add(m.group(1));
                     } else {
                         String variablePattern = match.substring(colonIdx + 1, match.length() - 1);
                         patternBuilder.append('(');
                         patternBuilder.append(variablePattern);
                         patternBuilder.append(')');
                         String variableName = match.substring(1, colonIdx);
-                        variableNames.add(variableName);
+                        this.variableNames.add(variableName);
                     }
                 }
                 end = m.end();
             }
             patternBuilder.append(quote(pattern, end, pattern.length()));
-            return Pattern.compile(patternBuilder.toString());
+            this.pattern = Pattern.compile(patternBuilder.toString());
         }
 
         private String quote(String s, int start, int end) {
@@ -609,14 +584,19 @@ public class AntPathMatcher {
         /**
          * Main entry point.
          *
-         * @return
-         * <code>true</code> if the string matches against the pattern, or
-         * <code>false</code> otherwise.
+         * @return {@code true} if the string matches against the pattern, or {@code false} otherwise.
          */
-        public boolean matchStrings() {
-            Matcher matcher = pattern.matcher(str);
+        public boolean matchStrings(String str, Map<String, String> uriTemplateVariables) {
+            Matcher matcher = this.pattern.matcher(str);
             if (matcher.matches()) {
                 if (uriTemplateVariables != null) {
+                    // SPR-8455
+                    if (this.variableNames.size() != matcher.groupCount()) {
+                        throw new IllegalArgumentException(
+                                "The number of capturing groups in the pattern segment " + this.pattern
+                                + " does not match the number of URI template variables it defines, which can occur if "
+                                + " capturing groups are used in a URI template regex. Use non-capturing groups instead.");
+                    }
                     for (int i = 1; i <= matcher.groupCount(); i++) {
                         String name = this.variableNames.get(i - 1);
                         String value = matcher.group(i);

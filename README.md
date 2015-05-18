@@ -32,7 +32,7 @@ Adding to your Maven2/3 application:
         <repository>
             <id>inn4j-repo</id>
             <name>inn4j-repository</name>
-            <url>http://inn4j-repository.googlecode.com/svn/repo/</url>
+            <url>https://raw.githubusercontent.com/sundancer/inn4j-repository/master/repo/</url>
         </repository>
     </repositories>
 
@@ -41,7 +41,7 @@ Adding to your Maven2/3 application:
         <dependency>
             <groupId>jrouter</groupId>
             <artifactId>jrouter</artifactId>
-            <version>1.6.6</version>
+            <version>1.6.7</version>
         </dependency>
     </dependencies>
 Springframework Integration:
@@ -86,7 +86,7 @@ Springframework Integration:
                     package = jrouter
                     <!-- optional, if empty means all -->
                     includeExpression = jrouter.impl.**
-                    <!-- optional -->
+                    <!-- optional, if empty means all -->
                     excludeExpression = jrouter.result.**, jrouter.interceptor.**
                 </value>
             </list>

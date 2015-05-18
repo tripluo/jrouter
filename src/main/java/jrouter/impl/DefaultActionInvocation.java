@@ -120,6 +120,7 @@ public class DefaultActionInvocation implements ActionInvocation {
         if (interceptors != null && _index < interceptors.size()) {
             final InterceptorProxy interceptor = interceptors.get(_index++);
             LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
+            //TODO enhancemet when only one parameter
             //pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
             invokeResult = MethodUtil.invoke(interceptor, parameterConverter);
         } else {
@@ -218,17 +219,17 @@ public class DefaultActionInvocation implements ActionInvocation {
         /*
          * 结果对象的名称
          */
-        private String name;
+        private final String name;
 
         /*
          * 结果对象的类型
          */
-        private String type;
+        private final String type;
 
         /*
          * 结果对象对应的资源路径
          */
-        private String location;
+        private final String location;
 
         /**
          * 构造一个结果对象。

@@ -121,11 +121,6 @@ public class DefaultActionFactory implements ActionFactory {
     private PathTreeMap<DefaultActionProxy> actions;
 
     /**
-     * Action路径与代理对象的映射缓存.
-     */
-    private Map<String, ActionCacheEntry> actionCache;
-
-    /**
      * 结果类型
      */
     private Map<String, ResultTypeProxy> resultTypes;
@@ -134,6 +129,11 @@ public class DefaultActionFactory implements ActionFactory {
      * 默认的全局结果对象集合
      */
     private Map<String, ResultProxy> results;
+
+    /**
+     * Action路径与代理对象的映射缓存
+     */
+    private ActionCache actionCache;
 
     /**
      * 根据指定的键值映射构造初始化数据的DefaultActionFactory对象。
@@ -146,9 +146,9 @@ public class DefaultActionFactory implements ActionFactory {
 
         interceptors = new HashMap<String, InterceptorProxy>();
         interceptorStacks = new HashMap<String, InterceptorStackProxy>();
-
         actions = new PathTreeMap<DefaultActionProxy>(pathSeparator);
-        actionCache = Collections.synchronizedMap(new jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber));
+        actionCache = new ActionCache(new java.util.concurrent.ConcurrentHashMap<String, ActionCacheEntry>(),
+                Collections.synchronizedMap(new jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber)));
 
         resultTypes = new HashMap<String, ResultTypeProxy>();
         results = new HashMap<String, ResultProxy>();
@@ -327,7 +327,7 @@ public class DefaultActionFactory implements ActionFactory {
     public Object invokeAction(String path, Object... params) throws JRouterException {
         LOG.debug("Start invoking Action [{}]; Parameters {} ", path, java.util.Arrays.toString(params));
         //remove the extension
-        //当后缀为单个字符时，按路径最后出现分割符的位置截断路径后缀；当后缀为未空字符串时，如果路径已后缀结尾，截断后缀。
+        //当后缀为单个字符时，按路径最后出现分割符的位置截断路径后缀；当后缀为非空字符串时，如果路径以后缀结尾，截断后缀。
         if (StringUtil.isNotEmpty(extension)) {
             int len = extension.length();
             //extension为特定的标记字符，则截去标记字符后的部分
@@ -442,7 +442,8 @@ public class DefaultActionFactory implements ActionFactory {
                 throw new JRouterException("No such Action : " + path);
 
             //put in cache
-            ace = new ActionCacheEntry(ap, Collections.unmodifiableMap(matchParameters));
+            ace = new ActionCacheEntry(ap, matchParameters.isEmpty()
+                    ? Collections.EMPTY_MAP : Collections.unmodifiableMap(matchParameters));
             putActionCache(path, ace);
         }
 
@@ -512,7 +513,7 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * "type:location"形式的字符串解析。
+     * "type:location"形式的字符串解析；以第一个':'划分。
      *
      * @param pathinfo "type:location"形式的字符串。
      * @param def type和location的默认值。
@@ -621,7 +622,12 @@ public class DefaultActionFactory implements ActionFactory {
     private void putActionCache(String path, ActionCacheEntry ace) {
         //如果缓存设置数大于0
         if (actionCacheNumber > 0) {
-            actionCache.put(path, ace);
+            //full match
+            if (ace.matchParameters.isEmpty()) {
+                actionCache.putFullPathAction(path, ace);
+            } else {
+                actionCache.putMatchedPathAction(path, ace);
+            }
         }
     }
 
@@ -1077,37 +1083,18 @@ public class DefaultActionFactory implements ActionFactory {
     private DefaultActionProxy createActionProxy(Method method, Object obj) throws
             IllegalAccessException, InvocationTargetException {
         Namespace ns = method.getDeclaringClass().getAnnotation(Namespace.class);
-        //trim empay and '/'
+        //trim empty and '/'
         String namespace = ns == null ? pathSeparator + "" : pathSeparator + StringUtil.trim(ns.name(), pathSeparator);
-
-        String path = null;
         //not nullable Action
         Action action = method.getAnnotation(Action.class);
         //如果Action为null
         if (action == null) {
             action = EMPTY_ACTION;
         }
-        //Action名称为空字符串
+        //Action名称可能为空字符串
         String aname = action.name().trim();
-        if ("".equals(aname)) {
-            //Action名称为空字符串时取其方法的名称（区分大小写）
-            aname = method.getName();
-            //if namespace is '/' or not
-            path = namespace.length() == 1 ? pathSeparator + aname : namespace + pathSeparator + aname;
-        } else {
-            //action's name can't be null by annotation
-            String name = StringUtil.trim(aname, pathSeparator);
-            //if action's name is trim as empty
-            if (name.isEmpty()) {
-                path = namespace;
-            } else if (pathSeparator == aname.charAt(0)) {
-                path = pathSeparator + name;
-            } else {
-                //if namespace is '/' or not
-                path = namespace.length() == 1 ? pathSeparator + name : namespace + pathSeparator + name;
-            }
-        }
 
+        String path = buildActionPath(namespace, aname, method);
         //包含指定path的属性注入，其Action需重新生成对象
         if (obj != null && Injector.actionInjection.containsKey(path)) {
             obj = objectFactory.newInstance(obj.getClass());
@@ -1198,6 +1185,38 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
+     * TODO
+     *
+     * @param namespace
+     * @param method
+     * @param aname
+     *
+     * @return
+     */
+    protected String buildActionPath(String namespace, String aname, Method method) {
+        String path = null;
+        if ("".equals(aname)) {
+            //Action名称为空字符串时取其方法的名称（区分大小写）
+            aname = method.getName();
+            //if namespace is '/' or not
+            path = (namespace.length() == 1 ? pathSeparator + aname : namespace + pathSeparator + aname);
+        } else {
+            //action's name can't be null by annotation
+            String name = StringUtil.trim(aname, pathSeparator);
+            //if action's name is trim as empty
+            if (name.isEmpty()) {
+                path = namespace;
+            } else if (pathSeparator == aname.charAt(0)) {
+                path = pathSeparator + name;
+            } else {
+                //if namespace is '/' or not
+                path = (namespace.length() == 1 ? pathSeparator + name : namespace + pathSeparator + name);
+            }
+        }
+        return path;
+    }
+
+    /**
      * 由指定拦截栈名称添加拦截器至Action的拦截器集合。
      *
      * @param interceptors Action的拦截器集合。
@@ -1227,7 +1246,7 @@ public class DefaultActionFactory implements ActionFactory {
      * @return 缓存的Action路径与其代理对象的映射。
      */
     public Map<String, Object> getActionCache() {
-        return (Map) actionCache;
+        return (Map) actionCache.toMap();
     }
 
     @Override
@@ -1337,12 +1356,97 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
+     * Action路径与缓存对象的映射。
+     */
+    private static class ActionCache {
+
+        /**
+         * 固定路径Action路径与缓存对象的映射。
+         */
+        private Map<String, ActionCacheEntry> fullPathActionCache;
+
+        /**
+         * 参数匹配Action路径与缓存对象的映射。
+         */
+        private Map<String, ActionCacheEntry> matchedPathActionCache;
+
+        /**
+         * 构造缓存。
+         *
+         * @param fullPathActionCache 固定路径Action路径与缓存对象的映射。
+         * @param matchedPathActionCache 参数匹配Action路径与缓存对象的映射。
+         */
+        ActionCache(Map<String, ActionCacheEntry> fullPathActionCache,
+                Map<String, ActionCacheEntry> matchedPathActionCache) {
+            this.fullPathActionCache = fullPathActionCache;
+            this.matchedPathActionCache = matchedPathActionCache;
+        }
+
+        /**
+         * 获取Action代理对象。
+         *
+         * @param path Action路径。
+         *
+         * @return Action缓存对象。
+         */
+        ActionCacheEntry get(String path) {
+            ActionCacheEntry cache = fullPathActionCache.get(path);
+            if (cache != null)
+                return cache;
+            return matchedPathActionCache.get(path);
+        }
+
+        /**
+         * 添加固定路径Action缓存。
+         *
+         * @param path Action路径。
+         * @param cache Action缓存对象。
+         *
+         * @return 以前与Action路径关联的缓存对象，如果没有Action路径的映射关系，则返回 null。
+         */
+        ActionCacheEntry putFullPathAction(String path, ActionCacheEntry cache) {
+            return fullPathActionCache.put(path, cache);
+        }
+
+        /**
+         * 添加参数匹配Action缓存。
+         *
+         * @param path Action路径。
+         * @param cache Action缓存对象。
+         *
+         * @return 以前与Action路径关联的缓存对象，如果没有Action路径的映射关系，则返回 null。
+         */
+        ActionCacheEntry putMatchedPathAction(String path, ActionCacheEntry cache) {
+            return matchedPathActionCache.put(path, cache);
+        }
+
+        /**
+         * 清空缓存。
+         */
+        void clear() {
+            fullPathActionCache.clear();
+            matchedPathActionCache.clear();
+        }
+
+        /**
+         * 返回缓存的Map视图。
+         *
+         * @return 缓存的Map视图。
+         */
+        Map<String, ActionCacheEntry> toMap() {
+            Map<String, ActionCacheEntry> cache = new LinkedHashMap<String, ActionCacheEntry>(matchedPathActionCache);
+            cache.putAll(fullPathActionCache);
+            return cache;
+        }
+    }
+
+    /**
      * 缓存对象。
      */
     private static class ActionCacheEntry {
 
         /**
-         * Action的代理对象
+         * Action的代理对象。
          */
         DefaultActionProxy actionProxy;
 

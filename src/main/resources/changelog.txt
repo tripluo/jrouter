@@ -1,7 +1,16 @@
 
 JROUTER CHANGELOG
 ==========================
-http://code.google.com/p/jrouter
+http://git.oschina.net/sundancer/jrouter/
+
+
+Changes in version 1.6.7 (2015-05-19)
+---------------------------------------
+* 更新DefaultActionFactory的ActionCache，区分fullPathActionCache和matchedPathActionCache。
+* DefaultActionFactory新增buildActionPath(...)方法，提供继承做自定义修改。
+* 更新依赖包slf4j至 1.7.12.
+* 更新依赖包javassist至 3.19.0-GA.
+* 更新依赖包springframework至 4.1.6.
 
 Changes in version 1.6.6 (2014-12-06)
 ---------------------------------------
@@ -19,7 +28,7 @@ Changes in version 1.6.6 (2014-12-06)
 * 废除DefaultActionFactory的actionInvocationClass变量及getActionInvocationClass()方法。
 * 废除InterceptorProxy/ResultProxy/ResultTypeProxy的requireAction属性及isRequireAction()方法。
 * 完善DefaultActionFactory的converterFactory属性的测试。
-* 更新依赖包slf4j至 1.7.7
+* 更新依赖包slf4j至 1.7.7.
 * 更新依赖包springframework至 4.1.2.
 
 

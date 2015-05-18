@@ -41,7 +41,7 @@ public class LRUMap<K, V> extends LinkedHashMap<K, V> {
      * @param maxEntries 最大条目数。
      */
     public LRUMap(int maxEntries) {
-        this(maxEntries, maxEntries);
+        this(128, maxEntries);
     }
 
     /**

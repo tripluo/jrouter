@@ -5,22 +5,23 @@
     <groupId>jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.6.6</version>
+    <version>1.6.7</version>
     <name>JRouter</name>
-    <url>http://git.oschina.net/sundancer/jrouter/wikis/home/</url>
+    <inceptionYear>2010</inceptionYear>
+    <url>http://git.oschina.net/sundancer/jrouter/</url>
 
     <dependencies>
         <!-- slf4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.7</version>
+            <version>1.7.12</version>
         </dependency>
         <!-- logback -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.1.2</version>
+            <version>1.1.3</version>
             <optional>true</optional>
         </dependency>
 
@@ -40,7 +41,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.7</version>
+            <version>1.7.12</version>
             <optional>true</optional>
         </dependency>
 
@@ -48,7 +49,7 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.18.2-GA</version>
+            <version>3.19.0-GA</version>
             <optional>true</optional>
         </dependency>
 
@@ -73,7 +74,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.3</version>
                 <configuration>
                     <source>1.6</source>
                     <target>1.6</target>
@@ -93,7 +94,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.5</version>
+                <version>2.6</version>
                 <configuration>
                     <excludes>
                         <!--  排除logback.xml -->
@@ -117,7 +118,7 @@
     </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.1.2.RELEASE</spring.version>
+        <spring.version>4.1.6.RELEASE</spring.version>
     </properties>
     <licenses>
         <license>
