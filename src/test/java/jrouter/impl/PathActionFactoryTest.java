@@ -21,6 +21,7 @@ import java.util.Map;
 import jrouter.JRouterException;
 import static jrouter.impl.PathTreeTest.*;
 import jrouter.interceptor.DefaultInterceptorStack;
+import jrouter.interceptor.DemoThreadActionContextInterceptor;
 import jrouter.interceptor.SampleInterceptor;
 import jrouter.result.DefaultResult;
 import org.junit.After;
@@ -33,22 +34,26 @@ import org.junit.Test;
  */
 public class PathActionFactoryTest {
 
-    private ThreadActionFactory factory;
+    private DefaultActionFactory factory;
 
     @Before
     public void init() {
         Map<String, Object> props = new HashMap<String, Object>();
         //set extension
         props.put("extension", "");
+
+        //default InterceptorStack
+        props.put("defaultInterceptorStack", DemoThreadActionContextInterceptor.DEMO_THREAD);
+
         //default result
         props.put("defaultResultType", DefaultResult.EMPTY);
-        factory = new ThreadActionFactory(props);
+        factory = new DefaultActionFactory(props);
 
         //interceptor
-        factory.addInterceptors(SampleInterceptor.class);
+        factory.addInterceptors(new DemoThreadActionContextInterceptor(false));
 
         //interceptor stack
-        factory.addInterceptorStacks(DefaultInterceptorStack.class);
+        factory.addInterceptorStacks(DemoThreadActionContextInterceptor.class);
 
         //result
         factory.addResultTypes(DefaultResult.class);
@@ -162,7 +167,7 @@ public class PathActionFactoryTest {
      * @return 返回Action路径匹配的键值映射。
      */
     private Map<String, String> getActionPathParameters() {
-        return ((DefaultActionInvocation) ThreadContext.getActionInvocation()).getActionPathParameters();
+        return ((DefaultActionInvocation) DemoThreadActionContextInterceptor.get()).getActionPathParameters();
     }
 
     /**

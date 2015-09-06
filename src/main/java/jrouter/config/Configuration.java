@@ -470,7 +470,7 @@ public class Configuration implements Serializable {
         } catch (ConfigurationException e) {
             throw e;
         } catch (Exception e) {
-            throw new ConfigurationException("Could not configure from inputStream resource : " + resourceName, e);
+            throw new ConfigurationException("Could not configure from input stream resource : " + resourceName, e);
         }
         return this;
     }
@@ -668,7 +668,7 @@ public class Configuration implements Serializable {
                     pathProps.put(p.getAttribute(NAME), p.getAttribute(VALUE));
                 }
                 if (pathProperties.containsKey(pathName)) {
-                    LOG.warn("Duplicate Action path configuration : {}, Override the properties.", pathName);
+                    LOG.warn("Duplicate Action path configuration [{}], Override the properties.", pathName);
                 }
                 if (!pathProps.isEmpty()) {
                     pathProperties.put(pathName, pathProps);
@@ -708,7 +708,7 @@ public class Configuration implements Serializable {
                 //add a new ClassScanner for each <component-scan>
                 classScanners.add(parsecComponentClassScanner(props));
             } else {
-                LOG.warn("Property \"{}\" can't be empty for <component-scan>.", PACKAGE);
+                LOG.warn("Property [{}] can't be empty for <component-scan>.", PACKAGE);
             }
         }
     }
@@ -727,7 +727,7 @@ public class Configuration implements Serializable {
             String name = e.getKey();
             String value = e.getValue();
             if (value == null) {
-                LOG.warn("Property \"{}\" can't be empty.", name);
+                LOG.warn("Property [{}] can't be empty.", name);
                 continue;
             }
             Set<String> set = new LinkedHashSet<String>();
@@ -744,7 +744,7 @@ public class Configuration implements Serializable {
                 //exclude expression
                 scanner.setExcludeExpressions(set);
             } else {
-                LOG.warn("Unknown property \"{}\" : {}", name, value);
+                LOG.warn("Unknown property [{}] : [{}]", name, value);
             }
         }
         return scanner;

@@ -16,6 +16,7 @@
  */
 package jrouter.impl;
 
+import java.util.Collections;
 import jrouter.JRouterException;
 import jrouter.TestDuplicate;
 import jrouter.interceptor.DefaultInterceptorStack;
@@ -37,7 +38,7 @@ public class ActionFactory2Test {
 
     @Before
     public void init() {
-        factory = new DefaultActionFactory();
+        factory = new DefaultActionFactory(Collections.EMPTY_MAP);
 
         //interceptor
         factory.addInterceptors(SampleInterceptor.class);

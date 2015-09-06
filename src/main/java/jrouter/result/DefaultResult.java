@@ -28,8 +28,8 @@ public class DefaultResult {
     /** 默认结果类型名称，不作任何处理 */
     public static final String EMPTY = "empty";
 
-    /** action forward结果类型名称 */
-    public static final String FORWARD = "forward";
+    /** actionForward结果类型名称 */
+    public static final String FORWARD = "actionForward";
 
     /**
      * 默认结果类型，未作任何处理。
@@ -43,16 +43,15 @@ public class DefaultResult {
 
     /**
      * Action结果直接调用映射的Action，类似forward结果类型。
-     * forward可多次关联调用，需自行判断循环调用。
+     * actionForward可多次关联调用，需自行判断循环调用。
      *
      * @param invocation Action运行时上下文。
      *
-     * @return 返回forward后的调用结果。
-     *
+     * @return 返回actionForward后的调用结果。
      */
     @ResultType(type = FORWARD)
     public static Object actionForward(ActionInvocation invocation) {
-        return invocation.getActionFactory().invokeAction(invocation.getResult().location());
+        return invocation.getActionFactory().invokeAction(invocation.getResult().location(), invocation.getParameters());
     }
     ////////////////////////////////////////////////////////////////////////////
     /**

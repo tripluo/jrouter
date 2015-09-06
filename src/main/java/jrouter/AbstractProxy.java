@@ -30,8 +30,12 @@ public abstract class AbstractProxy {
     /** 方法所在的对象 */
     protected Object object;
 
-    /** 方法所在的对象是否单例，默认情况是单例 */
-    private boolean singleton = true;
+    /**
+     * 方法所在的对象是否单例，默认情况是单例
+     *
+     * @deprecated
+     */
+    private final boolean singleton = true;
 
     /**
      * 指定方法及其对象的构造方法。
@@ -40,20 +44,8 @@ public abstract class AbstractProxy {
      * @param object 指定的对象。
      */
     public AbstractProxy(Method method, Object object) {
-        this(method, object, true);
-    }
-
-    /**
-     * 指定对象、方法及对象状态（是否单例）的构造方法。
-     *
-     * @param method 指定的方法。
-     * @param object 指定的对象。
-     * @param singleton 对象是否单例。
-     */
-    public AbstractProxy(Method method, Object object, boolean singleton) {
         this.method = method;
         this.object = object;
-        this.singleton = singleton;
     }
 
     /**
@@ -100,6 +92,8 @@ public abstract class AbstractProxy {
      * 判断方法所在的对象是否单例。
      *
      * @return 方法所在的对象是否单例。
+     *
+     * @deprecated
      */
     public boolean isSingleton() {
         return singleton;

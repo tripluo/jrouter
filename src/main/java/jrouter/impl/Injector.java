@@ -213,7 +213,7 @@ public class Injector {
 //                        p.getWriteMethod().invoke(obj, stringToObject(value, type));
 //                    } else {
 //                        //not supported setter method if been invoked
-//                        LOG.error("Not supported set \"{}\" as \"{}\"", p.getName(), p.getPropertyType());
+//                        LOG.error("Not supported set [{}] as [{}]", p.getName(), p.getPropertyType());
 //                    }
 //                }
 //            }

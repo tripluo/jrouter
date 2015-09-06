@@ -1,7 +1,7 @@
 
-**jrouter** is an open source lightweight method router processing container implemented entirely in Java. It focuses on methods' mapping, invoking, intercepting and result processing. You can use it to search and collect your application objects' methods for rpc, web services, http controller, desktop applications and so on.
+**jrouter** is an open source lightweight method router processing container implemented entirely in Java. It focuses on methods' mapping, invoking, intercepting and result processing. You can use it to search and collect your application objects' methods for HTTP controller, Web services, RPC, a variety of applications, etc.
 
-**jrouter** 是一个基于对象方法架构的开源轻量级Java容器。它专注于方法的映射、调用、拦截和结果处理，采用基于配置和注解的方式来抽取和收集程序中对象的方法（method）以用于RPC，Web服务，HTTP控制器，桌面应用程序等。
+**jrouter** 是一个基于对象方法架构的开源轻量级Java容器。它专注于方法的映射、调用、拦截和结果处理，采用基于配置和注解的方式来抽取和收集程序中对象的方法（method）以用于HTTP控制器，Web服务，RPC，各种应用等。
 
 针对方法，提供基于注解(@Annotation)的配置：
 
@@ -41,7 +41,7 @@ Adding to your Maven2/3 application:
         <dependency>
             <groupId>jrouter</groupId>
             <artifactId>jrouter</artifactId>
-            <version>1.6.7</version>
+            <version>1.7.0</version>
         </dependency>
     </dependencies>
 Springframework Integration:
@@ -74,7 +74,7 @@ Springframework Integration:
                 <!-- optional default -->
                 bytecode = javassist
                 <!-- optional default -->
-                converterFactory = jrouter.impl.LastPadParameterFactory
+                converterFactory = jrouter.impl.MultiParameterConverterFactory
             </value>
         </property>
 
@@ -86,7 +86,7 @@ Springframework Integration:
                     package = jrouter
                     <!-- optional, if empty means all -->
                     includeExpression = jrouter.impl.**
-                    <!-- optional, if empty means all -->
+                    <!-- optional -->
                     excludeExpression = jrouter.result.**, jrouter.interceptor.**
                 </value>
             </list>

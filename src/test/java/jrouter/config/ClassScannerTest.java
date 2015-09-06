@@ -22,6 +22,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.DemoInterceptor;
+import jrouter.interceptor.DemoThreadActionContextInterceptor;
 import jrouter.interceptor.SampleInterceptor;
 import jrouter.result.DefaultResult;
 import jrouter.result.DemoResult;
@@ -69,6 +70,7 @@ public class ClassScannerTest {
                     SampleInterceptor.class,
                     DefaultResult.class,
                     DemoInterceptor.class,
+                    DemoThreadActionContextInterceptor.class,
                     DemoResult.class
                 },
                 classScanner.calculateScanComponents());
@@ -80,6 +82,7 @@ public class ClassScannerTest {
         assertCollectionEqualContains(
                 new Class[]{
                     DefaultInterceptorStack.class,
+                    DemoThreadActionContextInterceptor.class,
                     DefaultResult.class,
                     DemoInterceptor.class,
                     DemoResult.class
@@ -97,13 +100,13 @@ public class ClassScannerTest {
                 classScanner.calculateScanComponents());
         clear();
 
-
         //include expressions
         classScanner.setIncludePackages(stringToSet("jrouter.result, jrouter.interceptor"));
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
         assertCollectionEqualContains(
                 new Class[]{
                     DefaultInterceptorStack.class,
+                    DemoThreadActionContextInterceptor.class,
                     DefaultResult.class,
                     DemoInterceptor.class,
                     DemoResult.class
@@ -142,6 +145,7 @@ public class ClassScannerTest {
                     SampleInterceptor.class,
                     DefaultResult.class,
                     DemoInterceptor.class,
+                    DemoThreadActionContextInterceptor.class,
                     DemoResult.class
                 },
                 classScanner.calculateScanComponents());
@@ -157,7 +161,6 @@ public class ClassScannerTest {
                     DefaultResult.class,},
                 classScanner.calculateScanComponents());
         clear();
-
 
         //include and exclude expressions
         classScanner.setIncludePackages(stringToSet("jrouter.result, jrouter.interceptor"));

@@ -19,6 +19,7 @@ package jrouter;
 import jrouter.annotation.Action;
 import jrouter.impl.PathTreeTest;
 import static jrouter.impl.PathTreeTest.*;
+import jrouter.interceptor.DemoThreadActionContextInterceptor;
 import jrouter.interceptor.SampleInterceptor;
 import org.springframework.stereotype.Component;
 
@@ -30,12 +31,14 @@ import org.springframework.stereotype.Component;
 @Component
 public class PathTestAction {
 
-    @Action(name = "/xx/yy/zz", interceptors = {SampleInterceptor.LOGGING})
+    @Action(name = "/xx/yy/zz",
+            interceptors = {DemoThreadActionContextInterceptor.DEMO_THREAD, SampleInterceptor.LOGGING})
     public String test0() {
         return PATHS[0];
     }
 
-    @Action(name = "/{k1}", interceptors = {SampleInterceptor.TIMER})
+    @Action(name = "/{k1}",
+            interceptors = {DemoThreadActionContextInterceptor.DEMO_THREAD, SampleInterceptor.TIMER})
     public String test1() {
         return PATHS[1];
     }

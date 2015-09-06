@@ -54,7 +54,10 @@ public class DefaultActionInvocation implements ActionInvocation {
     private int _index = 0;
 
     /** 方法调用的参数 */
-    private final Object[] params;
+    private final Object[] originalParams;
+
+    /** 提供给转换器的参数 */
+    private Object[] convertParameters;
 
     /** 方法调用后的结果 */
     private Object invokeResult;
@@ -74,13 +77,14 @@ public class DefaultActionInvocation implements ActionInvocation {
      *
      * @param actionFactory Action工厂对象。
      * @param actionProxy Action代理对象。
-     * @param params Action代理对象中方法调用的参数。
+     * @param originalParams Action代理对象中方法调用的原始参数。
      */
     public DefaultActionInvocation(ActionFactory actionFactory, DefaultActionProxy actionProxy,
-            Object... params) {
+            Object... originalParams) {
         this.actionFactory = actionFactory;
         this.actionProxy = actionProxy;
-        this.params = params;
+        this.originalParams = originalParams;
+        this.convertParameters = new Object[]{this};
         this.interceptors = actionProxy.getInterceptorProxies();
     }
 
@@ -99,12 +103,12 @@ public class DefaultActionInvocation implements ActionInvocation {
     public Object invokeActionOnly(Object... params) throws InvocationProxyException {
         //params is null only if explicitly set it null
         if (params == null || params.length == 0)
-            params = this.params;
+            params = this.originalParams; //TODO
         setExecuted(true);
         LOG.debug("Invoke Action [{}]; Parameters {} at : {}",
                 actionProxy.getPath(), java.util.Arrays.toString(params), actionProxy.getMethodInfo());
         //set invokeResult
-        invokeResult = MethodUtil.invoke(actionProxy, parameterConverter, params);
+        invokeResult = MethodUtil.invoke(actionProxy, parameterConverter, params, getConvertParameters());
         return invokeResult;
     }
 
@@ -120,9 +124,8 @@ public class DefaultActionInvocation implements ActionInvocation {
         if (interceptors != null && _index < interceptors.size()) {
             final InterceptorProxy interceptor = interceptors.get(_index++);
             LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
-            //TODO enhancemet when only one parameter
             //pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
-            invokeResult = MethodUtil.invoke(interceptor, parameterConverter);
+            invokeResult = MethodUtil.invoke(interceptor, parameterConverter, null, getConvertParameters());
         } else {
             //action invoke
             if (!executed) {
@@ -148,7 +151,7 @@ public class DefaultActionInvocation implements ActionInvocation {
 
     @Override
     public Object[] getParameters() {
-        return params;
+        return originalParams;
     }
 
     @Override
@@ -209,6 +212,16 @@ public class DefaultActionInvocation implements ActionInvocation {
     @Override
     public ParameterConverter getParameterConverter() {
         return this.parameterConverter;
+    }
+
+    @Override
+    public Object[] getConvertParameters() {
+        return this.convertParameters;
+    }
+
+    @Override
+    public void setConvertParameters(Object... params) {
+        this.convertParameters = params;
     }
 
     /**

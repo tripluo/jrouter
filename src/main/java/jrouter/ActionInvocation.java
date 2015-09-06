@@ -118,4 +118,18 @@ public interface ActionInvocation<T> {
      * @return 底层方法参数的转换器。
      */
     ParameterConverter getParameterConverter();
+
+    /**
+     * 设置提供给参数转换器的参数，转换参数可不同于原调用参数。
+     *
+     * @param params 提供给参数转换器的参数。
+     */
+    void setConvertParameters(Object... params);
+
+    /**
+     * 返回提供给参数转换器的参数，转换参数可不同于原调用参数。
+     *
+     * @return 提供给参数转换器的参数。
+     */
+    Object[] getConvertParameters();
 }

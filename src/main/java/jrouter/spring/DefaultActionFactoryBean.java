@@ -27,6 +27,7 @@ import jrouter.JRouterException;
 import jrouter.ObjectFactory;
 import jrouter.config.AopAction;
 import jrouter.config.Configuration;
+import jrouter.impl.DefaultActionFactory;
 import jrouter.util.AntPathMatcher;
 import jrouter.util.ClassUtil;
 import jrouter.util.CollectionUtil;
@@ -43,9 +44,11 @@ import org.springframework.core.io.Resource;
 
 /**
  * 提供与springframework集成的ActionFactory。Action指定path属性的注入由指定springframework的bean完成。
+ *
+ * @param <T> ActionFactory特定类型。
  */
-public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, InitializingBean,
-        DisposableBean, ApplicationContextAware {
+public class DefaultActionFactoryBean<T extends ActionFactory> implements FactoryBean<T>,
+        InitializingBean, DisposableBean, ApplicationContextAware {
 
     /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(DefaultActionFactoryBean.class);
@@ -56,10 +59,10 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     private Resource configLocation;
 
     /* ActionFactory对象 */
-    private ActionFactory actionFactory;
+    private T actionFactory;
 
     /* ActionFactory的类型 */
-    private Class<? extends ActionFactory> actionFactoryClass = null;
+    private Class<T> actionFactoryClass = null;
 
     /** Configuration对象 */
     private Configuration configuration;
@@ -122,7 +125,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      */
     @Override
     public void afterPropertiesSet() throws Exception {
-        actionFactory = buildActionFactory();
+        actionFactory = (T) buildActionFactory();
         afterActionFactoryCreation(actionFactory);
     }
 
@@ -136,7 +139,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     protected ActionFactory buildActionFactory() throws Exception {
         LOG.info("Initiating JRouter ActionFactory at : " + new java.util.Date());
         if (configuration == null) {
-            configuration = new SpringConfiguration(applicationContext);
+            configuration = createDefaultConfiguration();
         }
         //不保证ActionFactory属性的重复加载
         if (configLocation != null) {
@@ -147,10 +150,11 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
         if (actionFactoryClass != null) {
             LOG.debug("Set actionFactoryClass : " + actionFactoryClass);
             configuration.setActionFactoryClass(actionFactoryClass);
+        } else {
+            setDefaultActionFactoryClass(configuration);
         }
         if (objectFactory == null) {
-            //use default SpringObjectFactory
-            objectFactory = new SpringObjectFactory(applicationContext);
+            objectFactory = createDefaultObjectFactory(configuration);
         }
         actionFactoryProperties.put("objectFactory", objectFactory);
         configuration.addActionFactoryProperties((Map) actionFactoryProperties);
@@ -240,7 +244,6 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
 
         //TODO
         //configuration.setPathProperties(null);
-
         //actions' aop
         if (CollectionUtil.isNotEmpty(aopActions)) {
             configuration.addAopActions(aopActions);
@@ -248,6 +251,44 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
         return configuration.buildActionFactory();
     }
 
+    /**
+     * 未直接设置Configuration对象时，提供默认的<code>SpringConfiguration</code>对象实现。
+     *
+     * @return <code>SpringConfiguration</code>对象。
+     *
+     * @see #setConfiguration(jrouter.config.Configuration)
+     */
+    protected Configuration createDefaultConfiguration() {
+        //create SpringObjectFactory
+        return new SpringConfiguration(applicationContext);
+    }
+
+    /**
+     * 未设置actionFactoryClass属性时，提供默认的<code>DefaultActionFactory.class</code>属性。
+     *
+     * @param config Configuration对象。
+     *
+     * @see #setActionFactoryClass(java.lang.Class)
+     */
+    protected void setDefaultActionFactoryClass(Configuration config) {
+        config.setActionFactoryClass(DefaultActionFactory.class);
+    }
+
+    /**
+     * 未设置objectFactory属性时，提供默认的<code>SpringObjectFactory</code>对象实现。
+     *
+     * @param config Configuration对象。
+     *
+     * @return <code>SpringObjectFactory</code>对象。
+     *
+     * @see #setObjectFactory(jrouter.ObjectFactory)
+     */
+    protected ObjectFactory createDefaultObjectFactory(Configuration config) {
+        //create SpringObjectFactory
+        return new SpringObjectFactory(applicationContext);
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * Add matched bean.
      *
@@ -268,9 +309,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     }
 
     /**
-     * convert the
-     * <code>String</code> element of the list into
-     * <code>Class</code>.
+     * Convert the <code>String</code> element of the list into <code>Class</code>.
      *
      * @param listArray the array of list.
      *
@@ -309,8 +348,8 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      * 返回ActionFactory对象，默认为单例状态。
      */
     @Override
-    public ActionFactory getObject() {
-        return this.actionFactory;
+    public T getObject() {
+        return (T) this.actionFactory;
     }
 
     @Override
@@ -324,21 +363,23 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
     }
 
     /**
-     * Hook that allows post-processing after the ActionFactory has been successfully created. The
-     * ActionFactory is already available through
-     * <code>getActionFactory()</code> at this point. <p>This implementation is empty.
+     * Hook that allows post-processing after the ActionFactory has been successfully created.
+     * The ActionFactory is already available through <code>getActionFactory()</code> at this point.
+     * <p>
+     * This implementation is empty.
      *
      * @param actionFactory ActionFactory。
      *
      * @see #buildActionFactory()
      */
-    protected void afterActionFactoryCreation(ActionFactory actionFactory) {
+    protected void afterActionFactoryCreation(T actionFactory) {
     }
 
     /**
-     * Hook that allows shutdown processing before the ActionFactory will be closed. The
-     * ActionFactory is still available through
-     * <code>getActionFactory()</code> at this point. <p>This implementation is empty.
+     * Hook that allows shutdown processing before the ActionFactory will be closed.
+     * The ActionFactory is still available through <code>getActionFactory()</code> at this point.
+     * <p>
+     * This implementation is empty.
      *
      * @see #destroy()
      */
@@ -409,7 +450,7 @@ public class DefaultActionFactoryBean implements FactoryBean<ActionFactory>, Ini
      *
      * @see Configuration#setActionFactoryClass(java.lang.Class)
      */
-    public void setActionFactoryClass(Class<? extends ActionFactory> actionFactoryClass) {
+    public void setActionFactoryClass(Class<T> actionFactoryClass) {
         if (actionFactoryClass == null || !ActionFactory.class.isAssignableFrom(actionFactoryClass)) {
             throw new IllegalArgumentException(
                     "'actionFactoryClass' must be assignable to [jrouter.ActionFactory]");

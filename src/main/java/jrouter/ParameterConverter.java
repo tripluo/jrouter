@@ -27,14 +27,19 @@ public interface ParameterConverter {
 
     /**
      * 传递底层的方法、调用对象及原有的参数，返回转换处理后的调用参数。
+     * 原调用参数由ActionFactory的invokeAction方法指定传递。
      *
      * @param method 底层的方法。
      * @param obj 从中调用底层方法的对象。
-     * @param params 用于方法调用的参数。
+     * @param originalParams 用于方法调用的原始参数。
+     * @param convertParams 提供给转换器的参数。
      *
      * @return 转换处理后的调用参数。
      *
      * @throws JRouterException 如果发生转换异常。
+     *
+     * @see ActionFactory#invokeAction(java.lang.String, java.lang.Object...)
      */
-    Object[] convert(Method method, Object obj, Object[] params) throws JRouterException;
+    Object[] convert(Method method, Object obj, Object[] originalParams, Object[] convertParams)
+            throws JRouterException;
 }

@@ -90,6 +90,8 @@ public class StringUtil {
      * @return 去除首尾空白和指定字符后的字符串。
      */
     public static String trim(String src, char ch) {
+        if (isEmpty(src))
+            return src;
         int begin = 0;
         int end = src.length() - 1;
         while (begin < end) {
@@ -103,6 +105,39 @@ public class StringUtil {
         while (end >= begin) {
             char c = src.charAt(end);
             if (c == ch || Character.isWhitespace(c)) {
+                end--;
+            } else {
+                break;
+            }
+        }
+        return src.substring(begin, end + 1);
+    }
+
+    /**
+     *
+     * 去除字符串首尾的空格和特定字符数组。
+     *
+     * @param src 原字符串。
+     * @param chs 指定字符数组。
+     *
+     * @return 去除首尾空白和指定字符后的字符串。
+     */
+    public static String trim(String src, char... chs) {
+        if (isEmpty(src))
+            return src;
+        int begin = 0;
+        int end = src.length() - 1;
+        while (begin < end) {
+            char c = src.charAt(begin);
+            if (CollectionUtil.contains(c, chs) || Character.isWhitespace(c)) {
+                begin++;
+            } else {
+                break;
+            }
+        }
+        while (end >= begin) {
+            char c = src.charAt(end);
+            if (CollectionUtil.contains(c, chs) || Character.isWhitespace(c)) {
                 end--;
             } else {
                 break;
@@ -135,7 +170,9 @@ public class StringUtil {
 
     /**
      * Tokenize the given String into a String array via a StringTokenizer. Trims tokens and omits
-     * empty tokens. <p>The given delimiters string is supposed to consist of any number of
+     * empty tokens.
+     * <p>
+     * The given delimiters string is supposed to consist of any number of
      * delimiter characters. Each of those characters can be used to separate tokens. A delimiter is
      * always a single character; for multi-character delimiters, consider using
      * <code>delimitedListToStringArray</code>
@@ -143,7 +180,9 @@ public class StringUtil {
      * @param str the String to tokenize
      * @param delimiters the delimiter characters, assembled as String (each of those characters is
      * individually considered as delimiter).
+     *
      * @return an array of the tokens
+     *
      * @see java.util.StringTokenizer
      * @see java.lang.String#trim()
      */
@@ -152,7 +191,9 @@ public class StringUtil {
     }
 
     /**
-     * Tokenize the given String into a String array via a StringTokenizer. <p>The given delimiters
+     * Tokenize the given String into a String array via a StringTokenizer.
+     * <p>
+     * The given delimiters
      * string is supposed to consist of any number of delimiter characters. Each of those characters
      * can be used to separate tokens. A delimiter is always a single character; for multi-character
      * delimiters, consider using
@@ -166,9 +207,11 @@ public class StringUtil {
      * @param ignoreEmptyTokens omit empty tokens from the result array (only applies to tokens that
      * are empty after trimming; StringTokenizer will not consider subsequent delimiters as token in
      * the first place).
+     *
      * @return an array of the tokens (
      * <code>null</code> if the input String was
      * <code>null</code>)
+     *
      * @see java.util.StringTokenizer
      * @see java.lang.String#trim()
      */

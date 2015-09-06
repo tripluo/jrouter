@@ -21,6 +21,7 @@ import java.util.Map;
 import jrouter.ActionProxy;
 import jrouter.JRouterException;
 import jrouter.SimpleAction;
+import jrouter.bytecode.javassist.JavassistProxyFactory;
 import jrouter.config.Configuration;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.SampleInterceptor;
@@ -53,7 +54,7 @@ public class ActionFactoryTest {
         assertEquals(100000, factory.getActionCacheNumber());
         assertEquals(".", factory.getExtension());
         assertEquals('/', factory.getPathSeparator());
-        assertEquals(LastPadParameterFactory.class, factory.getConverterFactory().getClass());
+        assertEquals(MultiParameterConverterFactory.class, factory.getConverterFactory().getClass());
 
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.LOGGING));
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.TIMER));
@@ -145,6 +146,7 @@ public class ActionFactoryTest {
         assertNotNull(ap.getAction());
         assertTrue(ap.getInterceptorProxies().isEmpty());
         assertNotNull(ap.getResults());
+        assertTrue(factory.getProxyFactory() instanceof JavassistProxyFactory);
 
         ap.invoke();
 
@@ -198,9 +200,9 @@ public class ActionFactoryTest {
         assertEquals("[]", factory.invokeAction(url4));//change
         assertEquals("[null]", factory.invokeAction(url4, (Object) null));//change
         assertEquals("null", factory.invokeAction(url4, (Object[]) null));
-        //assertEquals("null", factory.invokeAction(url3, new Object[]{null}));//change
+        //assertEquals("null", factory.invokeAction(url4, new Object[]{null}));//change
         assertEquals("[null]", factory.invokeAction(url4, new Object[]{null}));//change
-        //assertEquals("null", factory.invokeAction(url3, new Object[0]));
+        //assertEquals("null", factory.invokeAction(url4, new Object[0]));
         assertEquals("[]", factory.invokeAction(url4, new Object[0]));//change
         assertEquals("[]", factory.invokeAction(url4, new Object[]{new String[]{}}));
         assertEquals("[null, null, null]", factory.invokeAction(url4, new Object[]{new String[]{null, null, null}}));
@@ -217,7 +219,7 @@ public class ActionFactoryTest {
         assertNotNull(ap);
         //varArgsArray
         assertEquals("100[]", factory.invokeAction(url5, 100));//change
-        //assertEquals("100null", factory.invokeAction(url4, 100, null));//change
+        //assertEquals("100null", factory.invokeAction(url5, 100, null));//change
         assertEquals("100[null]", factory.invokeAction(url5, 100, null));//change
         assertEquals("100[null, null, null]", factory.invokeAction(url5, 100, null, null, null));//change
         assertEquals("100[]", factory.invokeAction(url5, 100, new String[0]));
@@ -228,7 +230,7 @@ public class ActionFactoryTest {
         assertEquals("100[]", factory.invokeAction(url5, new Object[]{100, new String[]{}}));
         assertEquals("100[1, 2]", factory.invokeAction(url5, new Object[]{100, new String[]{"1", "2"}}));
         assertEquals("100[]", factory.invokeAction(url5, new Object[]{100, new String[0]}));
-        //assertEquals("100null", factory.invokeAction(url4, new Object[]{100, null}));//change
+        //assertEquals("100null", factory.invokeAction(url5, new Object[]{100, null}));//change
         assertEquals("100[null]", factory.invokeAction(url5, new Object[]{100, null}));//change
         assertEquals("100[1]", factory.invokeAction(url5, 100, "1"));//change
         assertEquals("100[1, 2]", factory.invokeAction(url5, 100, "1", "2"));//change
@@ -236,6 +238,24 @@ public class ActionFactoryTest {
         assertEquals("null[]", factory.invokeAction(url5, (Object) null));//change
         assertEquals("null[]", factory.invokeAction(url5, (Object[]) null));//change
 
+        String url6 = "/test/varArgsArray2";
+        assertEquals("100200[]", factory.invokeAction(url6, 100, 200));//change
+        assertEquals("100null[]", factory.invokeAction(url6, 100, null));//change
+        assertEquals("100null[null, null]", factory.invokeAction(url6, 100, null, null, null));//change
+        assertEquals("100200[]", factory.invokeAction(url6, 100, 200, new String[0]));
+        assertEquals("100200[]", factory.invokeAction(url6, 100, 200, new String[]{}));
+        assertEquals("100200[]", factory.invokeAction(url6, 100, 200, new String[]{""}));
+        assertEquals("100200[null]", factory.invokeAction(url6, 100, 200, new String[]{null}));
+        assertEquals("100200[1, 2]", factory.invokeAction(url6, 100, 200, new String[]{"1", "2"}));
+        assertEquals("100200[]", factory.invokeAction(url6, new Object[]{100, 200, new String[]{}}));
+        assertEquals("100200[1, 2]", factory.invokeAction(url6, new Object[]{100, 200, new String[]{"1", "2"}}));
+        assertEquals("100200[]", factory.invokeAction(url6, new Object[]{100, 200, new String[0]}));
+        assertEquals("100200[null]", factory.invokeAction(url6, new Object[]{100, 200, null}));//change
+        assertEquals("100200[1]", factory.invokeAction(url6, 100, 200, "1"));//change
+        assertEquals("100200[1, 2]", factory.invokeAction(url6, 100, 200, "1", "2"));//change
+        //set previous parameter null
+        assertEquals("100null[]", factory.invokeAction(url6, 100, (Object) null));//change
+        assertEquals("100null[]", factory.invokeAction(url6, 100, (Object[]) null));//change
     }
 
     /**
@@ -280,12 +300,12 @@ public class ActionFactoryTest {
         props.put("defaultResultType", DefaultResult.FORWARD);
         //rebuild factory
         factory = initiateConfiguration().addActionFactoryProperties(props).buildActionFactory();
-        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, ":/test/simple"));
-        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, "  : /test/simple"));
-        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + ":/test/simple"));
-        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + "  : /test/simple"));
-        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + "  : /test/simple  "));
-        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, "   " + DefaultResult.FORWARD + "  :   /test/simple  "));
+        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, ":/test/simple2"));
+        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, "  : /test/simple2"));
+        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + ":/test/simple2"));
+        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + "  : /test/simple2"));
+        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + "  : /test/simple2  "));
+        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, "   " + DefaultResult.FORWARD + "  :   /test/simple2  "));
 
         try {
             factory.invokeAction(url1, "notype:/nolocation");
@@ -384,7 +404,7 @@ public class ActionFactoryTest {
      * 测试ActionFactory的converterFactory属性。
      *
      * @see DefaultActionFactory#converterFactory
-     * @see jrouter.impl.LastPadParameterFactory
+     * @see jrouter.impl.MultiParameterConverterFactory
      */
     @Test
     public void test_lastPadParameter() {

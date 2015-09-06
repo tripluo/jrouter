@@ -3,6 +3,26 @@ JROUTER CHANGELOG
 ==========================
 http://git.oschina.net/sundancer/jrouter/
 
+Changes in version 1.7.0 (2015-09-06)
+---------------------------------------
+* ActionInvocation新增setConvertParameters(...)/getConvertParameters()方法，设置/返回提供给参数转换器的参数。
+* 更新DefaultActionInvocation，默认实现setConvertParameters(...)/getConvertParameters()返回自身引用。
+* 更新DefaultActionInvocation，invoke(...)和invokeActionOnly(...)方法提供getConvertParameters()参数给转换器。
+* 重构ParameterConverter的convert(...)方法，新增Object[] additionalParams参数。
+* 废除LastPadParameterFactory，由MultiParameterConverterFactory取代。
+* 新增MultiParameterConverterFactory，提供多参数自动映射转换器的工厂类，并默认缓存转换参数匹配的位置。
+* 更新DefaultActionFactory，converterFactory属性默认采用MultiParameterConverterFactory实现。
+* 删除ThreadContext，不需要线程变量；可由Interceptor替代。并删除相关测试用例。
+* 删除DefaultActionFactory的默认不参数构造器，确保子类继承复写。
+* 更新DefaultActionFactoryBean，支持泛型方便继承调用。
+* 更新DefaultActionFactoryBean，新增createDefaultConfiguration()，setDefaultActionFactoryClass(...)，createDefaultObjectFactory(...)方法，方便子类继承复写。
+* 新增NotFoundException，标识指定资源不存在时抛出的异常。
+* 更新DefaultActionFactory，方法调用时Action、ResultType不存在的情况下抛出NotFoundException。
+* 更新DefaultResult的actionForward结果类型名称为"actionForward"。
+* 修正测试用例DemoThreadActionContextInterceptor、PathTestAction、PathActionFactoryTest、MultiParameterConverterTest。
+* 更新依赖包javassist至 3.20.0-GA.
+* 更新依赖包springframework至 4.2.1.
+
 
 Changes in version 1.6.7 (2015-05-19)
 ---------------------------------------

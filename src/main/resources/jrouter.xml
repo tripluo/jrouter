@@ -19,7 +19,7 @@
         <!-- optional default -->
         <property name="bytecode" value="javassist"/>
         <!-- optional default -->
-        <property name="converterFactory" value="jrouter.impl.LastPadParameterFactory"/>
+        <property name="converterFactory" value="jrouter.impl.MultiParameterConverterFactory"/>
     </action-factory>
 
     <!-- scan classes only in root configuration, use ',' as separate -->

@@ -35,7 +35,7 @@ public class ConverterParameterActionFactoryTest {
     public void init() {
         Map<String, Object> props = new HashMap<String, Object>();
         //manually set converterFactory
-        props.put("converterFactory", jrouter.impl.LastPadParameterFactory.class);
+        props.put("converterFactory", jrouter.impl.MultiParameterConverterFactory.class);
 //        props.put("bytecode", "default");
         factory = new ConverterParameterActionFactory(props);
         //add test Action

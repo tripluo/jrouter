@@ -34,16 +34,20 @@ public class CollectionUtilTest {
 
         assertArrayEquals(new String[0], CollectionUtil.stringToCollection(null, null, sep).toArray());
         assertArrayEquals(new String[]{""}, CollectionUtil.stringToCollection("", null).toArray());
+        assertArrayEquals(new String[]{"  "}, CollectionUtil.stringToCollection("  ", null).toArray());
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection("a", null).toArray());
         assertArrayEquals(new String[]{"a,bb"}, CollectionUtil.stringToCollection("a,bb", null).toArray());
 
         assertArrayEquals(new String[]{}, CollectionUtil.stringToCollection("", null, sep).toArray());
         assertArrayEquals(new String[]{}, CollectionUtil.stringToCollection("  ", null, sep).toArray());
+        assertArrayEquals(new String[]{}, CollectionUtil.stringToCollection(",", null, sep).toArray());
+        assertArrayEquals(new String[]{}, CollectionUtil.stringToCollection(" \r\n", null, sep).toArray());
         assertArrayEquals(new String[]{}, CollectionUtil.stringToCollection(" , ,, ", null, sep).toArray());
 
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection("a", null, sep).toArray());
+        assertArrayEquals(new String[]{"aa"}, CollectionUtil.stringToCollection("aa", null, sep).toArray());
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection("  a   ", null, sep).toArray());
-        assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection(",a", null, sep).toArray());
+        assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection(",a \r", null, sep).toArray());
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection("a,", null, sep).toArray());
         assertArrayEquals(new String[]{"a"}, CollectionUtil.stringToCollection("  a,,,", null, sep).toArray());
 
@@ -72,26 +76,58 @@ public class CollectionUtilTest {
      */
     @Test
     public void testStringToMap() {
-
         char[] sep = {',', '|'};
+        String[] nulls = {null, "", " ", "   ",
+            ",", " ,", " ,", " ,  ", ",,", " ,,", " ,,  ", " ,,,,  "};
+        for (String emtpy : nulls) {
+            assertEquals("{}", CollectionUtil.stringToMap(emtpy, null, sep).toString());
+        }
+        String[] emtpys = {"=", " =", "   =", "= ", "=    ", "  =    ",
+            ",=", "=,", " ,=", " , =", " =  ,", "=,,"};
+        for (String emtpy : emtpys) {
+            assertEquals("{=}", CollectionUtil.stringToMap(emtpy, null, sep).toString());
+        }
 
-        assertEquals("{}", CollectionUtil.stringToMap(null, null, sep).toString());
-        assertEquals("{}", CollectionUtil.stringToMap("", null).toString());
-        assertEquals("{}", CollectionUtil.stringToMap("a", null).toString());
-        assertEquals("{}", CollectionUtil.stringToMap("a=a", null).toString());
-        assertEquals("{}", CollectionUtil.stringToMap("", null, sep).toString());
-        assertEquals("{}", CollectionUtil.stringToMap("a", null, sep).toString());
-        assertEquals("{}", CollectionUtil.stringToMap("a==a", null, sep).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("a", null).toString());
+        assertEquals("{a,=}", CollectionUtil.stringToMap("a,", null).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("a,", null, sep).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap(" a", null).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("   a", null).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("a ", null).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("a   ", null).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("  a   ", null).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("a=", null).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("a =", null).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap(" a  =", null).toString());
+        assertEquals("{=a}", CollectionUtil.stringToMap("=a", null).toString());
+        assertEquals("{=a}", CollectionUtil.stringToMap("= a", null).toString());
+        assertEquals("{=a}", CollectionUtil.stringToMap("=   a", null).toString());
+        assertEquals("{=a}", CollectionUtil.stringToMap("=  a   ", null).toString());
 
+        assertEquals("{a=a}", CollectionUtil.stringToMap("a=a", null).toString());
+        assertEquals("{a=a}", CollectionUtil.stringToMap("a=a,", null, sep).toString());
+        assertEquals("{a=}", CollectionUtil.stringToMap("a=,a", null, sep).toString());
+        assertEquals("{a=, b=}", CollectionUtil.stringToMap("a= ,b", null, sep).toString());
+        assertEquals("{a=a}", CollectionUtil.stringToMap("a = a", null).toString());
         assertEquals("{a=a}", CollectionUtil.stringToMap("  a=a", null, sep).toString());
         assertEquals("{a=a}", CollectionUtil.stringToMap("a=a   ", null, sep).toString());
+        assertEquals("{==a}", CollectionUtil.stringToMap("==a", null, sep).toString());
+        assertEquals("{==a}", CollectionUtil.stringToMap("= =a", null, sep).toString());
+        assertEquals("{a==a}", CollectionUtil.stringToMap("a==a", null, sep).toString());
+        assertEquals("{a==a}", CollectionUtil.stringToMap(" a  ==a", null, sep).toString());
         assertEquals("{a=a}", CollectionUtil.stringToMap(",a=a", null, sep).toString());
         assertEquals("{a=a}", CollectionUtil.stringToMap("a=a,  ", null, sep).toString());
         assertEquals("{a=a}", CollectionUtil.stringToMap("a=a ,,,", null, sep).toString());
+        assertEquals("{a=a}", CollectionUtil.stringToMap(",,a=a ,,,", null, sep).toString());
+
+        assertEquals("{a=a=}", CollectionUtil.stringToMap("a=a= ,,,", null, sep).toString());
+        assertEquals("{a=a=, b=}", CollectionUtil.stringToMap("a=a= ,,  b ,", null, sep).toString());
+        assertEquals("{a=a=, =}", CollectionUtil.stringToMap("a=a= ,,  = ,", null, sep).toString());
 
         assertEquals("{bb=bb}", CollectionUtil.stringToMap("bb=bb", null, sep).toString());
-        assertEquals("{bb=ccc}", CollectionUtil.stringToMap("a=bb=ccc", null, sep).toString());
-        assertEquals("{a=a, bb=bb}", CollectionUtil.stringToMap("a=a, bb=bb, c=xyz==xyz,", null, sep).toString());
+        assertEquals("{bb==bb}", CollectionUtil.stringToMap("bb==bb", null, sep).toString());
+        assertEquals("{a=bb=ccc}", CollectionUtil.stringToMap("a=bb=ccc", null, sep).toString());
+        assertEquals("{a=a, bb=bb, c=xyz==xyz}", CollectionUtil.stringToMap("a=a, bb=bb, c=xyz==xyz,", null, sep).toString());
 
         assertEquals("{a=a, bb=bb, c=c}", CollectionUtil.stringToMap("a=a,  bb=bb,  c=c  ", null, sep).toString());
         assertEquals("{a=a, bb=bb, c=c}", CollectionUtil.stringToMap("a=a  ,, bb=bb,c=c,", null, sep).toString());
@@ -101,6 +137,7 @@ public class CollectionUtilTest {
         assertEquals("{aaa=aaa, bb=bb, xyz=xyz}", CollectionUtil.stringToMap("aaa=aaa, bb=bb, xyz=xyz", null, sep).toString());
         assertEquals("{aaa=aaa, bb=bb, xyz=xyz}", CollectionUtil.stringToMap("aaa=aaa|||bb=bb, xyz=xyz", null, sep).toString());
         assertEquals("{aaa=aaa, bb=bb, xyz=xyz}", CollectionUtil.stringToMap("aaa:aaa | bb=bb, xyz:xyz ,||", null, sep).toString());
+        assertEquals("{aaa=aaa, bb=bb, xyz=xyz}", CollectionUtil.stringToMap("aaa : aaa | bb= bb, xyz :xyz ,||", null, sep).toString());
 
     }
 }

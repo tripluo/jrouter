@@ -37,6 +37,10 @@ public class ConverterParameterActionFactory extends DefaultActionFactory {
     protected ActionInvocation createActionInvocation(String path, Object... params) {
         ActionInvocation ai = super.createActionInvocation(path, params);
         DemoActionInvocation invocation = new DefaultDemoActionInvocation("demo", ai);
+        //重设调用ActionInvocation的参数转换器
+        ai.setParameterConverter(invocation.getActionFactory().getConverterFactory().getParameterConverter(invocation));
+        //重设调用ActionInvocation的转换参数
+        invocation.setConvertParameters(new Object[]{invocation});
         return invocation;
     }
 
@@ -62,8 +66,6 @@ public class ConverterParameterActionFactory extends DefaultActionFactory {
         public DefaultDemoActionInvocation(String name, ActionInvocation invocation) {
             this.name = name;
             this.invocation = invocation;
-            //重设调用ActionInvocation的参数转换器
-            invocation.setParameterConverter(invocation.getActionFactory().getConverterFactory().getParameterConverter(this));
         }
 
         @Override
@@ -129,6 +131,16 @@ public class ConverterParameterActionFactory extends DefaultActionFactory {
         @Override
         public ParameterConverter getParameterConverter() {
             return invocation.getParameterConverter();
+        }
+
+        @Override
+        public void setConvertParameters(Object... params) {
+            invocation.setConvertParameters(params);
+        }
+
+        @Override
+        public Object[] getConvertParameters() {
+            return invocation.getConvertParameters();
         }
     }
 }

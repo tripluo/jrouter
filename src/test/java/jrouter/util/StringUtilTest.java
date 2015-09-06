@@ -74,7 +74,10 @@ public class StringUtilTest {
         assertEquals("x", StringUtil.trim("x  ", PATH));
         assertEquals("x", StringUtil.trim("/x", PATH));
         assertEquals("x", StringUtil.trim("x/", PATH));
+        assertEquals("x", StringUtil.trim("//x", PATH));
+        assertEquals("x", StringUtil.trim("x///", PATH));
         assertEquals("x", StringUtil.trim("/x/", PATH));
+        assertEquals("x", StringUtil.trim("//x///", PATH));
         assertEquals("x/y", StringUtil.trim("/x/y/", PATH));
         assertEquals("test", StringUtil.trim("/test/", PATH));
         assertEquals("test", StringUtil.trim("/test/   ", PATH));

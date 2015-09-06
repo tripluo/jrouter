@@ -83,6 +83,16 @@ public class SimpleAction {
     }
 
     /**
+     * 测试简单调用。
+     *
+     * @return Action执行成功。
+     */
+    @Action(name = "simple2", interceptorStack = DefaultInterceptorStack.EMPTY_INTERCEPTOR_STACK)
+    protected String simple2(String str) {
+        return SUCCESS;
+    }
+
+    /**
      * 测试Action的初始属性。
      */
     @Action(parameters = {
@@ -116,6 +126,14 @@ public class SimpleAction {
     @Action
     public String varArgsArray(Object str, String... params) {
         return str + Arrays.toString(params);
+    }
+
+    /**
+     * 带参数调用。
+     */
+    @Action
+    public String varArgsArray2(Object str1, Object str2, String... params) {
+        return "" + str1 + str2 + Arrays.toString(params);
     }
 
     /**
@@ -166,7 +184,7 @@ public class SimpleAction {
      * @return 结果视图的表达式字符串。
      */
     @Action(results = {
-        @Result(name = "test", type = DefaultResult.FORWARD, location = "/test/simple"),
+        @Result(name = "test", type = DefaultResult.FORWARD, location = "/test/simple2"),
         @Result(name = "*")
     })
     public String autoRender(String type) {
@@ -232,7 +250,7 @@ public class SimpleAction {
     /**
      * 测试LastPadParameter。
      *
-     * @see jrouter.impl.LastPadParameterFactory
+     * @see jrouter.impl.MultiParameterConverterFactory
      */
     @Action
     public String lastPadParameter2(String test, DefaultActionInvocation invocation) {
@@ -263,7 +281,7 @@ public class SimpleAction {
      */
     @Ignore
     public void setString(String string) {
-        LOG.info("Set string \"{}\" in {}", string, this);
+        LOG.info("Set string [{}] in {}", string, this);
         this.string = string;
     }
 }

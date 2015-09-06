@@ -189,14 +189,18 @@ public class MethodUtil {
      *
      * @param proxy AbstractProxy子对象。
      * @param converter 转换底层方法调用参数的转换器。
-     * @param params 用于方法调用的参数。
+     * @param originalParams 用于方法调用的原始参数。
+     * @param additionalParams 提供给转换器的参数。
      *
      * @return AbstractProxy子对象底层方法调用后的结果。
      *
      * @see AbstractProxy#invoke(java.lang.Object...)
      */
-    public static Object invoke(AbstractProxy proxy, ParameterConverter converter, Object... params) {
-        return converter == null ? proxy.invoke(params) : proxy.invoke(converter.convert(proxy.getMethod(), proxy, params));
+    public static Object invoke(AbstractProxy proxy, ParameterConverter converter,
+            Object[] originalParams, Object[] additionalParams) {
+        return converter == null
+                ? proxy.invoke(originalParams)
+                : proxy.invoke(converter.convert(proxy.getMethod(), proxy, originalParams, additionalParams));
     }
 
     /**
@@ -204,13 +208,12 @@ public class MethodUtil {
      *
      * @param proxy AbstractProxy子对象。
      * @param invocation Action运行时上下文对象。
-     * @param params 用于方法调用的参数。
      *
      * @return AbstractProxy子对象底层方法调用后的结果。
      *
      * @see #invoke(jrouter.AbstractProxy, jrouter.ParameterConverter, java.lang.Object...)
      */
-    public static Object invoke(AbstractProxy proxy, ActionInvocation invocation, Object... params) {
-        return invoke(proxy, invocation.getParameterConverter(), params);
+    public static Object invoke(AbstractProxy proxy, ActionInvocation invocation) {
+        return invoke(proxy, invocation.getParameterConverter(), null, invocation.getConvertParameters());
     }
 }

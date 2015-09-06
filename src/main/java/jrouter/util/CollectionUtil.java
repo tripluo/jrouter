@@ -17,6 +17,7 @@
 package jrouter.util;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -254,7 +255,7 @@ public class CollectionUtil {
      *
      * @return 解析后的字符串集合。
      */
-    public static <T extends Collection<String>> T stringToCollection(String source,
+    public static <T extends Collection<String>> T stringToCollection(final String source,
             Collection<String> collection, char... sep) {
         if (collection == null)
             collection = new ArrayList<String>();
@@ -265,37 +266,32 @@ public class CollectionUtil {
             collection.add(source);
             return (T) collection;
         }
-        char[] chars = source.toCharArray();
         int i = 0;
         int point = 0;
         int end = 0;
-        for (; i < chars.length; i++) {
+        for (; i < source.length(); i++) {
             //if separate
-            if (contains(chars[i], sep)) {
+            if (contains(source.charAt(i), sep)) {
                 //blank
                 end = i - 1;
-
-                while (chars[point] == ' ')
+                while (Character.isWhitespace(source.charAt(point)))
                     point++;
-                while (end > point && chars[end] == ' ')
+                while (end > point && Character.isWhitespace(source.charAt(end)))
                     end--;
-
-//                System.out.println(i + "," + point + "," + end);
                 if (point <= end)
-                    collection.add(new String(chars, point, end - point + 1));
-
+                    collection.add(source.substring(point, end + 1));
                 point = i + 1;
             }
         }
-        //串未以分隔符结尾
+        //尾串
         if (i != point) {
             end = i - 1;
-            while (point < i && chars[point] == ' ')
+            while (point < i && Character.isWhitespace(source.charAt(point)))
                 point++;
-            while (end > point && chars[end] == ' ')
+            while (end > point && Character.isWhitespace(source.charAt(end)))
                 end--;
             if (point <= end)
-                collection.add(new String(chars, point, end - point + 1));
+                collection.add(source.substring(point, end + 1));
         }
         return (T) collection;
     }
@@ -312,56 +308,81 @@ public class CollectionUtil {
      *
      * @return 解析后的字符串键值映射。
      */
-    public static <T extends Map<String, String>> T stringToMap(String source, Map<String, String> map,
-            char... sep) {
+    public static <T extends Map<String, String>> T stringToMap(final String source,
+            Map<String, String> map, char... sep) {
+        if (contains('=', sep) || contains(':', sep)) {
+            throw new IllegalArgumentException("Separate array " + Arrays.toString(sep)
+                    + " can't contain " + Arrays.toString(new char[]{'=', ':'}));
+        }
         if (map == null)
             map = new LinkedHashMap<String, String>();
-        if (StringUtil.isEmpty(source) || sep.length == 0) {
+        if (StringUtil.isEmpty(source)) {
             return (T) map;
         }
-
-        char[] chars = source.toCharArray();
 
         int i = 0;
         int point = 0;
         int end = 0;
-        String key = null;
-        for (; i < chars.length; i++) {
-            char b = chars[i];
-            //key
-            if (b == '=' || b == ':') {
-                //blank
+        for (; i < source.length(); i++) {
+            //if separate
+            if (contains(source.charAt(i), sep)) {
                 end = i - 1;
-                while (chars[point] == ' ')
+                while (Character.isWhitespace(source.charAt(point)))
                     point++;
-                while (chars[end] == ' ')
+                while (end > point && Character.isWhitespace(source.charAt(end)))
                     end--;
-                key = point <= end ? new String(chars, point, end - point + 1) : null;
-                point = i + 1;
-            } //value
-            else if (contains(b, sep)) {
-                //blank
-                end = i - 1;
-                while (chars[point] == ' ')
-                    point++;
-                while (end > point && chars[end] == ' ')
-                    end--;
-
-                if (null != key && point <= end)
-                    map.put(key, new String(chars, point, end - point + 1));
-                key = null;
+                if (point < end || (point == end && !contains(source.charAt(point), sep))) {
+                    String[] kv = parseKeyValue(source, point, end);
+                    map.put(kv[0], kv[1]);
+                }
                 point = i + 1;
             }
         }
-        if (null != key) {
+        //尾串
+        if (i != point) {
             end = i - 1;
-            while (point < end && chars[point] == ' ')
+            while (point < i && Character.isWhitespace(source.charAt(point)))
                 point++;
-            while (chars[end] == ' ')
+            while (end > point && Character.isWhitespace(source.charAt(end)))
                 end--;
-            if (point <= end)
-                map.put(key, new String(chars, point, end - point + 1));
+            if (point < end || (point == end && !contains(source.charAt(point), sep))) {
+                String[] kv = parseKeyValue(source, point, end);
+                map.put(kv[0], kv[1]);
+            }
         }
         return (T) map;
+    }
+
+    /**
+     * 针对<code>stringToMap</code>方法的解析key:value对；左右索引已去空。
+     *
+     * @param source 原字符串。
+     * @param beginIndex 起始索引（包括）。
+     * @param endIndex - 结束索引（包括）。
+     *
+     * @return 指定的key:value对数组。
+     *
+     * @see #stringToMap(java.lang.String, java.util.Map, char...)
+     */
+    private static String[] parseKeyValue(String source, int beginIndex, int endIndex) {
+        int point = -1;
+        for (int i = beginIndex; i <= endIndex; i++) {
+            char c = source.charAt(i);
+            if (c == '=' || c == ':') {
+                point = i;
+                break;
+            }
+        }
+        if (point == -1) {
+            return new String[]{source.substring(beginIndex, endIndex + 1), ""};
+        }
+        int lp = point - 1;
+        int rp = point + 1;
+        while (lp > beginIndex && Character.isWhitespace(source.charAt(lp)))
+            lp--;
+        while (rp < endIndex && Character.isWhitespace(source.charAt(rp)))
+            rp++;
+        return new String[]{point == beginIndex ? "" : source.substring(beginIndex, lp + 1),
+            point == endIndex ? "" : source.substring(rp, endIndex + 1)};
     }
 }

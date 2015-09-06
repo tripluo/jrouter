@@ -92,7 +92,7 @@ public class DefaultActionFactory implements ActionFactory {
     /**
      * 创建对象的工厂对象。
      */
-    private ObjectFactory objectFactory;
+    private ObjectFactory objectFactory = null;
 
     /**
      * 创建底层方法代理的工厂对象。
@@ -155,13 +155,6 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 构造DefaultActionFactory并初始化数据。
-     */
-    public DefaultActionFactory() {
-        this(Collections.EMPTY_MAP);
-    }
-
-    /**
      * 设置ActionFactory初始化属性值。
      *
      * @param properties 属性值键值映射。
@@ -173,7 +166,7 @@ public class DefaultActionFactory implements ActionFactory {
             String name = e.getKey();
             Object value = e.getValue();
             if (value == null) {
-                LOG.warn("Property \"{}\" can't be null.", name);
+                LOG.warn("Property [{}] can't be null.", name);
                 continue;
             }
             //string value
@@ -250,7 +243,7 @@ public class DefaultActionFactory implements ActionFactory {
                     LOG.info("Set converterFactory : " + this.converterFactory);
                 }
             } else {
-                LOG.warn("Ignore unknown property \"{}\" : {}", name, value);
+                LOG.warn("Ignore unknown property [{}] : [{}]", name, value);
             }
         }
         //default objectFactory
@@ -263,8 +256,8 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 当objectFactory对象为空时，设置其值。
-     * 默认提供DefaultObjectFactory对象。
+     * 未设置objectFactory属性时，提供默认的<code>ObjectFactory</code>实现。
+     * 默认提供<code>DefaultObjectFactory</code>。
      */
     private void setDefaultObjectFactory() {
         if (objectFactory == null) {
@@ -274,8 +267,10 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 当proxyFactory对象为空时，设置其值。
-     * 默认当引入了javassist时提供JavassistProxyFactory对象；若无javassist引用则默认采用java反射机制。
+     * 未设置proxyFactory属性时，提供默认的<code>ProxyFactory</code>实现。
+     * 默认引入javassist时提供<code>JavassistProxyFactory</code>；若无javassist引用则采用java反射机制。
+     *
+     * @see DefaultProxy#invoke
      */
     private void setDefaultProxyFactory() {
         if (proxyFactory == null) {
@@ -291,7 +286,7 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * Set converterFactory using objectFactory, use LastPadParameterFactory as default
+     * Set converterFactory using objectFactory, use MultiParameterConverterFactory as default
      * if converterFactory is not set.
      *
      * @param converterFactoryClass ConverterFactory.class
@@ -303,10 +298,17 @@ public class DefaultActionFactory implements ActionFactory {
         }
         //finally check if converterFactory is still not set
         if (converterFactory == null) {
-            //default converterFactory
-            converterFactory = new LastPadParameterFactory();
-            LOG.info("No converterFactory setting, use default : " + this.converterFactory);
+            setDefaultConverterFactory();
         }
+    }
+
+    /**
+     * 未设置converterFactory属性时提供默认的<code>ConverterFactory</code>实现。
+     * 默认提供<code>MultiParameterConverterFactory</code>。
+     */
+    private void setDefaultConverterFactory() {
+        this.converterFactory = new MultiParameterConverterFactory(true);
+        LOG.info("No converterFactory setting, use default : " + this.converterFactory);
     }
 
     /**
@@ -438,8 +440,9 @@ public class DefaultActionFactory implements ActionFactory {
             //get Action and fill matchParameters
             ap = actions.get(path, matchParameters);
 
-            if (ap == null)
-                throw new JRouterException("No such Action : " + path);
+            if (ap == null) {
+                throw new NotFoundException("No such Action : " + path);
+			}
 
             //put in cache
             ace = new ActionCacheEntry(ap, matchParameters.isEmpty()
@@ -473,7 +476,7 @@ public class DefaultActionFactory implements ActionFactory {
 
         ResultTypeProxy rtp = resultTypes.get(type);
         if (rtp == null)
-            throw new JRouterException("No such ResultType [" + type + "] at : "
+            throw new NotFoundException("No such ResultType [" + type + "] at : "
                     + invocation.getActionProxy().getMethodInfo());
 
         invocation.setResult(result);
@@ -608,7 +611,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     protected Object invokeUndefinedResult(ActionInvocation<?> invocation, String resInfo) {
         LOG.warn("Invoking undefined String Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethodInfo());
-        //throw new JRouterException("No match Result [" + resInfo + "] at " + ap.getMethodInfo(), ap);
+        //throw new NotFoundException("No match Result [" + resInfo + "] at " + ap.getMethodInfo(), ap);
         //不作处理直接跳过，直接返回调用结果字符串
         return resInfo;
     }
@@ -737,6 +740,11 @@ public class DefaultActionFactory implements ActionFactory {
      * @see jrouter.annotation.InterceptorStack
      */
     public void addInterceptorStacks(Object obj) {
+        //TODO 添加一个<code>String</code>类型的支持??? key=value1,value2,value3...
+        if (obj instanceof String) {
+            //TODO
+            return ;
+        }
         boolean isCls = obj instanceof Class;
         Class<?> cls = isCls ? (Class) obj : obj.getClass();
         Object invoker = isCls ? null : obj;
@@ -1037,7 +1045,7 @@ public class DefaultActionFactory implements ActionFactory {
                 InterceptorProxy ip = interceptors.get(names[i]);
                 //if null
                 if (ip == null) {
-                    LOG.warn("No such Interceptor [{}] at : {}", names[i], field);
+                    LOG.warn("No such Interceptor [{}] for : {}", names[i], field);
                 } else {
                     list.add(ip);
                 }
@@ -1185,13 +1193,13 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * TODO
+     * 提供继承修改构建Action路径。
      *
-     * @param namespace
-     * @param method
-     * @param aname
+     * @param namespace Namespace名称。
+     * @param aname Action的原路径。
+     * @param method 指定的方法。
      *
-     * @return
+     * @return 构建完成的Action路径。
      */
     protected String buildActionPath(String namespace, String aname, Method method) {
         String path = null;

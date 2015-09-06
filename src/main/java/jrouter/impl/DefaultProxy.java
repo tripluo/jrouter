@@ -56,29 +56,13 @@ public class DefaultProxy extends AbstractProxy {
         super(method, object);
         this.varArgs = method.isVarArgs();
         if (varArgs) {
-            this.varArgIndex = method.getParameterTypes().length - 1;
-            varArgClass = method.getParameterTypes()[varArgIndex].getComponentType();
+            Class<?>[] parameterTypes = method.getParameterTypes();
+            this.varArgIndex = parameterTypes.length - 1;
+            varArgClass = parameterTypes[varArgIndex].getComponentType();
             empty = (Object[]) Array.newInstance(varArgClass, 0);
         }
         if (proxyFactory != null) {
             this.proxy = proxyFactory.newInstance(method);
-        }
-    }
-
-    /**
-     * 指定对象、方法及对象状态（是否单例）的构造方法。
-     *
-     * @param method 指定的方法。
-     * @param object 指定的对象。
-     * @param singleton 对象是否单例。
-     */
-    public DefaultProxy(Method method, Object object, boolean singleton) {
-        super(method, object, singleton);
-        this.varArgs = method.isVarArgs();
-        if (varArgs) {
-            this.varArgIndex = method.getParameterTypes().length - 1;
-            varArgClass = method.getParameterTypes()[varArgIndex].getComponentType();
-            empty = (Object[]) Array.newInstance(varArgClass, 0);
         }
     }
 
@@ -91,6 +75,7 @@ public class DefaultProxy extends AbstractProxy {
                 //have only varArgs
                 return varArgIndex == 0
                         ? invoke(method, object, new Object[]{null})
+                        //varArgs前有多参数仅补足第一个参数为null，否则调用抛出InvocationTargetException异常
                         : invoke(method, object, new Object[]{null, empty});
             } //pass no varArgs
             else if (params.length == varArgIndex) {

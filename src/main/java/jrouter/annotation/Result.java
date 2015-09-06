@@ -24,9 +24,9 @@ import java.lang.annotation.Target;
 
 /**
  * Result，定义于方法上的注解。
- * <p>当Result定义与注解Action中的子项时，表示Action特定的结果对象；</p>
+ * <p>当Result定义于注解Action中的子项时，表示Action特定的结果对象；</p>
  * <p>
- * 当Result单独定义于方法上时，表示全局的结果对象。
+ * 当Result单独定义于方法上时，表示某种特定<code>String</code>类型全局的结果对象。。
  * 当作为全局结果对象时，type值为空时直接调用后结束；type值不为空调用后再调用相应的{@link ResultType}。
  * </p>
  *
