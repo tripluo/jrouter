@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * Ignore，定义于方法上的注解。表明略过所注解的方法不做处理。
  */
 @Target(ElementType.METHOD)
-@Retention(value = RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Ignore {
 }

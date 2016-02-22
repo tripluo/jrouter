@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 适配Map接口的树结构路径。包含了一个树结构路径和一个含相关联值的最终路径的<code>Set</code>集合。
+ * 适配Map接口的树结构路径。包含了一个树结构路径和一个含相关联值的最终路径的{@code Set}集合。
  *
  * @param <T> 与路径相关联值的类型。
  */

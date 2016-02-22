@@ -56,7 +56,7 @@ public class DemoResult {
      */
     @Result(name = DEMO_RESULT_NOT_FOUND)
     public static Object resultNotFound(ActionInvocation invocation) {
-        return DEMO_RESULT_NOT_FOUND + ":" + invocation.getActionProxy().getPath();
+        return DEMO_RESULT_NOT_FOUND + ":" + invocation.getActionPath();
     }
 
     /**
@@ -66,7 +66,7 @@ public class DemoResult {
      */
     @Result(name = DEMO_RESULT_EXCEPTION)
     public static Object resultException(ActionInvocation invocation) {
-        throw new RuntimeException("Result excpetion : " + invocation.getActionProxy().getPath());
+        throw new RuntimeException("Result excpetion : " + invocation.getActionPath());
     }
 
     /**

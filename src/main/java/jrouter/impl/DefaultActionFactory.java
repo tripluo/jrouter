@@ -30,7 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 默认<code>ActionFactory</code>的实现类，以‘/’作为路径的分隔符。
+ * 默认{@code ActionFactory}的实现类，以'/'作为路径的分隔符。
  *
  * <p>
  * DefaultActionFactory中的加载和调用的拦截器、结果类型对象均为单例；
@@ -256,8 +256,8 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 未设置objectFactory属性时，提供默认的<code>ObjectFactory</code>实现。
-     * 默认提供<code>DefaultObjectFactory</code>。
+     * 未设置objectFactory属性时，提供默认的{@code ObjectFactory}实现。
+     * 默认提供{@code DefaultObjectFactory}。
      */
     private void setDefaultObjectFactory() {
         if (objectFactory == null) {
@@ -267,8 +267,8 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 未设置proxyFactory属性时，提供默认的<code>ProxyFactory</code>实现。
-     * 默认引入javassist时提供<code>JavassistProxyFactory</code>；若无javassist引用则采用java反射机制。
+     * 未设置proxyFactory属性时，提供默认的{@code ProxyFactory}实现。
+     * 默认引入javassist时提供{@code JavassistProxyFactory}；若无javassist引用则采用java反射机制。
      *
      * @see DefaultProxy#invoke
      */
@@ -303,8 +303,8 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 未设置converterFactory属性时提供默认的<code>ConverterFactory</code>实现。
-     * 默认提供<code>MultiParameterConverterFactory</code>。
+     * 未设置converterFactory属性时提供默认的{@code ConverterFactory}实现。
+     * 默认提供{@code MultiParameterConverterFactory}。
      */
     private void setDefaultConverterFactory() {
         this.converterFactory = new MultiParameterConverterFactory(true);
@@ -442,7 +442,7 @@ public class DefaultActionFactory implements ActionFactory {
 
             if (ap == null) {
                 throw new NotFoundException("No such Action : " + path);
-			}
+            }
 
             //put in cache
             ace = new ActionCacheEntry(ap, matchParameters.isEmpty()
@@ -454,7 +454,7 @@ public class DefaultActionFactory implements ActionFactory {
         ap = ap.getInstance();
         //TODO actionInvocationClass ???
         //create DefaultActionInvocation
-        DefaultActionInvocation ai = new DefaultActionInvocation(this, ap, params);
+        DefaultActionInvocation ai = new DefaultActionInvocation(path, this, ap, params);
         //setActionPathParameters
         ai.setActionPathParameters(matchParameters);
         return ai;
@@ -587,7 +587,7 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 用于子类继承，提供非字符串<code>string</code>对象的处理方式。
+     * 用于子类继承，提供非字符串{@code string}对象的处理方式。
      * 默认直接返回非字符串对象，void方法返回 null 。
      *
      * @param invocation Action运行时上下文。
@@ -601,7 +601,7 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 用于子类继承，提供Action和全局结果对象集合均未匹配<code>string</code>结果字符串对象情况下的处理方式。
+     * 用于子类继承，提供Action和全局结果对象集合均未匹配{@code string}结果字符串对象情况下的处理方式。
      * 默认直接返回结果字符串。
      *
      * @param invocation Action运行时上下文。
@@ -740,10 +740,10 @@ public class DefaultActionFactory implements ActionFactory {
      * @see jrouter.annotation.InterceptorStack
      */
     public void addInterceptorStacks(Object obj) {
-        //TODO 添加一个<code>String</code>类型的支持??? key=value1,value2,value3...
+        //TODO 添加一个{@code String}类型的支持??? key=value1,value2,value3...
         if (obj instanceof String) {
             //TODO
-            return ;
+            return;
         }
         boolean isCls = obj instanceof Class;
         Class<?> cls = isCls ? (Class) obj : obj.getClass();
@@ -893,41 +893,43 @@ public class DefaultActionFactory implements ActionFactory {
     /**
      * 添加Action。
      *
-     * @param ap Action代理对象。
+     * @param aps Action代理对象集合。
      */
-    public void addAction(DefaultActionProxy ap) {
-        String aPath = ap.getPath();
+    public void addAction(DefaultActionProxy... aps) {
+        for (DefaultActionProxy ap : aps) {
+            String aPath = ap.getPath();
 
-        if (StringUtil.isBlank(aPath))
-            throw new IllegalArgumentException("Null path of Action : " + ap.getMethodInfo());
+            if (StringUtil.isBlank(aPath))
+                throw new IllegalArgumentException("Null path of Action : " + ap.getMethodInfo());
 
-        //可能存在模糊匹配 或者 完全相等的路径
-        DefaultActionProxy exist = actions.get(aPath);
-        //模糊匹配添加新值，完全相等的路径则特换原路径的值
-        actions.put(aPath, ap);
-        //添加或替换后查询新路径的值
-        DefaultActionProxy newAction = actions.get(aPath);
+            //可能存在模糊匹配 或者 完全相等的路径
+            DefaultActionProxy exist = actions.get(aPath);
+            //模糊匹配添加新值，完全相等的路径则特换原路径的值
+            actions.put(aPath, ap);
+            //添加或替换后查询新路径的值
+            DefaultActionProxy newAction = actions.get(aPath);
 
-        if (exist != null) {
-            //新增与原有完全相等的路径
-            if (exist.getPath().equals(newAction.getPath())) {
-                throw new JRouterException("Duplicate path Action [" + aPath + "] : "
-                        + ap.getMethodInfo() + " override "
-                        + exist.getMethodInfo());
-            } //新增与原有相同的匹配路径，考虑匹配级别是否相同???
-            //TODO
-            //            else if (0 == PathTree.compareMathedPath(newAction.getPath(), exist.getPath())) {
-            //                throw new JRouterException("Duplicate matched path Action [" + aPath + "] : "
-            //                        + ap.getMethodInfo() + " override "
-            //                        + exist.getMethodInfo());
-            //            }
-            //原有路径模糊匹配，继续添加新路径；或反之
-            else {
-                LOG.warn("Exist matched path [{}] : {}, add [{}] : {}",
-                        exist.getPath(), exist.getMethodInfo(), aPath, ap.getMethodInfo());
+            if (exist != null) {
+                //新增与原有完全相等的路径
+                if (exist.getPath().equals(newAction.getPath())) {
+                    throw new JRouterException("Duplicate path Action [" + aPath + "] : "
+                            + ap.getMethodInfo() + " override "
+                            + exist.getMethodInfo());
+                } //新增与原有相同的匹配路径，考虑匹配级别是否相同???
+                //TODO
+                //            else if (0 == PathTree.compareMathedPath(newAction.getPath(), exist.getPath())) {
+                //                throw new JRouterException("Duplicate matched path Action [" + aPath + "] : "
+                //                        + ap.getMethodInfo() + " override "
+                //                        + exist.getMethodInfo());
+                //            }
+                //原有路径模糊匹配，继续添加新路径；或反之
+                else {
+                    LOG.warn("Exist matched path [{}] : {}, add [{}] : {}",
+                            exist.getPath(), exist.getMethodInfo(), aPath, ap.getMethodInfo());
+                }
+            } else {
+                LOG.info("Add Action [{}] at : {}", aPath, ap.getMethodInfo());
             }
-        } else {
-            LOG.info("Add Action [{}] at : {}", aPath, ap.getMethodInfo());
         }
     }
 
@@ -1088,7 +1090,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return Action代理对象。
      */
-    private DefaultActionProxy createActionProxy(Method method, Object obj) throws
+    private DefaultActionProxy[] createActionProxy(final Method method, final Object obj) throws
             IllegalAccessException, InvocationTargetException {
         Namespace ns = method.getDeclaringClass().getAnnotation(Namespace.class);
         //trim empty and '/'
@@ -1099,107 +1101,128 @@ public class DefaultActionFactory implements ActionFactory {
         if (action == null) {
             action = EMPTY_ACTION;
         }
-        //Action名称可能为空字符串
-        String aname = action.name().trim();
 
-        String path = buildActionPath(namespace, aname, method);
-        //包含指定path的属性注入，其Action需重新生成对象
-        if (obj != null && Injector.actionInjection.containsKey(path)) {
-            obj = objectFactory.newInstance(obj.getClass());
-            Injector.injectAction(path, obj);
+        String[] names = action.name();
+        //name优先value
+        if (names.length == 0) {
+            names = action.value();
         }
-
-        //Action中不记录路径的后缀名称
-        DefaultActionProxy ap = new DefaultActionProxy(this, namespace, path, action, method, obj);
-
-        //void method
-        if (void.class == method.getReturnType())
-            LOG.warn("Mapping [{}] void method at : {}", ap.getPath(), ap.getMethodInfo());
-
-        //interceptorStack
-        String stackName = action.interceptorStack().trim();
-        //not not nullable action's interceptors
-        String[] interceptorNames = action.interceptors();
-
-        List<InterceptorProxy> inters = new ArrayList<InterceptorProxy>(5);
-        //action interceptors
-        if (interceptorNames.length != 0) {
-            ////action interceptorStack
-            if (StringUtil.isNotEmpty(stackName)) {
-                addActionInterceptors(inters, stackName, ap);
+        //name/value都未赋值或Action为null的情况
+        if (names.length == 0) {
+            names = new String[]{""};
+        }
+        //去重复的path
+        Collection<String> paths = new LinkedHashSet<String>(1);
+        for (String name : names) {
+            if (name != null) {
+                //Action名称可为空字符串
+                paths.add(buildActionPath(namespace, name.trim(), method));
             }
-            //action中申明的interceptors
-            for (String name : action.interceptors()) {
-                InterceptorProxy ip = interceptors.get(name);
-                if (ip == null) {
-                    LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
-                } else {
-                    inters.add(ip);
-                }
+        }
+        DefaultActionProxy[] aps = new DefaultActionProxy[paths.size()];
+        int _idx = 0;
+        for (String path : paths) {
+            //包含指定path的属性注入，其Action需重新生成对象
+            Object _obj = obj;
+            if (_obj != null && Injector.actionInjection.containsKey(path)) {
+                _obj = objectFactory.newInstance(_obj.getClass());
+                Injector.injectAction(path, _obj);
             }
-        } //action interceptorStack
-        else if (StringUtil.isNotEmpty(stackName)) {
-            addActionInterceptors(inters, stackName, ap);
-        } else {
-            //是否已设置action的拦截器集合
-            boolean setInterceptors = false;
-            //namespace interceptorStack & interceptors
-            if (ns != null) {
-                //namespace interceptorStack
-                if (StringUtil.isNotEmpty(stackName = ns.interceptorStack().trim())) {
-                    setInterceptors = true;
+
+            //Action中不记录路径的后缀名称
+            DefaultActionProxy ap = new DefaultActionProxy(this, namespace, path, action, method, _obj);
+            aps[_idx++] = ap;
+            //void method
+            if (void.class == method.getReturnType())
+                LOG.warn("Mapping [{}] void method at : {}", ap.getPath(), ap.getMethodInfo());
+
+            //interceptorStack
+            String stackName = action.interceptorStack().trim();
+            //not not nullable action's interceptors
+            String[] interceptorNames = action.interceptors();
+
+            List<InterceptorProxy> inters = new ArrayList<InterceptorProxy>(5);
+            //action interceptors
+            if (interceptorNames.length != 0) {
+                ////action interceptorStack
+                if (StringUtil.isNotEmpty(stackName)) {
                     addActionInterceptors(inters, stackName, ap);
                 }
-                //namespace interceptors
-                if (ns.interceptors().length != 0) {
-                    setInterceptors = true;
-                    for (String name : ns.interceptors()) {
-                        InterceptorProxy ip = interceptors.get(name);
-                        if (ip == null) {
-                            LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
-                        } else {
-                            inters.add(ip);
+                //action中申明的interceptors
+                for (String name : action.interceptors()) {
+                    InterceptorProxy ip = interceptors.get(name);
+                    if (ip == null) {
+                        LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
+                    } else {
+                        inters.add(ip);
+                    }
+                }
+            } //action interceptorStack
+            else if (StringUtil.isNotEmpty(stackName)) {
+                addActionInterceptors(inters, stackName, ap);
+            } else {
+                //是否已设置action的拦截器集合
+                boolean setInterceptors = false;
+                //namespace interceptorStack & interceptors
+                if (ns != null) {
+                    //namespace interceptorStack
+                    if (StringUtil.isNotEmpty(stackName = ns.interceptorStack().trim())) {
+                        setInterceptors = true;
+                        addActionInterceptors(inters, stackName, ap);
+                    }
+                    //namespace interceptors
+                    if (ns.interceptors().length != 0) {
+                        setInterceptors = true;
+                        for (String name : ns.interceptors()) {
+                            InterceptorProxy ip = interceptors.get(name);
+                            if (ip == null) {
+                                LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
+                            } else {
+                                inters.add(ip);
+                            }
                         }
                     }
                 }
-            }
-            //defaultInterceptorStack
-            if (!setInterceptors) {
-                if (StringUtil.isNotEmpty(stackName = defaultInterceptorStack)) {
-                    addActionInterceptors(inters, stackName, ap);
+                //defaultInterceptorStack
+                if (!setInterceptors) {
+                    if (StringUtil.isNotEmpty(stackName = defaultInterceptorStack)) {
+                        addActionInterceptors(inters, stackName, ap);
+                    }
                 }
             }
-        }
-        //trim
-        ((ArrayList) inters).trimToSize();
-        ap.setInterceptors(inters);
+            //trim
+            ((ArrayList) inters).trimToSize();
+            ap.setInterceptors(inters);
 
-        //set action parameters
-        Parameter[] ps = action.parameters();
-        Map<String, String[]> params = new HashMap<String, String[]>(ps.length);
-        for (Parameter p : ps) {
-            params.put(p.name(), p.value());
+            //set action parameters
+            Parameter[] ps = action.parameters();
+            Map<String, String[]> params = new HashMap<String, String[]>(ps.length);
+            for (Parameter p : ps) {
+                params.put(p.name(), p.value());
+            }
+            ap.setActionParameters(Collections.unmodifiableMap(params));
+            //set results
+            Result[] rs = action.results();
+            Map<String, Result> res = new HashMap<String, Result>(rs.length);
+            for (Result r : rs) {
+                res.put(r.name(), r);
+            }
+            ap.setResults(Collections.unmodifiableMap(res));
         }
-        ap.setActionParameters(Collections.unmodifiableMap(params));
-        //set results
-        Result[] rs = action.results();
-        Map<String, Result> res = new HashMap<String, Result>(rs.length);
-        for (Result r : rs) {
-            res.put(r.name(), r);
-        }
-        ap.setResults(Collections.unmodifiableMap(res));
-
-        return ap;
+        return aps;
     }
 
     /**
      * 提供继承修改构建Action路径。
+     * 最终构建的路径已删除前导空白和尾部空白、以{@linkplain #getPathSeparator() pathSeparator}起始、并截去尾部{@linkplain #getPathSeparator() pathSeparator}（如果包含）。
      *
      * @param namespace Namespace名称。
      * @param aname Action的原路径。
      * @param method 指定的方法。
      *
      * @return 构建完成的Action路径。
+     *
+     * @see #getPathSeparator()
      */
     protected String buildActionPath(String namespace, String aname, Method method) {
         String path = null;
@@ -1323,9 +1346,9 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 返回{@link #getActionCache()}的最大缓存数目。
+     * 返回{@linkplain #getActionCache() actionCache}的最大缓存数目。
      *
-     * @return {@link #getActionCache()}的最大缓存数目。
+     * @return {@linkplain #getActionCache() actionCache}的最大缓存数目。
      */
     public int getActionCacheNumber() {
         return actionCacheNumber;
@@ -1485,8 +1508,13 @@ public class DefaultActionFactory implements ActionFactory {
      */
     private static final Action EMPTY_ACTION = new Action() {
         @Override
-        public String name() {
-            return "";
+        public String[] value() {
+            return CollectionUtil.EMPTY_STRING_ARRAY;
+        }
+
+        @Override
+        public String[] name() {
+            return CollectionUtil.EMPTY_STRING_ARRAY;
         }
 
         @Override
@@ -1518,6 +1546,7 @@ public class DefaultActionFactory implements ActionFactory {
         public Class<? extends Annotation> annotationType() {
             return Action.class;
         }
+
     };
 
 }

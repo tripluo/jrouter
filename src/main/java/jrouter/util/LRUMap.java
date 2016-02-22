@@ -20,7 +20,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
- * A simple LRU cache that implements the<code>Map</code> interface. Instances are not thread-safe
+ * A simple LRU cache that implements the{@code Map} interface. Instances are not thread-safe
  * and should be synchronized externally, for instance by using {@link java.util.Collections#synchronizedMap}.
  *
  * @param <K> the type of keys maintained by this map
@@ -36,7 +36,7 @@ public class LRUMap<K, V> extends LinkedHashMap<K, V> {
     private final int maxEntries;
 
     /**
-     * 构造一个带指定最大条目数的空<code>LRUMap</code>实例。
+     * 构造一个带指定最大条目数的空{@code LRUMap}实例。
      *
      * @param maxEntries 最大条目数。
      */
@@ -45,7 +45,7 @@ public class LRUMap<K, V> extends LinkedHashMap<K, V> {
     }
 
     /**
-     * 构造一个带指定初始容量、最大条目数的空<code>LRUMap</code>实例。
+     * 构造一个带指定初始容量、最大条目数的空{@code LRUMap}实例。
      *
      * @param initialEntries 初始容量。
      * @param maxEntries 最大条目数。

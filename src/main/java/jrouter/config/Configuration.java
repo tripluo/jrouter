@@ -384,11 +384,11 @@ public class Configuration implements Serializable {
         };
 
         /**
-         * 将给定 InputStream 的内容解析为一个 XML 文档，并且返回一个新的 DOM <code>Document</code> 对象。
+         * 将给定 InputStream 的内容解析为一个 XML 文档，并且返回一个新的 DOM {@code Document} 对象。
          *
          * @param stream 包含要解析内容的 InputStream。
          *
-         * @return <code>Document</code> 对象。
+         * @return {@code Document} 对象。
          */
         private static Document loadDocument(InputStream stream) throws ParserConfigurationException,
                 SAXException, IOException {
@@ -862,10 +862,10 @@ public class Configuration implements Serializable {
     /**
      * 创建新对象。
      *
-     * @param factory 指定的<code>ActionFactory</code>。
+     * @param factory 指定的{@code ActionFactory}。
      * @param obj 传入的对象。
      *
-     * @return 如果传入的对象为<code>String</code>或<code>Class</code>，返回由<code>ActionFactory</code>创建的实例对象；否则直接返回传入的对象。
+     * @return 如果传入的对象为{@code String}或{@code Class}，返回由{@code ActionFactory}创建的实例对象；否则直接返回传入的对象。
      *
      * @throws ClassNotFoundException 如果没有找到具有指定名称的类。
      */
@@ -885,7 +885,7 @@ public class Configuration implements Serializable {
      *
      * @param <T> ActionFactory的类型。
      *
-     * @return 生成的<code>ActionFactory</code>对象。
+     * @return 生成的{@code ActionFactory}对象。
      *
      * @throws ConfigurationException 如果发生无效的配置。
      */
@@ -1174,7 +1174,7 @@ public class Configuration implements Serializable {
      *
      * @return ActionFactory。
      *
-     * @deprecated 由<code>{@link #buildActionFactory()}</code>取代。
+     * @deprecated 由{@code {@link #buildActionFactory()}}取代。
      */
     @Deprecated
     public <T extends ActionFactory> T getFactory() {

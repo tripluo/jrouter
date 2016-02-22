@@ -49,13 +49,6 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
     private final Action action;
 
     /**
-     * TODO
-     * Action调用参数中ActionInvocation所在的位置。
-     * 默认以0为起始，无ActionInvocation调用参数则为-1。
-     */
-    private final int invocationIndex = -1;
-
-    /**
      * Action初始化参数的键/值映射。
      */
     private Map<String, String[]> actionParameters;

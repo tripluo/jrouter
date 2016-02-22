@@ -3,6 +3,18 @@ JROUTER CHANGELOG
 ==========================
 http://git.oschina.net/sundancer/jrouter/
 
+Changes in version 1.7.1 (2016-02-22)
+---------------------------------------
+* @Action新增value()方法，等同于name()，当仅需要name属性时提供便捷的注解方式。
+* 修改@Action的name()，可多个路径映射同一个Aciton。
+* 更新ActionInvocation#getActionProxy().getPath()可能返回带参数的动态路径，而非真实调用路径。新增getActionPath()方法，返回Aciton调用的真实路径；
+* 更新DefaultActionInvocation，实现getActionPath()方法。
+* 修改ActionProxy接口，提供getObject()方法获取原始方法的调用对象（非代理）。
+* 完善测试用例SimpleAction、PathTestAction、URLTestAction2。
+* 更新依赖包slf4j至 1.7.16.
+* 更新依赖包springframework至 4.2.4.
+
+
 Changes in version 1.7.0 (2015-09-06)
 ---------------------------------------
 * ActionInvocation新增setConvertParameters(...)/getConvertParameters()方法，设置/返回提供给参数转换器的参数。

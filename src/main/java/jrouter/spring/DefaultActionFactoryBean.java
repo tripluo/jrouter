@@ -252,9 +252,9 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * 未直接设置Configuration对象时，提供默认的<code>SpringConfiguration</code>对象实现。
+     * 未直接设置Configuration对象时，提供默认的{@code SpringConfiguration}对象实现。
      *
-     * @return <code>SpringConfiguration</code>对象。
+     * @return {@code SpringConfiguration}对象。
      *
      * @see #setConfiguration(jrouter.config.Configuration)
      */
@@ -264,7 +264,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * 未设置actionFactoryClass属性时，提供默认的<code>DefaultActionFactory.class</code>属性。
+     * 未设置actionFactoryClass属性时，提供默认的{@code DefaultActionFactory.class}属性。
      *
      * @param config Configuration对象。
      *
@@ -275,11 +275,11 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * 未设置objectFactory属性时，提供默认的<code>SpringObjectFactory</code>对象实现。
+     * 未设置objectFactory属性时，提供默认的{@code SpringObjectFactory}对象实现。
      *
      * @param config Configuration对象。
      *
-     * @return <code>SpringObjectFactory</code>对象。
+     * @return {@code SpringObjectFactory}对象。
      *
      * @see #setObjectFactory(jrouter.ObjectFactory)
      */
@@ -309,7 +309,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * Convert the <code>String</code> element of the list into <code>Class</code>.
+     * Convert the {@code String} element of the list into {@code Class}.
      *
      * @param listArray the array of list.
      *
@@ -364,7 +364,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /**
      * Hook that allows post-processing after the ActionFactory has been successfully created.
-     * The ActionFactory is already available through <code>getActionFactory()</code> at this point.
+     * The ActionFactory is already available through {@code getActionFactory()} at this point.
      * <p>
      * This implementation is empty.
      *
@@ -377,7 +377,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /**
      * Hook that allows shutdown processing before the ActionFactory will be closed.
-     * The ActionFactory is still available through <code>getActionFactory()</code> at this point.
+     * The ActionFactory is still available through {@code getActionFactory()} at this point.
      * <p>
      * This implementation is empty.
      *

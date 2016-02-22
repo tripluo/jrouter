@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 拦截栈，定义于字符串{@link String}变量上的注解。
+ * 拦截栈，定义于字符串{@code String}变量上的注解。
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)

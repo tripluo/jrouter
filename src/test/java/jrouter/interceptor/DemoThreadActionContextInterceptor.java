@@ -21,7 +21,7 @@ import jrouter.annotation.Interceptor;
 import jrouter.annotation.InterceptorStack;
 
 /**
- * 使用<code>ThreadLocal</code>存储<code>ActionInvocation</code>的拦截器。
+ * 使用{@link ThreadLocal}存储{@link ActionInvocation}的拦截器。
  * Action调用前存储ActionInvocation，默认调用结束后清除。
  */
 public class DemoThreadActionContextInterceptor {

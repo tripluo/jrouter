@@ -104,6 +104,11 @@ public class ConverterParameterActionFactory extends DefaultActionFactory {
         }
 
         @Override
+        public String getActionPath() {
+            return invocation.getActionPath();
+        }
+
+        @Override
         public Object getInvokeResult() {
             return invocation.getInvokeResult();
         }
@@ -142,5 +147,6 @@ public class ConverterParameterActionFactory extends DefaultActionFactory {
         public Object[] getConvertParameters() {
             return invocation.getConvertParameters();
         }
+
     }
 }

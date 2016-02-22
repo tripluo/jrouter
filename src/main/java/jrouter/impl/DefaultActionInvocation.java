@@ -53,6 +53,8 @@ public class DefaultActionInvocation implements ActionInvocation {
     /** recursion invoke index */
     private int _index = 0;
 
+    private String actionPath;
+
     /** 方法调用的参数 */
     private final Object[] originalParams;
 
@@ -79,8 +81,10 @@ public class DefaultActionInvocation implements ActionInvocation {
      * @param actionProxy Action代理对象。
      * @param originalParams Action代理对象中方法调用的原始参数。
      */
-    public DefaultActionInvocation(ActionFactory actionFactory, DefaultActionProxy actionProxy,
+    public DefaultActionInvocation(String realPath, ActionFactory actionFactory,
+            DefaultActionProxy actionProxy,
             Object... originalParams) {
+        this.actionPath = realPath;
         this.actionFactory = actionFactory;
         this.actionProxy = actionProxy;
         this.originalParams = originalParams;
@@ -191,6 +195,11 @@ public class DefaultActionInvocation implements ActionInvocation {
      */
     void setActionPathParameters(Map<String, String> actionPathParameters) {
         this.actionPathParameters = actionPathParameters;
+    }
+
+    @Override
+    public String getActionPath() {
+        return actionPath;
     }
 
     /**

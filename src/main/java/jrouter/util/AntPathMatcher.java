@@ -74,19 +74,19 @@ public class AntPathMatcher {
 
     /**
      * Does the given
-     * <code>path</code> represent a pattern that can be matched
+     * {@code path} represent a pattern that can be matched
      * by an implementation of this interface?
      * <p>
      * If the return value is
-     * <code>false</code>, then the {@link #match}
+     * {@code false}, then the {@link #match}
      * method does not have to be used because direct equality comparisons
      * on the static path Strings will lead to the same result.
      *
      * @param path the path String to check
      *
      * @return
-     * <code>true</code> if the given
-     * <code>path</code> represents a pattern
+     * {@code true} if the given
+     * {@code path} represents a pattern
      */
     public boolean isPattern(String path) {
         return (path.indexOf('*') != -1 || path.indexOf('?') != -1);
@@ -94,17 +94,17 @@ public class AntPathMatcher {
 
     /**
      * Match the given
-     * <code>path</code> against the given
-     * <code>pattern</code>,
+     * {@code path} against the given
+     * {@code pattern},
      * according to this PathMatcher's matching strategy.
      *
      * @param pattern the pattern to match against
      * @param path the path String to test
      *
      * @return
-     * <code>true</code> if the supplied
-     * <code>path</code> matched,
-     * <code>false</code> if it didn't
+     * {@code true} if the supplied
+     * {@code path} matched,
+     * {@code false} if it didn't
      */
     public boolean match(String pattern, String path) {
         return doMatch(pattern, path, true, null);
@@ -112,8 +112,8 @@ public class AntPathMatcher {
 
     /**
      * Match the given
-     * <code>path</code> against the corresponding part of the given
-     * <code>pattern</code>, according to this PathMatcher's matching strategy.
+     * {@code path} against the corresponding part of the given
+     * {@code pattern}, according to this PathMatcher's matching strategy.
      * <p>
      * Determines whether the pattern at least matches as far as the given base
      * path goes, assuming that a full path may then match as well.
@@ -122,9 +122,9 @@ public class AntPathMatcher {
      * @param path the path String to test
      *
      * @return
-     * <code>true</code> if the supplied
-     * <code>path</code> matched,
-     * <code>false</code> if it didn't
+     * {@code true} if the supplied
+     * {@code path} matched,
+     * {@code false} if it didn't
      */
     public boolean matchStart(String pattern, String path) {
         return doMatch(pattern, path, false, null);
@@ -132,8 +132,8 @@ public class AntPathMatcher {
 
     /**
      * Actually match the given
-     * <code>path</code> against the given
-     * <code>pattern</code>.
+     * {@code path} against the given
+     * {@code pattern}.
      *
      * @param pattern the pattern to match against
      * @param path the path String to test
@@ -142,9 +142,9 @@ public class AntPathMatcher {
      * @param uriTemplateVariables tamplate variables
      *
      * @return
-     * <code>true</code> if the supplied
-     * <code>path</code> matched,
-     * <code>false</code> if it didn't
+     * {@code true} if the supplied
+     * {@code path} matched,
+     * {@code false} if it didn't
      */
     protected boolean doMatch(String pattern, String path, boolean fullMatch,
             Map<String, String> uriTemplateVariables) {
@@ -413,9 +413,9 @@ public class AntPathMatcher {
      * explicitness.
      * <p>
      * The returned
-     * <code>Comparator</code> will {@linkplain java.util.Collections#sort(java.util.List,
+     * {@code Comparator} will {@linkplain java.util.Collections#sort(java.util.List,
      * java.util.Comparator) sort} a list so that more specific patterns (without uri templates or
-     * wild cards) come before generic patterns. So given a list with the following patterns: <ol> <li><code>/hotels/new</code></li> <li><code>/hotels/{hotel}</code></li> <li><code>/hotels/*</code></li>
+     * wild cards) come before generic patterns. So given a list with the following patterns: <ol> <li>{@code /hotels/new}</li> <li>{@code /hotels/{hotel}}</li> <li>{@code /hotels/*}</li>
      * </ol> the returned comparator will sort this list so that the order will be as indicated.
      * <p>
      * The full path given as parameter is used to test for exact matches. So when the given path

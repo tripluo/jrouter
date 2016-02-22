@@ -49,6 +49,13 @@ public interface ActionInvocation<T> {
     boolean isExecuted();
 
     /**
+     * 返回Aciton调用的真实路径。
+     *
+     * @return Aciton调用的真实路径。
+     */
+    String getActionPath();
+
+    /**
      * 返回Action的调用参数。
      *
      * @return Action的调用参数。

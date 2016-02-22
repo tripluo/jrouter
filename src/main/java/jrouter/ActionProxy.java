@@ -35,9 +35,9 @@ public interface ActionProxy {
     Action getAction();
 
     /**
-     * 返回Action所对应的全路径。
+     * 返回Action所映射的全路径（可能为带参数的动态路径，而非真实调用路径）。
      *
-     * @return Action所对应的全路径。
+     * @return Action所对应的全路径（可能为带参数的动态路径，而非真实调用路径）。
      */
     String getPath();
 
@@ -106,9 +106,18 @@ public interface ActionProxy {
     Map<String, Result> getResults();
 
     /**
+     * TODO
      * 返回调用方法的描述信息。
      *
      * @return 调用方法的描述信息。
      */
     String getMethodInfo();
+
+    /**
+     * TODO
+     * 返回方法所在的对象（非代理）。
+     *
+     * @return 方法所在的对象（非代理）。
+     */
+    Object getObject();
 }

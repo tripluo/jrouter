@@ -23,8 +23,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Namespace，定义于类{@link Class}上的注解。
- * <p>Namespace上拦截器集合：</p>
+ * Namespace，定义于类{@code Class}上的注解。
+ * <p>
+ * Namespace上拦截器集合：</p>
  * <p>
  * Namespace的拦截器集合 = 存在Namespace指定的拦截栈 ? 指定拦截栈的拦截器集合 + 指定的拦截器集合 : 指定的拦截器集合。
  * </p>
@@ -34,7 +35,7 @@ import java.lang.annotation.Target;
  * @see jrouter.interceptor.DefaultInterceptorStack#EMPTY_INTERCEPTOR_STACK
  */
 @Target(ElementType.TYPE)
-@Retention(value = RetentionPolicy.RUNTIME)
+@Retention(RetentionPolicy.RUNTIME)
 @Documented
 public @interface Namespace {
 

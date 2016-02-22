@@ -24,7 +24,8 @@ import java.lang.annotation.Target;
 
 /**
  * Action，定义于方法上的注解。
- * <p>Action上拦截器集合：</p>
+ * <p>
+ * Action上拦截器集合：</p>
  * <p>
  * Action指定的拦截器集合 = 存在Action指定的拦截栈 ? 指定拦截栈的拦截器集合 + 指定的拦截器集合 : 指定的拦截器集合。
  * </p>
@@ -32,7 +33,8 @@ import java.lang.annotation.Target;
  * Action最终的拦截器集合 = Action指定拦截器集合 > 命名空间拦截器集合 > 全局默认拦截器集合。
  * </p>
  *
- * <p>Action上拦截栈优先级：</p>
+ * <p>
+ * Action上拦截栈优先级：</p>
  * <p>
  * Action指定拦截栈 > 命名空间拦截栈 > 全局默认拦截栈。
  * </p>
@@ -47,12 +49,26 @@ import java.lang.annotation.Target;
 public @interface Action {
 
     /**
-     * Action名称，应保障其最终生成路径的唯一性。
+     * Action名称，可多个路径映射同一个Aciton。
+     * 等同于{@link #name()}，name属性非空时优先选取name值，当仅需要name属性时提供便捷的注解方式。
+     *
+     * @return Action名称。
+     *
+     * @see #name();
+     *
+     * @since 1.7.1
+     */
+    String[] value() default {};
+
+    /**
+     * Action名称，可多个路径映射同一个Aciton，需保证其最终生成路径的唯一性。
      * Action名称为空时，默认取其所在的方法名称（区分大小写）。
      *
      * @return Action名称。
+     *
+     * @see #value()
      */
-    String name() default "";
+    String[] name() default {};
 
     /**
      * Action指定的拦截栈名称。
@@ -65,7 +81,6 @@ public @interface Action {
      * Action指定的拦截器集合的名称集合，指定空集合无效。
      *
      * @return Action指定的拦截器集合的名称集合。
-
      */
     String[] interceptors() default {};
 

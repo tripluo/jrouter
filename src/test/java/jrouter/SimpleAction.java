@@ -244,7 +244,7 @@ public class SimpleAction {
     @Action
     public String lastPadParameter(ActionInvocation invocation) {
         Assert.assertNotNull(invocation);
-        return invocation.getActionProxy().getPath();
+        return invocation.getActionPath();
     }
 
     /**
@@ -255,7 +255,7 @@ public class SimpleAction {
     @Action
     public String lastPadParameter2(String test, DefaultActionInvocation invocation) {
         Assert.assertNotNull(invocation);
-        return test + invocation.getActionProxy().getPath();
+        return test + invocation.getActionPath();
     }
 
     /**

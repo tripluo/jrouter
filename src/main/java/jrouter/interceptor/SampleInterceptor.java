@@ -53,7 +53,7 @@ public class SampleInterceptor {
         } finally {
             long executionTime = System.currentTimeMillis() - startTime;
             StringBuilder message = new StringBuilder(64);
-            message.append("Executed action [").append(invocation.getActionProxy().getPath());
+            message.append("Executed action [").append(invocation.getActionPath());
             message.append("] took ").append(executionTime).append(" ms.");
             LOG.info(message.toString());
         }
@@ -69,10 +69,10 @@ public class SampleInterceptor {
      */
     @Interceptor(name = LOGGING)
     public static Object logging(ActionInvocation invocation) {
-        LOG.info("Starting action [{}] at {}.", invocation.getActionProxy().getPath(), new Date());
+        LOG.info("Starting action [{}] at {}.", invocation.getActionPath(), new Date());
         //invoke
         Object result = invocation.invoke();
-        LOG.info("Finishing action [{}] at {}.", invocation.getActionProxy().getPath(), new Date());
+        LOG.info("Finishing action [{}] at {}.", invocation.getActionPath(), new Date());
         return result;
     }
 }

@@ -37,13 +37,13 @@ public class PathTestAction {
         return PATHS[0];
     }
 
-    @Action(name = "/{k1}",
+    @Action(value = "/{k1}",
             interceptors = {DemoThreadActionContextInterceptor.DEMO_THREAD, SampleInterceptor.TIMER})
     public String test1() {
         return PATHS[1];
     }
 
-    @Action(name = "/aa/b1/c1/d0")
+    @Action("/aa/b1/c1/d0")
     public String test2() {
         return PATHS[2];
     }
@@ -53,57 +53,57 @@ public class PathTestAction {
         return PATHS[3];
     }
 
-    @Action(name = "/aa/b2/c2/d2")
+    @Action(value = "/aa/b2/c2/d2")
     public String test4() {
         return PATHS[4];
     }
 
-    @Action(name = "/aa/b3/c1/d1/*")
+    @Action("/aa/b3/c1/d1/*")
     public String test5() {
         return PATHS[5];
     }
 
-    @Action(name = "/aa/b3/*/d1")
+    @Action("/aa/b3/*/d1")
     public String test6() {
         return PATHS[6];
     }
 
-    @Action(name = "/aa/b3/*/d1/{k2}")
+    @Action("/aa/b3/*/d1/{k2}")
     public String test7() {
         return PATHS[7];
     }
 
-    @Action(name = "/aa/*/c1/d1")
+    @Action("/aa/*/c1/d1")
     public String test8() {
         return PATHS[8];
     }
 
-    @Action(name = "/aa/*/c1/d1/e1")
+    @Action("/aa/*/c1/d1/e1")
     public String test9() {
         return PATHS[9];
     }
 
-    @Action(name = "/aa/b4/{k1}/d1")
+    @Action("/aa/b4/{k1}/d1")
     public String test10() {
         return PATHS[10];
     }
 
-    @Action(name = "/aa/b4/{k1}/d2")
+    @Action("/aa/b4/{k1}/d2")
     public String test11() {
         return PATHS[11];
     }
 
-    @Action(name = "/aa/b4/{k1}/d2/e1")
+    @Action("/aa/b4/{k1}/d2/e1")
     public String test12() {
         return PATHS[12];
     }
 
-    @Action(name = "/aa/b4/{k1}/d2/{k2}")
+    @Action("/aa/b4/{k1}/d2/{k2}")
     public String test13() {
         return PATHS[13];
     }
 
-    @Action(name = "/aa/b5/*/*/*/*")
+    @Action("/aa/b5/*/*/*/*")
     public String test14() {
         return PATHS[14];
     }

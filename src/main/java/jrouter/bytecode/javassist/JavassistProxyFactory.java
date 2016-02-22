@@ -26,9 +26,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * 提供基于javassist的根据<code>Method</code>底层方法动态构建JavassistProxy对象的工厂类。
+ * 提供基于javassist的根据{@link Method}底层方法动态构建{@link JavassistProxy}对象的工厂类。
  *
- * <p> 通常如下使用：
+ * <p>
+ * 通常如下使用：
  * <code><blockquote><pre>
  * Method method = ...
  * JavassistProxyFactory factory = new JavassistProxyFactory();
@@ -36,8 +37,6 @@ import org.slf4j.LoggerFactory;
  * proxy.invoke(...);
  * </pre></blockquote></code>
  * </p>
- *
- * @see JavassistProxy
  */
 public class JavassistProxyFactory implements ProxyFactory {
 
@@ -73,7 +72,7 @@ public class JavassistProxyFactory implements ProxyFactory {
     }
 
     /**
-     * 根据底层方法构建<code>CtClass</code>对象。
+     * 根据底层方法构建{@link CtClass}对象。
      *
      * @param method 底层的方法。
      *
@@ -107,7 +106,7 @@ public class JavassistProxyFactory implements ProxyFactory {
     }
 
     /**
-     * 基于底层方法构建<code>CtMethod</code>方法。
+     * 基于底层方法构建{@link CtMethod}方法。
      *
      * @param clazz 代理方法所在的CtClass类。
      * @param method 底层的方法。
@@ -159,8 +158,8 @@ public class JavassistProxyFactory implements ProxyFactory {
     private String getClassName(Class<?> clazz, String parameter) {
         return void.class != clazz && clazz.isPrimitive()
                 ? (clazz == boolean.class
-                ? "((Boolean)" + parameter + ").booleanValue()"
-                : "((Number)" + parameter + ")." + clazz.getCanonicalName() + "Value()")
+                        ? "((Boolean)" + parameter + ").booleanValue()"
+                        : "((Number)" + parameter + ")." + clazz.getCanonicalName() + "Value()")
                 : "(" + clazz.getCanonicalName() + ")" + parameter;
     }
 }

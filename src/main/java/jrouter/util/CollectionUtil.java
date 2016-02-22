@@ -354,7 +354,7 @@ public class CollectionUtil {
     }
 
     /**
-     * 针对<code>stringToMap</code>方法的解析key:value对；左右索引已去空。
+     * 针对{@code stringToMap}方法的解析key:value对；左右索引已去空。
      *
      * @param source 原字符串。
      * @param beginIndex 起始索引（包括）。

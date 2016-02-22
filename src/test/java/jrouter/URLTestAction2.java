@@ -35,22 +35,22 @@ public class URLTestAction2 extends URLTestAction {
         return "/url/test101";
     }
 
-    @Action(name = "a2")
+    @Action("a2")
     public String test200() {
         return "/url/a2";
     }
 
-    @Action(name = " b2")
+    @Action(" b2")
     public String test201() {
         return "/url/b2";
     }
 
-    @Action(name = " c2 ")
+    @Action(" c2 ")
     public String test202() {
         return "/url/c2";
     }
 
-    @Action(name = "/url_d2/")
+    @Action("/url_d2/")
     public String test203() {
         return "/url_d2";
     }

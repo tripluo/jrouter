@@ -31,7 +31,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
 
     /**
      * 不缓存转换参数位置的工厂类。提供一个便捷的无参数构造类。
-     * new MultiParameterConverterFactory.NoFixedOrder()==new MultiParameterConverterFactory(false).
+     * MultiParameterConverterFactory.NoFixedOrder()即 MultiParameterConverterFactory(false)。
      */
     public static class NoFixedOrder extends MultiParameterConverterFactory {
 
@@ -92,7 +92,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
     /**
      * 提供多参数自动映射的转换器。不包含任何成员对象，线程安全。
      * 如果原方法的调用参数数目大于或等于方法本身所需的参数个数，则返回未处理的原调用参数（调用时可能会抛出方法调用异常）。
-     * 仅在原方法的调用参数数目小于方法本身所需的参数个数时，注入并自动映射追加的转换参数（无转换参数类型匹配映射<code>null</code>）。
+     * 仅在原方法的调用参数数目小于方法本身所需的参数个数时，注入并自动映射追加的转换参数（无转换参数类型匹配映射{@code null}）。
      */
     public class MultiParameterConverter implements ParameterConverter {
 
