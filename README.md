@@ -41,7 +41,7 @@ Adding to your Maven2/3 application:
         <dependency>
             <groupId>jrouter</groupId>
             <artifactId>jrouter</artifactId>
-            <version>1.7.0</version>
+            <version>1.7.1</version>
         </dependency>
     </dependencies>
 Springframework Integration:
