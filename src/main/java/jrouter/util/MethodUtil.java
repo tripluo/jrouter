@@ -211,7 +211,7 @@ public class MethodUtil {
      *
      * @return AbstractProxy子对象底层方法调用后的结果。
      *
-     * @see #invoke(jrouter.AbstractProxy, jrouter.ParameterConverter, java.lang.Object...)
+     * @see #invoke(jrouter.AbstractProxy, jrouter.ParameterConverter, java.lang.Object[], java.lang.Object[])
      */
     public static Object invoke(AbstractProxy proxy, ActionInvocation invocation) {
         return invoke(proxy, invocation.getParameterConverter(), null, invocation.getConvertParameters());

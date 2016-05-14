@@ -17,33 +17,14 @@
 
 ★ 结果类型（ResultType）
 
-![outline](http://git.oschina.net/sundancer/jrouter/raw/master/outline.png)
+![outline](https://raw.githubusercontent.com/innjj/jrouter/master/outline.png)
 
 ● require [jdk 1.6+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 ● require [slf4j](http://www.slf4j.org/download.html)
 
-◇ [changelog](http://git.oschina.net/sundancer/jrouter/blob/master/src/main/resources/changelog.txt)
+◇ [changelog](https://github.com/innjj/jrouter/blob/master/src/main/resources/changelog.txt)
 
-Adding to your Maven2/3 application:
-
-    <repositories>
-        ...
-        <repository>
-            <id>inn4j-repo</id>
-            <name>inn4j-repository</name>
-            <url>https://raw.githubusercontent.com/sundancer/inn4j-repository/master/repo/</url>
-        </repository>
-    </repositories>
-
-    <dependencies>
-        ...
-        <dependency>
-            <groupId>jrouter</groupId>
-            <artifactId>jrouter</artifactId>
-            <version>1.7.1</version>
-        </dependency>
-    </dependencies>
 Springframework Integration:
 
     <!-- JRouter ActionFactory -->

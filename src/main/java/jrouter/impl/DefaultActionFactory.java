@@ -526,64 +526,29 @@ public class DefaultActionFactory implements ActionFactory {
     private static String[] parseMatch(String pathinfo, String... def) {
         String type = def[0];
         String loc = def[1];
-        //首個非空格非分隔符的位置
-        int begin = -1;
-        //分隔符前的最后一个非空格字符的位置
-        int p1 = -1;
-        //分隔符的位置
-        int colon = -1;
-        int len = pathinfo.length();
-        //定位分隔符位置
-        for (int i = 0; i < len; i++) {
-            char c = pathinfo.charAt(i);
-            //may extend
-            if (c == ':') {
-                colon = i;
-                break;
-            } else {
-                if (c != ' ') {
-                    p1 = i;
-                    if (begin == -1)
-                        begin = i;
-                }
-            }
-        }
-        //判断结果类型
-        switch (colon) {
+        int idx = pathinfo.indexOf(':');
+        String temp = null;
+        switch (idx) {
             case -1:
-                begin = 0;
-                p1 = len - 1;
-                while (begin < p1 && pathinfo.charAt(begin) == ' ')
-                    begin++;
-                while (begin < p1 && pathinfo.charAt(p1) == ' ')
-                    p1--;
-                //非空
-                if (begin < p1)
-                    type = pathinfo.substring(begin, p1 + 1);
+                if (!(temp = StringUtil.trim(pathinfo)).isEmpty()) {
+                    type = temp;
+                }
                 break;
             case 0:
+                if (!(temp = StringUtil.trim(pathinfo.substring(1))).isEmpty()) {
+                    loc = temp;
+                }
                 break;
             default:
-                //非空
-                if (begin != -1)
-                    type = pathinfo.substring(begin, p1 + 1);
+                if (!(temp = StringUtil.trim(pathinfo.substring(0, idx))).isEmpty()) {
+                    type = temp;
+                }
+                if (!(temp = StringUtil.trim(pathinfo.substring(idx + 1))).isEmpty()) {
+                    loc = temp;
+                }
         }
-        //分隔符非末位，判断结果路径
-        if (colon != -1 && colon != len - 1) {
-            //分隔符后的第一个非空格字符的位置
-            int p2 = colon + 1;
-            //最后一个非空字符的位置
-            int end = len - 1;
-            while (p2 < end && pathinfo.charAt(p2) == ' ')
-                p2++;
-            while (p2 < end && pathinfo.charAt(end) == ' ')
-                end--;
-
-            if (p2 != end)
-                loc = pathinfo.substring(p2, end + 1);
-        }
-        //返回0.type 1.location形式的数组
-        return new String[]{type, loc};
+        //返回0.type 1.location形式的数组, 值为null则返回""
+        return new String[]{type == null ? "" : type, loc == null ? "" : loc};
     }
 
     /**

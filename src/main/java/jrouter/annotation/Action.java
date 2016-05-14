@@ -54,7 +54,7 @@ public @interface Action {
      *
      * @return Action名称。
      *
-     * @see #name();
+     * @see #name()
      *
      * @since 1.7.1
      */
