@@ -117,20 +117,22 @@
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
                         <version>3.0.0</version>
-                        <configuration>
-                            <excludes>
-                                <!--  排除logback.xml -->
-                                <exclude>logback.xml</exclude>
-                            </excludes>
-                        </configuration>
                         <executions>
                             <execution>
+                                <id>attach-sources</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>jar-no-fork</goal>
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <attach>true</attach>
+                            <excludes>
+                                <!--  排除logback.xml -->
+                                <exclude>logback.xml</exclude>
+                            </excludes>
+                        </configuration>
                     </plugin>
                     <!-- javadoc -->
                     <plugin>
@@ -162,6 +164,12 @@
                     </plugin>
                 </plugins>
             </build>
+            <distributionManagement>
+                <repository>
+                    <id>oss</id>
+                    <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+                </repository>
+            </distributionManagement>
         </profile>
     </profiles>
     <properties>

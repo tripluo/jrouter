@@ -25,104 +25,114 @@
 
 ◇ [changelog](https://github.com/innjj/jrouter/blob/master/src/main/resources/changelog.txt)
 
-Springframework Integration:
+### Maven: ###
+```xml
+<dependency>
+    <groupId>net.jrouter</groupId>
+    <artifactId>jrouter</artifactId>
+    <version>1.7.1</version>
+</dependency>
+```
 
-    <!-- JRouter ActionFactory -->
-    <bean id="actionFactory" class="jrouter.spring.DefaultActionFactoryBean">
-        <!-- optional default:null -->
-        <property name="configLocation" value="classpath:jrouter.xml" />
-        <!-- optional default -->
-        <property name="actionFactoryClass" value="jrouter.impl.DefaultActionFactory"/>
-        <!-- optional default -->
-        <property name="objectFactory">
-            <bean class="jrouter.spring.SpringObjectFactory"/>
-        </property>
-        <!-- optional default -->
-        <property name="actionFactoryProperties">
-            <value>
-                <!-- optional default:null deprecated since 1.6.6 -->
-                <!--actionInvocationClass = jrouter.impl.DefaultActionInvocation-->
-                <!-- optional default:null -->
-                defaultInterceptorStack = empty
-                <!-- optional default:null -->
-                defaultResultType = empty
-                <!-- optional default -->
-                pathSeparator = /
-                <!-- optional default -->
-                extension = .
-                <!-- optional default -->
-                actionCacheNumber = 10000
-                <!-- optional default -->
-                bytecode = javassist
-                <!-- optional default -->
-                converterFactory = jrouter.impl.MultiParameterConverterFactory
-            </value>
-        </property>
+### Springframework Integration: ###
+```xml
+<!-- JRouter ActionFactory -->
+<bean id="actionFactory" class="jrouter.spring.DefaultActionFactoryBean">
+    <!-- optional default:null -->
+    <property name="configLocation" value="classpath:jrouter.xml" />
+    <!-- optional default -->
+    <property name="actionFactoryClass" value="jrouter.impl.DefaultActionFactory"/>
+    <!-- optional default -->
+    <property name="objectFactory">
+        <bean class="jrouter.spring.SpringObjectFactory"/>
+    </property>
+    <!-- optional default -->
+    <property name="actionFactoryProperties">
+        <value>
+            <!-- optional default:null deprecated since 1.6.6 -->
+            <!--actionInvocationClass = jrouter.impl.DefaultActionInvocation-->
+            <!-- optional default:null -->
+            defaultInterceptorStack = empty
+            <!-- optional default:null -->
+            defaultResultType = empty
+            <!-- optional default -->
+            pathSeparator = /
+            <!-- optional default -->
+            extension = .
+            <!-- optional default -->
+            actionCacheNumber = 10000
+            <!-- optional default -->
+            bytecode = javassist
+            <!-- optional default -->
+            converterFactory = jrouter.impl.MultiParameterConverterFactory
+        </value>
+    </property>
 
-        <!-- scan classes properties -->
-        <property name="componentClassScanProperties">
-            <list>
-                <value>
-                    <!-- required -->
-                    package = jrouter
-                    <!-- optional, if empty means all -->
-                    includeExpression = jrouter.impl.**
-                    <!-- optional -->
-                    excludeExpression = jrouter.result.**, jrouter.interceptor.**
-                </value>
-            </list>
-        </property>
-
-        <property name="interceptors">
-            <list>
-                <!-- the value can be the class name or the ref bean: -->
-                <value>jrouter.interceptor.SampleInterceptor</value>
-            </list>
-        </property>
-        <property name="interceptorStacks">
-            <list>
-                <!-- the value can be the class name or the ref bean: -->
-                <value>jrouter.interceptor.DefaultInterceptorStack</value>
-            </list>
-        </property>
-        <property name="resultTypes">
-            <list>
-                <!-- the value can be the class name or the ref bean: -->
-                <value>jrouter.result.DefaultResult</value>
-            </list>
-        </property>
-        <property name="results">
-            <list>
-                <!-- the value can be the class name or the ref bean: -->
-                <value>jrouter.result.DefaultResult</value>
-            </list>
-        </property>
-        <property name="actions">
-            <list>
-                <!-- the value can be the class name or the ref bean: -->
-            </list>
-        </property>
-        <property name="componentBeanScanProperties">
+    <!-- scan classes properties -->
+    <property name="componentClassScanProperties">
+        <list>
             <value>
                 <!-- required -->
-                includeComponentBeanExpression =
+                package = jrouter
+                <!-- optional, if empty means all -->
+                includeExpression = jrouter.impl.**
                 <!-- optional -->
-                excludeComponentBeanExpression =
-                <!-- optional -->
-                includeComponentClassExpression =
-                <!-- optional -->
-                excludeComponentClassExpression =
+                excludeExpression = jrouter.result.**, jrouter.interceptor.**
             </value>
-        </property>
+        </list>
+    </property>
 
-        <property name="aopActions">
-            <list>
-                <bean class="jrouter.spring.AopActionBean">
-                    <property name="matches" value="/**"/>
-                    <property name="interceptorStackNames" value="empty"/>
-                    <property name="interceptorNames" value=""/>
-                    <property name="typeName" value="add-before"/>
-                </bean>
-            </list>
-        </property>
-    </bean>
+    <property name="interceptors">
+        <list>
+            <!-- the value can be the class name or the ref bean: -->
+            <value>jrouter.interceptor.SampleInterceptor</value>
+        </list>
+    </property>
+    <property name="interceptorStacks">
+        <list>
+            <!-- the value can be the class name or the ref bean: -->
+            <value>jrouter.interceptor.DefaultInterceptorStack</value>
+        </list>
+    </property>
+    <property name="resultTypes">
+        <list>
+            <!-- the value can be the class name or the ref bean: -->
+            <value>jrouter.result.DefaultResult</value>
+        </list>
+    </property>
+    <property name="results">
+        <list>
+            <!-- the value can be the class name or the ref bean: -->
+            <value>jrouter.result.DefaultResult</value>
+        </list>
+    </property>
+    <property name="actions">
+        <list>
+            <!-- the value can be the class name or the ref bean: -->
+        </list>
+    </property>
+    <property name="componentBeanScanProperties">
+        <value>
+            <!-- required -->
+            includeComponentBeanExpression =
+            <!-- optional -->
+            excludeComponentBeanExpression =
+            <!-- optional -->
+            includeComponentClassExpression =
+            <!-- optional -->
+            excludeComponentClassExpression =
+        </value>
+    </property>
+
+    <property name="aopActions">
+        <list>
+            <bean class="jrouter.spring.AopActionBean">
+                <property name="matches" value="/**"/>
+                <property name="interceptorStackNames" value="empty"/>
+                <property name="interceptorNames" value=""/>
+                <property name="typeName" value="add-before"/>
+            </bean>
+        </list>
+    </property>
+</bean>
+```
