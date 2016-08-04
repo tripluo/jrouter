@@ -26,20 +26,14 @@ import jrouter.annotation.Interceptor;
 public final class InterceptorProxy extends DefaultProxy {
 
     /**
-     * 拦截器的名称
+     * 拦截器的名称。
      */
     private final String name;
 
     /**
-     * 拦截器
+     * 拦截器。
      */
     private final Interceptor interceptor;
-
-    /**
-     * 是否传递ActionInvocation参数
-     */
-    @Deprecated
-    private final boolean requireAction;
 
     /**
      * 构造一个拦截器的代理类，包含指定的拦截器名称、拦截器调用参数的状态。
@@ -48,14 +42,12 @@ public final class InterceptorProxy extends DefaultProxy {
      * @param interceptor 所代理的拦截器。
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
-     * @param requireAction 拦截器调用是否传递ActionInvocation参数。
      */
     public InterceptorProxy(ActionFactory actionFactory, Interceptor interceptor, Method method,
-            Object object, boolean requireAction) {
-        super(method, object, actionFactory.getProxyFactory());
+            Object object) {
+        super(method, object, actionFactory.getMethodInvokerFactory());
         this.interceptor = interceptor;
         this.name = interceptor.name().trim();
-        this.requireAction = requireAction;
     }
 
     /**
@@ -74,16 +66,5 @@ public final class InterceptorProxy extends DefaultProxy {
      */
     public Interceptor getInterceptor() {
         return interceptor;
-    }
-
-    /**
-     * 判断拦截器调用是否传递ActionInvocation参数。
-     *
-     * @return 拦截器调用是否传递ActionInvocation参数。
-     *
-     * @deprecated since 1.6.6
-     */
-    public boolean isRequireAction() {
-        return requireAction;
     }
 }

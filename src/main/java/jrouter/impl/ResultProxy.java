@@ -26,10 +26,6 @@ import jrouter.annotation.ResultType;
  */
 public final class ResultProxy extends DefaultProxy {
 
-    /** 是否传递ActionInvocation参数 */
-    @Deprecated
-    private final boolean requireAction;
-
     /** 结果对象 */
     private final Result result;
 
@@ -43,13 +39,10 @@ public final class ResultProxy extends DefaultProxy {
      * @param result 代理的结果对象。
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
-     * @param requireAction 拦截器调用是否传递ActionInvocation参数。
      */
-    public ResultProxy(ActionFactory actionFactory, Result result, Method method, Object object,
-            boolean requireAction) {
-        super(method, object, actionFactory.getProxyFactory());
+    public ResultProxy(ActionFactory actionFactory, Result result, Method method, Object object) {
+        super(method, object, actionFactory.getMethodInvokerFactory());
         this.result = result;
-        this.requireAction = requireAction;
     }
 
     /**
@@ -59,16 +52,5 @@ public final class ResultProxy extends DefaultProxy {
      */
     public Result getResult() {
         return result;
-    }
-
-    /**
-     * 判断拦截器调用是否传递ActionInvocation参数。
-     *
-     * @return 拦截器调用是否传递ActionInvocation参数。
-     *
-     * @deprecated since 1.6.6
-     */
-    public boolean isRequireAction() {
-        return requireAction;
     }
 }

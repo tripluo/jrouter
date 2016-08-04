@@ -106,18 +106,10 @@ public interface ActionProxy {
     Map<String, Result> getResults();
 
     /**
-     * TODO
      * 返回调用方法的描述信息。
      *
      * @return 调用方法的描述信息。
      */
     String getMethodInfo();
 
-    /**
-     * TODO
-     * 返回方法所在的对象（非代理）。
-     *
-     * @return 方法所在的对象（非代理）。
-     */
-    Object getObject();
 }

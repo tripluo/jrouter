@@ -106,7 +106,8 @@ public class MethodUtil {
                     sb.append("[]");
                 }
                 return sb.toString();
-            } catch (Throwable e) { /*FALLTHRU*/ }
+            } catch (Throwable e) {
+                /*FALLTHRU*/ }
         }
         String name = type.getName();
         int i = 0;

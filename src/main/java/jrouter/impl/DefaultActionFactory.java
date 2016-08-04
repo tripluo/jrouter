@@ -24,7 +24,8 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import jrouter.*;
 import jrouter.annotation.*;
-import jrouter.bytecode.javassist.JavassistProxyFactory;
+import jrouter.bytecode.javassist.JavassistMethodChecker;
+import jrouter.bytecode.javassist.JavassistMethodInvokerFactory;
 import jrouter.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,9 +79,11 @@ public class DefaultActionFactory implements ActionFactory {
     private String defaultInterceptorStack = null;
 
     /**
-     * 默认视图类型。作用于ResultType的调用。
+     * 默认视图类型，主要针对{@code String}类型的结果对象。
      *
-     * @see #invokeAction(String, Object[])
+     * @see #invokeAction(java.lang.String, java.lang.Object...)
+     * @see #invokeColonString
+     * @see #invokeStringResult
      */
     private String defaultResultType = null;
 
@@ -97,41 +100,46 @@ public class DefaultActionFactory implements ActionFactory {
     /**
      * 创建底层方法代理的工厂对象。
      */
-    private ProxyFactory proxyFactory = null;
+    private MethodInvokerFactory methodInvokerFactory = null;
 
     /**
      * 创建底层方法转换器的工厂对象。
      */
     private ConverterFactory converterFactory = null;
+
+    /**
+     * 方法检查器。
+     */
+    private JavassistMethodChecker methodChecker;
 ////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * 拦截器
+     * 拦截器。
      */
     private Map<String, InterceptorProxy> interceptors;
 
     /**
-     * 拦截栈
+     * 拦截栈。
      */
     private Map<String, InterceptorStackProxy> interceptorStacks;
 
     /**
-     * 实际的Action树结构路径映射
+     * 实际的Action树结构路径映射。
      */
     private PathTreeMap<DefaultActionProxy> actions;
 
     /**
-     * 结果类型
+     * 结果类型。
      */
     private Map<String, ResultTypeProxy> resultTypes;
 
     /**
-     * 默认的全局结果对象集合
+     * 默认的全局结果对象集合。
      */
     private Map<String, ResultProxy> results;
 
     /**
-     * Action路径与代理对象的映射缓存
+     * Action路径与代理对象的映射缓存。
      */
     private ActionCache actionCache;
 
@@ -171,7 +179,7 @@ public class DefaultActionFactory implements ActionFactory {
             }
             //string value
             String strValue = value.toString().trim();
-            //TODO
+            //deprecated since 1.6.6
 //            if ("actionInvocationClass".equalsIgnoreCase(name)) {
 //                try {
 //                    //设置Action运行时上下文的类型
@@ -205,27 +213,34 @@ public class DefaultActionFactory implements ActionFactory {
                 actionCacheNumber = Integer.parseInt(strValue);
                 LOG.info("Set actionCacheNumber : " + this.actionCacheNumber);
             } else if ("objectFactory".equalsIgnoreCase(name)) {
-                //设置创建对象的工厂对象
-                this.objectFactory = (ObjectFactory) value; //throw exception if not matched
+                //TODO
+                if (value instanceof String) {
+
+                } else if (value instanceof Class) {
+
+                } else {
+                    //设置创建对象的工厂对象
+                    this.objectFactory = (ObjectFactory) value; //throw exception if not matched
+                }
                 LOG.info("Set objectFactory : " + this.objectFactory);
             } else if ("bytecode".equalsIgnoreCase(name)) {
                 setBytecode = true;
                 if (value instanceof String) {
                     //default to use java reflect directly
                     if ("default".equalsIgnoreCase(strValue)) {
-                        proxyFactory = null;
-                        LOG.info("Set proxyFactory : " + strValue);
+                        methodInvokerFactory = null;
+                        LOG.info("Set methodInvokerFactory : " + strValue);
                     } else if ("javassist".equalsIgnoreCase(strValue)) {
-                        proxyFactory = new JavassistProxyFactory();
-                        LOG.info("Set proxyFactory : " + this.proxyFactory);
+                        methodInvokerFactory = new JavassistMethodInvokerFactory();
+                        LOG.info("Set methodInvokerFactory : " + this.methodInvokerFactory);
                     } else {
                         setBytecode = false;
                         LOG.warn("Unknown bytecode property : " + strValue);
                     }
                 } else {
                     //throw exception if not matched
-                    proxyFactory = (ProxyFactory) value;
-                    LOG.info("Set proxyFactory : " + this.proxyFactory);
+                    methodInvokerFactory = (MethodInvokerFactory) value;
+                    LOG.info("Set methodInvokerFactory : " + this.methodInvokerFactory);
                 }
             } else if ("converterFactory".equalsIgnoreCase(name)) {
                 if (value instanceof String) {
@@ -242,24 +257,30 @@ public class DefaultActionFactory implements ActionFactory {
                     converterFactory = (ConverterFactory) value;
                     LOG.info("Set converterFactory : " + this.converterFactory);
                 }
+            } else if ("interceptorMethodChecker".equalsIgnoreCase(name)) {
+                //create interceptorMethodChecker
+                if (ClassUtil.isJavassistSupported() && StringUtil.isNotBlank(strValue)) {
+                    methodChecker = new JavassistMethodChecker(strValue);
+                    LOG.info("Set methodChecker : " + this.methodChecker);
+                }
             } else {
                 LOG.warn("Ignore unknown property [{}] : [{}]", name, value);
             }
         }
-        //default objectFactory
-        setDefaultObjectFactory();
-        //default proxyFactory
+        //create default objectFactory
+        createDefaultObjectFactory();
+        //create default methodInvokerFactory
         if (!setBytecode)
-            setDefaultProxyFactory();
-        //set converterFactory using objectFactory
-        setConverterFactory(converterFactoryClass);
+            createDefaultMethodInvokerFactory();
+        //create converterFactory using objectFactory
+        createConverterFactory(converterFactoryClass);
     }
 
     /**
      * 未设置objectFactory属性时，提供默认的{@code ObjectFactory}实现。
      * 默认提供{@code DefaultObjectFactory}。
      */
-    private void setDefaultObjectFactory() {
+    private void createDefaultObjectFactory() {
         if (objectFactory == null) {
             objectFactory = new DefaultObjectFactory();
             LOG.info("No objectFactory setting, use default : " + objectFactory);
@@ -267,38 +288,37 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * 未设置proxyFactory属性时，提供默认的{@code ProxyFactory}实现。
-     * 默认引入javassist时提供{@code JavassistProxyFactory}；若无javassist引用则采用java反射机制。
+     * 未设置proxyFactory属性时，提供默认的{@code MethodInvokerFactory}实现。
+     * 默认引入javassist时提供{@code JavassistMethodInvokerFactory}；若无javassist引用则采用java反射机制。
      *
      * @see DefaultProxy#invoke
      */
-    private void setDefaultProxyFactory() {
-        if (proxyFactory == null) {
-            try {
-                //check javassist jar
-                ClassUtil.loadClass("javassist.ClassPool");
-                proxyFactory = new JavassistProxyFactory();
-                LOG.info("No proxyFactory setting, use javassist as default : " + proxyFactory);
-            } catch (ClassNotFoundException ex) {
-                LOG.info("No proxyFactory setting and no javassist jar found, use java reflect as default");
+    private void createDefaultMethodInvokerFactory() {
+        if (methodInvokerFactory == null) {
+            //check if javassist is supported
+            if (ClassUtil.isJavassistSupported()) {
+                methodInvokerFactory = new JavassistMethodInvokerFactory();
+                LOG.info("No methodInvokerFactory setting, use javassist as default : " + methodInvokerFactory);
+            } else {
+                LOG.info("No methodInvokerFactory setting and no javassist jar found, use java reflect as default");
             }
         }
     }
 
     /**
-     * Set converterFactory using objectFactory, use MultiParameterConverterFactory as default
+     * Create converterFactory using objectFactory, use MultiParameterConverterFactory as default
      * if converterFactory is not set.
      *
      * @param converterFactoryClass ConverterFactory.class
      */
-    private void setConverterFactory(Class<? extends ConverterFactory> converterFactoryClass) {
+    private void createConverterFactory(Class<? extends ConverterFactory> converterFactoryClass) {
         if (converterFactoryClass != null) {
             converterFactory = objectFactory.newInstance(converterFactoryClass);
             LOG.info("Set converterFactory : " + this.converterFactory);
         }
         //finally check if converterFactory is still not set
         if (converterFactory == null) {
-            setDefaultConverterFactory();
+            createDefaultConverterFactory();
         }
     }
 
@@ -306,7 +326,7 @@ public class DefaultActionFactory implements ActionFactory {
      * 未设置converterFactory属性时提供默认的{@code ConverterFactory}实现。
      * 默认提供{@code MultiParameterConverterFactory}。
      */
-    private void setDefaultConverterFactory() {
+    private void createDefaultConverterFactory() {
         this.converterFactory = new MultiParameterConverterFactory(true);
         LOG.info("No converterFactory setting, use default : " + this.converterFactory);
     }
@@ -338,8 +358,7 @@ public class DefaultActionFactory implements ActionFactory {
                 if (index != -1) {
                     path = path.substring(0, index);
                 }
-            } else {
-                //extension为特定的后缀字符串
+            } else //extension为特定的后缀字符串
                 if (path.endsWith(extension)) {
                     //如果extension前一位非字母或数字
                     if (!Character.isLetterOrDigit(path.charAt(path.length() - len - 1))) {
@@ -347,11 +366,10 @@ public class DefaultActionFactory implements ActionFactory {
                     }
                     path = path.substring(0, path.length() - len);
                 }
-            }
         }
 
         //create ActionInvocation
-        ActionInvocation<?> invocation = createActionInvocation(path, params);
+        ActionInvocation invocation = createActionInvocation(path, params);
         //invoke
         Object res = null;
         try {
@@ -366,13 +384,13 @@ public class DefaultActionFactory implements ActionFactory {
                 //如果action中存在相应的结果映射
                 if ((result = ap.getResults().get(resInfo)) != null) {
                     //调用结果对象相应的结果类型
-                    Object rr = invokeByResult(invocation, result);
+                    Object rr = invokeStringResult(invocation, result);
                     if (rr != null)
                         res = rr;
                 } //如果Action调用结果的路径信息中包含':'可省略Action中的@Result(name = "*"...)
                 else if ((result = ap.getResults().get(match)) != null || resInfo.indexOf(':') != -1) {
                     //非完全匹配字符串路径的调用
-                    Object rr = invokeByString(invocation, result, resInfo);
+                    Object rr = invokeColonString(invocation, result, resInfo);
                     if (rr != null)
                         res = rr;
                 } //如果全局结果对象集合中存在相应的结果映射
@@ -386,7 +404,7 @@ public class DefaultActionFactory implements ActionFactory {
                     result = rp.getResult();
                     //当Result的type值不为空时，执行相应的ResultType
                     if (StringUtil.isNotEmpty(result.type())) {
-                        rr = invokeByResult(invocation, result);
+                        rr = invokeStringResult(invocation, result);
                         if (rr != null)
                             res = rr;
                     }
@@ -419,7 +437,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return Action调用时的上下文对象。
      */
-    protected ActionInvocation<?> createActionInvocation(String path, Object... params) {
+    protected ActionInvocation createActionInvocation(String path, Object... params) {
         //cache
         ActionCacheEntry ace = null;
         if (actionCacheNumber > 0)
@@ -444,15 +462,14 @@ public class DefaultActionFactory implements ActionFactory {
                 throw new NotFoundException("No such Action : " + path);
             }
 
-            //put in cache
             ace = new ActionCacheEntry(ap, matchParameters.isEmpty()
                     ? Collections.EMPTY_MAP : Collections.unmodifiableMap(matchParameters));
+            //put in cache, ignore multi-thread issue here
             putActionCache(path, ace);
         }
 
         //scope action
         ap = ap.getInstance();
-        //TODO actionInvocationClass ???
         //create DefaultActionInvocation
         DefaultActionInvocation ai = new DefaultActionInvocation(path, this, ap, params);
         //setActionPathParameters
@@ -468,7 +485,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return 调用ResultType后的结果。
      */
-    private Object invokeByResult(ActionInvocation<?> invocation, Result result) {
+    private Object invokeStringResult(ActionInvocation invocation, Result result) {
         String type = result.type();
         //default result type
         if (StringUtil.isEmpty(type))
@@ -495,9 +512,9 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return 调用相应结果类型后的值，无匹配则返回 null。
      *
-     * @see #invokeByResult
+     * @see #invokeStringResult
      */
-    private Object invokeByString(ActionInvocation<?> invocation, Result result, String pathinfo) {
+    private Object invokeColonString(ActionInvocation invocation, Result result, String pathinfo) {
         //default values
         String type = defaultResultType;
         String loc = null;
@@ -512,7 +529,7 @@ public class DefaultActionFactory implements ActionFactory {
         loc = parseRes[1];
         //重新封装result参数
         Result res = new DefaultActionInvocation.ResultProxy(match, type, loc);
-        return invokeByResult(invocation, res);
+        return invokeStringResult(invocation, res);
     }
 
     /**
@@ -560,7 +577,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return 非字符串对象。
      */
-    protected Object invokeObjectResult(ActionInvocation<?> invocation, Object res) {
+    protected Object invokeObjectResult(ActionInvocation invocation, Object res) {
         LOG.warn("Invoking Object Result [{}] and return directly at : {}", res, invocation.getActionProxy().getMethodInfo());
         return res;
     }
@@ -574,7 +591,7 @@ public class DefaultActionFactory implements ActionFactory {
      *
      * @return 结果字符串。
      */
-    protected Object invokeUndefinedResult(ActionInvocation<?> invocation, String resInfo) {
+    protected Object invokeUndefinedResult(ActionInvocation invocation, String resInfo) {
         LOG.warn("Invoking undefined String Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethodInfo());
         //throw new NotFoundException("No match Result [" + resInfo + "] at " + ap.getMethodInfo(), ap);
         //不作处理直接跳过，直接返回调用结果字符串
@@ -972,8 +989,12 @@ public class DefaultActionFactory implements ActionFactory {
      * @return Interceptor代理对象。
      */
     private InterceptorProxy createInterceptorProxy(Method method, Object obj) {
+        //do interceptor method check
+        if (methodChecker != null) {
+            methodChecker.check(method);
+        }
         Interceptor interceptor = method.getAnnotation(Interceptor.class);
-        return new InterceptorProxy(this, interceptor, method, obj, true);
+        return new InterceptorProxy(this, interceptor, method, obj);
     }
 
     /**
@@ -1031,7 +1052,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     private ResultTypeProxy createResultTypeProxy(Method method, Object obj) {
         ResultType resultType = method.getAnnotation(ResultType.class);
-        return new ResultTypeProxy(this, resultType, method, obj, true);
+        return new ResultTypeProxy(this, resultType, method, obj);
     }
 
     /**
@@ -1044,7 +1065,7 @@ public class DefaultActionFactory implements ActionFactory {
      */
     private ResultProxy createResultProxy(Method method, Object obj) {
         Result res = method.getAnnotation(Result.class);
-        return new ResultProxy(this, res, method, obj, true);
+        return new ResultProxy(this, res, method, obj);
     }
 
     /**
@@ -1109,7 +1130,7 @@ public class DefaultActionFactory implements ActionFactory {
             List<InterceptorProxy> inters = new ArrayList<InterceptorProxy>(5);
             //action interceptors
             if (interceptorNames.length != 0) {
-                ////action interceptorStack
+                //action interceptorStack
                 if (StringUtil.isNotEmpty(stackName)) {
                     addActionInterceptors(inters, stackName, ap);
                 }
@@ -1224,10 +1245,8 @@ public class DefaultActionFactory implements ActionFactory {
         InterceptorStackProxy isp = interceptorStacks.get(stackName);
         if (isp == null) {
             LOG.warn("No such InterceptorStack [{}] at : {}", stackName, ap.getMethodInfo());
-        } else {
-            if (isp.getInterceptors() != null)
-                interceptors.addAll(isp.getInterceptors());
-        }
+        } else if (isp.getInterceptors() != null)
+            interceptors.addAll(isp.getInterceptors());
     }
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1325,8 +1344,8 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     @Override
-    public ProxyFactory getProxyFactory() {
-        return proxyFactory;
+    public MethodInvokerFactory getMethodInvokerFactory() {
+        return methodInvokerFactory;
     }
 
     @Override
@@ -1352,7 +1371,7 @@ public class DefaultActionFactory implements ActionFactory {
     }
 
     /**
-     * Action路径与缓存对象的映射。
+     * Action路径与缓存对象的映射，线程安全。
      */
     private static class ActionCache {
 

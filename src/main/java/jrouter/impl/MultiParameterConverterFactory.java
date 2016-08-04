@@ -52,12 +52,12 @@ public class MultiParameterConverterFactory implements ConverterFactory {
      *
      * @see ActionInvocation#getConvertParameters()
      */
-    private boolean fixedOrder = true;
+    private final boolean fixedOrder;
 
     /**
      * 多参数转换器，线程安全的单例对象。
      */
-    private ParameterConverter parameterConverter;
+    private final ParameterConverter parameterConverter;
 
     /**
      * 创建固定参数自动映射转换器的工厂类。
@@ -113,7 +113,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
                 Object[] newArgs = new Object[originalSize];
                 if (pLen > 0)
                     System.arraycopy(originalParams, 0, newArgs, 0, pLen);
-                int[] idx = match(method, parameterTypes, convertParams);
+                int[] idx = match(method, pLen, parameterTypes, convertParams);
                 for (int i = pLen; i < originalSize; i++) {
                     newArgs[i] = (idx[i] == -1 ? null : convertParams[idx[i]]);
                 }
@@ -135,7 +135,8 @@ public class MultiParameterConverterFactory implements ConverterFactory {
          *
          * @see #methodParametersCache
          */
-        private int[] match(Method method, Class[] parameterTypes, Object[] convertParams) {
+        private int[] match(Method method, int matchStart, Class[] parameterTypes,
+                Object[] convertParams) {
             int[] idx = null;
             if (fixedOrder) {
                 //get from cache
@@ -144,15 +145,20 @@ public class MultiParameterConverterFactory implements ConverterFactory {
                     return idx;
             }
             idx = new int[parameterTypes.length];
-            for (int i = 0; i < idx.length; i++) {
+            boolean[] convertMatched = null;
+            if (convertParams != null) {
+                convertMatched = new boolean[convertParams.length];
+            }
+            for (int i = matchStart; i < idx.length; i++) {
                 //初始值-1, 无匹配
                 idx[i] = -1;
                 if (convertParams != null) {
                     Class parameterType = parameterTypes[i];
                     for (int j = 0; j < convertParams.length; j++) {
                         //不考虑父子优先级，参数按顺序优先匹配。
-                        if (parameterType.isInstance(convertParams[j])) {
+                        if (!convertMatched[j] && parameterType.isInstance(convertParams[j])) {
                             idx[i] = j;
+                            convertMatched[j] = true;
                             break;
                         }
                     }

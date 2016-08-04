@@ -30,7 +30,7 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.7.1</version>
+    <version>1.7.2</version>
 </dependency>
 ```
 
@@ -65,6 +65,8 @@
             bytecode = javassist
             <!-- optional default -->
             converterFactory = jrouter.impl.MultiParameterConverterFactory
+            <!-- optional default:null -->
+            interceptorMethodChecker = jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)
         </value>
     </property>
 

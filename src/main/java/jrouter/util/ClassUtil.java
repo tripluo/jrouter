@@ -45,6 +45,19 @@ public class ClassUtil {
     /** JAVA Class文件后缀 */
     private static final String JAVA_CLASS_SUFFIX = ".class";
 
+    /** 检测是否引入javassist */
+    private static boolean JAVASSIST_SUPPORTED = false;
+
+    static {
+        try {
+            //check javassist jar
+            ClassUtil.loadClass("javassist.ClassPool");
+            JAVASSIST_SUPPORTED = true;
+        } catch (ClassNotFoundException ex) {
+            //ignore
+        }
+    }
+
     /**
      * 从指定的包名中获取所有Class的名称集合。
      *
@@ -183,5 +196,14 @@ public class ClassUtil {
      */
     public static Class<?> loadClass(String className) throws ClassNotFoundException {
         return Thread.currentThread().getContextClassLoader().loadClass(className);
+    }
+
+    /**
+     * 是否支持Javassist。
+     *
+     * @return 是否支持Javassist。
+     */
+    public static boolean isJavassistSupported() {
+        return JAVASSIST_SUPPORTED;
     }
 }

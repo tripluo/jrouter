@@ -1,7 +1,19 @@
 
 JROUTER CHANGELOG
 ==========================
-http://www.jrouter.net/
+http://jrouter.net/
+
+Changes in version 1.7.2 (2016-08-04)
+* 重命名Proxy接口为Invoker，避免于ActionProxy、AbstractProxy名称歧义。
+* 重命名ProxyFactory接口为MethodInvokerFactory。
+* 修正jrouter.bytecode.javassist包中的的类名。
+* 新增JavassistMethodChecker类，根据底层方法解析匹配指定字符串的方法检查器。
+* 配置jrouter.properties新增interceptorMethodChecker属性；检查interceptor方法体，匹配指定的字符串。
+* 修改MultiParameterConverter中追加参数匹配算法，同类型参数依顺序匹配。
+* 完善测试用例MultiParameterConverterTest。
+* 更新依赖包slf4j至 1.7.21.
+* 更新依赖包springframework至 4.3.2.
+
 
 Changes in version 1.7.1 (2016-02-22)
 ---------------------------------------

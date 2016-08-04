@@ -39,7 +39,7 @@ public class DefaultActionInvocation implements ActionInvocation {
     private static final Logger LOG = LoggerFactory.getLogger(DefaultActionInvocation.class);
 
     /** Action是否已调用 */
-    protected boolean executed = false;
+    private boolean executed = false;
 
     /** ActionFactory */
     private final ActionFactory actionFactory;
@@ -53,7 +53,8 @@ public class DefaultActionInvocation implements ActionInvocation {
     /** recursion invoke index */
     private int _index = 0;
 
-    private String actionPath;
+    /** Aciton调用的真实路径 */
+    private final String actionPath;
 
     /** 方法调用的参数 */
     private final Object[] originalParams;
@@ -77,13 +78,13 @@ public class DefaultActionInvocation implements ActionInvocation {
     /**
      * 构造一个Action运行时上下文的代理类，包含指定的ActionFactory、ActionProxy、Action路径的参数匹配映射及调用参数。
      *
+     * @param realPath Actino不含绑定参数的真实路径。
      * @param actionFactory Action工厂对象。
      * @param actionProxy Action代理对象。
      * @param originalParams Action代理对象中方法调用的原始参数。
      */
     public DefaultActionInvocation(String realPath, ActionFactory actionFactory,
-            DefaultActionProxy actionProxy,
-            Object... originalParams) {
+            DefaultActionProxy actionProxy, Object... originalParams) {
         this.actionPath = realPath;
         this.actionFactory = actionFactory;
         this.actionProxy = actionProxy;
@@ -130,11 +131,9 @@ public class DefaultActionInvocation implements ActionInvocation {
             LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
             //pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
             invokeResult = MethodUtil.invoke(interceptor, parameterConverter, null, getConvertParameters());
-        } else {
-            //action invoke
-            if (!executed) {
-                invokeActionOnly(params);
-            }
+        } else //action invoke
+        if (!executed) {
+            invokeActionOnly(params);
         }
         return invokeResult;
     }

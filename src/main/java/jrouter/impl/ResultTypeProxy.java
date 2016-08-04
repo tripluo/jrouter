@@ -31,10 +31,6 @@ public final class ResultTypeProxy extends DefaultProxy {
     /** 结果类型 */
     private final ResultType resultType;
 
-    /** 是否传递ActionInvocation参数 */
-    @Deprecated
-    private final boolean requireAction;
-
     /**
      * 构造一个结果类型的代理类，包含指定的结果类型、代理的方法及方法的对象。
      *
@@ -42,14 +38,12 @@ public final class ResultTypeProxy extends DefaultProxy {
      * @param resultType 所代理的结果类型。
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
-     * @param requireAction 结果类型调用是否传递ActionInvocation参数。
      */
     public ResultTypeProxy(ActionFactory actionFactory, ResultType resultType, Method method,
-            Object object, boolean requireAction) {
-        super(method, object, actionFactory.getProxyFactory());
+            Object object) {
+        super(method, object, actionFactory.getMethodInvokerFactory());
         this.resultType = resultType;
         this.type = resultType.type().trim();
-        this.requireAction = requireAction;
     }
 
     /**
@@ -68,16 +62,5 @@ public final class ResultTypeProxy extends DefaultProxy {
      */
     public ResultType getResultType() {
         return resultType;
-    }
-
-    /**
-     * 结果类型调用是否传递ActionInvocation参数。
-     *
-     * @return 结果类型的调用是否传递ActionInvocation参数。
-     *
-     * @deprecated since 1.6.6
-     */
-    public boolean isRequireAction() {
-        return requireAction;
     }
 }

@@ -20,8 +20,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import jrouter.AbstractProxy;
-import jrouter.Proxy;
-import jrouter.ProxyFactory;
+import jrouter.Invoker;
+import jrouter.MethodInvokerFactory;
 
 /**
  * 默认方法代理类实现，封装了调用代理方法时及异常的处理。
@@ -42,8 +42,8 @@ public class DefaultProxy extends AbstractProxy {
     /** 变长方法的空值 */
     private Object[] empty;
 
-    /** 调用底层方法的代理对象 */
-    private Proxy proxy;
+    /** 底层方法的调用对象 */
+    private Invoker invoker;
 
     /**
      * 指定方法及其对象的构造方法。
@@ -52,7 +52,7 @@ public class DefaultProxy extends AbstractProxy {
      * @param object 指定的对象。
      * @param proxyFactory 生成底层方法代理的工厂对象。
      */
-    public DefaultProxy(Method method, Object object, ProxyFactory proxyFactory) {
+    public DefaultProxy(Method method, Object object, MethodInvokerFactory proxyFactory) {
         super(method, object);
         this.varArgs = method.isVarArgs();
         if (varArgs) {
@@ -62,7 +62,7 @@ public class DefaultProxy extends AbstractProxy {
             empty = (Object[]) Array.newInstance(varArgClass, 0);
         }
         if (proxyFactory != null) {
-            this.proxy = proxyFactory.newInstance(method);
+            this.invoker = proxyFactory.newInstance(method);
         }
     }
 
@@ -106,11 +106,11 @@ public class DefaultProxy extends AbstractProxy {
     }
 
     /**
-     * 使用Java反射或代理对象调用底层方法。
+     * 使用Java反射或调用对象调用底层方法。
      *
      * @param <T> 方法调用后结果的类型。
      *
-     * @param method 底层的方法。
+     * @param method 底层方法。
      * @param obj 从中调用底层方法的对象。
      * @param params 用于方法调用的参数。
      *
@@ -118,7 +118,7 @@ public class DefaultProxy extends AbstractProxy {
      */
     private Object invoke(Method method, Object obj, Object... params) {
         try {
-            return proxy == null ? method.invoke(obj, params) : proxy.invoke(method, obj, params);
+            return invoker == null ? method.invoke(obj, params) : invoker.invoke(obj, params);
         } catch (IllegalAccessException e) {
             throw new InvocationProxyException(e, this);
         } catch (InvocationTargetException e) {

@@ -71,7 +71,7 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
      */
     public DefaultActionProxy(ActionFactory actionFactory, String namespace, String path,
             Action action, Method method, Object object) {
-        super(method, object, actionFactory.getProxyFactory());
+        super(method, object, actionFactory.getMethodInvokerFactory());
         this.actionFactory = actionFactory;
         this.namespace = namespace;
         this.path = path;

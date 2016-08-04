@@ -26,10 +26,10 @@ import jrouter.annotation.Dynamic;
 public interface ParameterConverter {
 
     /**
-     * 传递底层的方法、调用对象及原有的参数，返回转换处理后的调用参数。
+     * 传递底层方法、调用对象及原有的参数，返回转换处理后的调用参数。
      * 原调用参数由ActionFactory的invokeAction方法指定传递。
      *
-     * @param method 底层的方法。
+     * @param method 底层方法。
      * @param obj 从中调用底层方法的对象。
      * @param originalParams 用于方法调用的原始参数。
      * @param convertParams 提供给转换器的参数。

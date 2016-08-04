@@ -31,11 +31,11 @@ public interface ActionFactory {
     ObjectFactory getObjectFactory();
 
     /**
-     * 返回创建方法代理对象的工厂对象。
+     * 返回创建方法调用对象的工厂对象。
      *
-     * @return 创建方法代理对象的工厂对象。
+     * @return 创建方法调用对象的工厂对象。
      */
-    ProxyFactory getProxyFactory();
+    MethodInvokerFactory getMethodInvokerFactory();
 
     /**
      * 返回创建底层方法转换器的工厂对象。

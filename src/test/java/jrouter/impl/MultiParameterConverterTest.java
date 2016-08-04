@@ -79,9 +79,9 @@ public class MultiParameterConverterTest {
         assertArrayEquals(new Object[]{null, obj}, testConvertMethod(c, "test4", null, convert));  //match & fill null
         assertArrayEquals(new Object[]{str1, obj}, testConvertMethod(c, "test4", new Object[]{str1}, convert));  //original params & match
         convert = new Object[]{str1};
-        assertArrayEquals(new Object[]{str1, str1}, testConvertMethod(c, "test4", null, convert));  //match
+        assertArrayEquals(new Object[]{str1, null}, testConvertMethod(c, "test4", null, convert));  //match
         convert = new Object[]{str1, str2};
-        assertArrayEquals(new Object[]{str1, str1}, testConvertMethod(c, "test4", null, convert));  //match
+        assertArrayEquals(new Object[]{str1, str2}, testConvertMethod(c, "test4", null, convert));  //match
         assertArrayEquals(new Object[]{obj, sb2}, testConvertMethod(c, "test4", new Object[]{obj, sb2}, convert));  //original params
         assertArrayEquals(new Object[]{str2, sb2}, testConvertMethod(c, "test4", new Object[]{str2, sb2}, convert));  //original params
 
@@ -97,10 +97,10 @@ public class MultiParameterConverterTest {
         assertArrayEquals(new Object[]{null, null, null}, testConvertMethod(c, "test6", null, convert));  //no match & fill null
         assertArrayEquals(new Object[]{obj, null, null}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //original params & no match & fill null
         convert = new Object[]{str1, str2};
-        assertArrayEquals(new Object[]{str1, str1, str1}, testConvertMethod(c, "test6", null, convert));  //match
-        assertArrayEquals(new Object[]{obj, str1, str1}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //original params & match
+        assertArrayEquals(new Object[]{str1, str2, null}, testConvertMethod(c, "test6", null, convert));  //match
+        assertArrayEquals(new Object[]{obj, str1, str2}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //original params & match
         convert = new Object[]{sb1, sb2};
-        assertArrayEquals(new Object[]{sb1, sb1, null}, testConvertMethod(c, "test6", null, convert));  //match & fill null
+        assertArrayEquals(new Object[]{sb1, sb2, null}, testConvertMethod(c, "test6", null, convert));  //match & fill null
         assertArrayEquals(new Object[]{obj, sb1, null}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //original params & match & fill null
     }
 

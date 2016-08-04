@@ -37,6 +37,8 @@
                 bytecode = javassist
                 <!-- optional default -->
                 converterFactory = jrouter.impl.MultiParameterConverterFactory
+                <!-- optional default:null -->
+                interceptorMethodChecker = jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)
             </value>
         </property>
 

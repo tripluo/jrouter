@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import jrouter.ActionFactory;
+import jrouter.ConverterFactory;
 import jrouter.JRouterException;
 import jrouter.ObjectFactory;
 import jrouter.config.AopAction;
@@ -77,6 +78,9 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /** @see ActionFactory#getObjectFactory() */
     private ObjectFactory objectFactory;
+
+    /** @see ActionFactory#getConverterFactory() */
+    private ConverterFactory converterFactory;
 
     /**
      * @see Configuration#actionFactoryProperties
@@ -157,6 +161,10 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
             objectFactory = createDefaultObjectFactory(configuration);
         }
         actionFactoryProperties.put("objectFactory", objectFactory);
+
+        if (converterFactory != null) {
+            actionFactoryProperties.put("converterFactory", converterFactory);
+        }
         configuration.addActionFactoryProperties((Map) actionFactoryProperties);
 
         //添加扫描工具属性
@@ -481,8 +489,20 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     public void setObjectFactory(ObjectFactory objectFactory) {
         this.objectFactory = objectFactory;
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /**
+     * 设置ActionFactory中创建底层方法转换器的工厂对象。
+     *
+     * @param converterFactory ActionFactory中创建底层方法转换器的工厂对象。
+     *
+     * @see Configuration#addActionFactoryProperties(java.util.Map)
+     * @see ActionFactory#getConverterFactory()
+     */
+    public void setConverterFactory(ConverterFactory converterFactory) {
+        this.converterFactory = converterFactory;
+    }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 设置Action的bean名称和类名称的集合。
      *

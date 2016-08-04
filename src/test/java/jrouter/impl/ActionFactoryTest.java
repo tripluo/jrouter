@@ -21,7 +21,7 @@ import java.util.Map;
 import jrouter.ActionProxy;
 import jrouter.JRouterException;
 import jrouter.SimpleAction;
-import jrouter.bytecode.javassist.JavassistProxyFactory;
+import jrouter.bytecode.javassist.JavassistMethodInvokerFactory;
 import jrouter.config.Configuration;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.SampleInterceptor;
@@ -104,6 +104,36 @@ public class ActionFactoryTest {
     public void test_parseMatch() throws Exception {
         java.lang.reflect.Method method = DefaultActionFactory.class.getDeclaredMethod("parseMatch", String.class, String[].class);
         method.setAccessible(true);
+        String[] emptyDefaults = new String[]{"", ""};
+
+        String[] nullDefaults = new String[]{null, null};
+        assertArrayEquals(new String[]{"", ""}, (String[]) method.invoke(null, "  ", nullDefaults));
+        assertArrayEquals(new String[]{"", ""}, (String[]) method.invoke(null, "", nullDefaults));
+        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, "abc", nullDefaults));
+        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, "  abc", nullDefaults));
+        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, "abc ", nullDefaults));
+        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, " abc  ", nullDefaults));
+
+        assertArrayEquals(new String[]{"1", ""}, (String[]) method.invoke(null, "1:", nullDefaults));
+        assertArrayEquals(new String[]{"1", ""}, (String[]) method.invoke(null, "1 :", nullDefaults));
+        assertArrayEquals(new String[]{"1", ""}, (String[]) method.invoke(null, "1 :  ", nullDefaults));
+        assertArrayEquals(new String[]{"", "1"}, (String[]) method.invoke(null, ":1", nullDefaults));
+        assertArrayEquals(new String[]{"", "1"}, (String[]) method.invoke(null, " :1", nullDefaults));
+        assertArrayEquals(new String[]{"", "1"}, (String[]) method.invoke(null, ": 1  ", nullDefaults));
+        assertArrayEquals(new String[]{"", "123"}, (String[]) method.invoke(null, ":123", nullDefaults));
+        assertArrayEquals(new String[]{"", "123"}, (String[]) method.invoke(null, "  :123  ", nullDefaults));
+        assertArrayEquals(new String[]{"", "123"}, (String[]) method.invoke(null, ":  123  ", nullDefaults));
+        assertArrayEquals(new String[]{"", "123"}, (String[]) method.invoke(null, "   :  123   ", nullDefaults));
+        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "abc:123  ", nullDefaults));
+        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "abc    :123  ", nullDefaults));
+        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc:123 ", nullDefaults));
+        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc    :123 ", nullDefaults));
+        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc    :   123 ", nullDefaults));
+        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, "   abc    :", nullDefaults));
+        assertArrayEquals(emptyDefaults, (String[]) method.invoke(null, ":", nullDefaults));
+        assertArrayEquals(emptyDefaults, (String[]) method.invoke(null, " : ", nullDefaults));
+        assertArrayEquals(emptyDefaults, (String[]) method.invoke(null, "    :   ", nullDefaults));
+
         String defaultType = "defaultType";
         String defaultLoc = "defaultLoc";
         String[] defaults = new String[]{defaultType, defaultLoc};
@@ -126,6 +156,7 @@ public class ActionFactoryTest {
         assertArrayEquals(defaults, (String[]) method.invoke(null, ":", defaults));
         assertArrayEquals(defaults, (String[]) method.invoke(null, " : ", defaults));
         assertArrayEquals(defaults, (String[]) method.invoke(null, "    :   ", defaults));
+
     }
 
     /**
@@ -146,7 +177,7 @@ public class ActionFactoryTest {
         assertNotNull(ap.getAction());
         assertTrue(ap.getInterceptorProxies().isEmpty());
         assertNotNull(ap.getResults());
-        assertTrue(factory.getProxyFactory() instanceof JavassistProxyFactory);
+        assertTrue(factory.getMethodInvokerFactory() instanceof JavassistMethodInvokerFactory);
 
         ap.invoke();
 
