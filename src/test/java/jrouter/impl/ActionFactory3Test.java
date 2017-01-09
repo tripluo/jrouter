@@ -33,10 +33,10 @@ import static org.junit.Assert.*;
 public class ActionFactory3Test {
 
     //factory1
-    private DefaultActionFactory factory1;
+    private PathActionFactory factory1;
 
     //factory2
-    private DefaultActionFactory factory2;
+    private PathActionFactory factory2;
 
     //extension for factory1
     private String extension1 = ".do";
@@ -50,7 +50,7 @@ public class ActionFactory3Test {
         //set extension
         props1.put("extension", ".");
 
-        factory1 = new DefaultActionFactory(props1);
+        factory1 = new PathActionFactory(props1);
 
         //interceptor
         factory1.addInterceptors(SampleInterceptor.class);
@@ -69,7 +69,7 @@ public class ActionFactory3Test {
         //set extension
         props2.put("extension", extension2);
 
-        factory2 = new DefaultActionFactory(props2);
+        factory2 = new PathActionFactory(props2);
 
         //interceptor
         factory2.addInterceptors(SampleInterceptor.class);

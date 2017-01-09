@@ -21,7 +21,7 @@ import java.util.Map;
 import jrouter.ObjectFactory;
 import jrouter.SimpleAction;
 import jrouter.URLTestAction2;
-import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.PathActionFactory;
 import jrouter.interceptor.DemoInterceptor;
 import org.junit.After;
 import static org.junit.Assert.*;
@@ -39,8 +39,8 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = {"classpath:jrouter-spring_test.xml"})
 public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
 
-    //DefaultActionFactory
-    private DefaultActionFactory factory;
+    //PathActionFactory
+    private PathActionFactory factory;
 
     //ObjectFactory
     private ObjectFactory objectFactory;
@@ -53,7 +53,7 @@ public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("objectFactory", objectFactory);
         //create ActionFactory not by springframework
-        factory = new DefaultActionFactory(props);
+        factory = new PathActionFactory(props);
 
         factory.addInterceptors(DemoInterceptor.class);
         factory.addInterceptorStacks(DemoInterceptor.class);

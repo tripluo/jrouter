@@ -2,7 +2,7 @@
 <configuration>
     <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
-            <pattern>/* [%p] %logger %line */ %date{yyyy-MM-dd HH:mm:ss} %n%m%n</pattern>
+            <pattern>%d{HH:mm:ss.SSS}|%p|%thread|%logger %line%n%m%n</pattern>
         </encoder>
     </appender>
     <root level="DEBUG">

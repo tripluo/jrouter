@@ -37,7 +37,7 @@ import org.junit.Test;
  */
 public class ActionFactoryTest {
 
-    private DefaultActionFactory factory;
+    private PathActionFactory factory;
 
     /**
      * 初始化Configuration。
@@ -73,7 +73,7 @@ public class ActionFactoryTest {
         Map<String, Object> props = new HashMap<String, Object>();
         //set extension
         props.put("extension", ".do");
-        factory = new DefaultActionFactory(props);
+        factory = new PathActionFactory(props);
 
         //interceptor
         factory.addInterceptors(SampleInterceptor.class);
@@ -98,11 +98,11 @@ public class ActionFactoryTest {
      *
      * @throws Exception 如果发生异常。
      *
-     * @see DefaultActionFactory#parseMatch(java.lang.String, java.lang.String[])
+     * @see PathActionFactory#parseMatch(java.lang.String, java.lang.String[])
      */
     @Test
     public void test_parseMatch() throws Exception {
-        java.lang.reflect.Method method = DefaultActionFactory.class.getDeclaredMethod("parseMatch", String.class, String[].class);
+        java.lang.reflect.Method method = PathActionFactory.class.getDeclaredMethod("parseMatch", String.class, String[].class);
         method.setAccessible(true);
         String[] emptyDefaults = new String[]{"", ""};
 
@@ -171,7 +171,7 @@ public class ActionFactoryTest {
         //简单调用
         String url1 = "/test/simple";
 
-        DefaultActionProxy ap = factory.getActions().get(url1);
+        PathActionProxy ap = factory.getActions().get(url1);
 
         assertNotNull(ap);
         assertNotNull(ap.getAction());
@@ -434,7 +434,7 @@ public class ActionFactoryTest {
     /**
      * 测试ActionFactory的converterFactory属性。
      *
-     * @see DefaultActionFactory#converterFactory
+     * @see PathActionFactory#converterFactory
      * @see jrouter.impl.MultiParameterConverterFactory
      */
     @Test

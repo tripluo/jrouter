@@ -97,29 +97,29 @@ public class MultiParameterConverterFactory implements ConverterFactory {
     public class MultiParameterConverter implements ParameterConverter {
 
         @Override
-        public Object[] convert(Method method, Object obj, Object[] originalParams,
+        public Object[] convert(Method method, Object obj, Object[] invokeParams,
                 Object[] convertParams) throws JRouterException {
             if (convertParams == null || convertParams.length == 0)
-                return originalParams;
+                return invokeParams;
             Class<?>[] parameterTypes = method.getParameterTypes();
-            int originalSize = parameterTypes.length;
+            int paramSize = parameterTypes.length;
             //变长或原本无参数的方法
-            if (method.isVarArgs() || originalSize == 0) {
-                return originalParams;
+            if (method.isVarArgs() || paramSize == 0) {
+                return invokeParams;
             }
-            int pLen = (originalParams == null ? 0 : originalParams.length);
+            int invokeSize = (invokeParams == null ? 0 : invokeParams.length);
             //保留原参数，追加支持的绑定参数
-            if (originalSize > pLen) {
-                Object[] newArgs = new Object[originalSize];
-                if (pLen > 0)
-                    System.arraycopy(originalParams, 0, newArgs, 0, pLen);
-                int[] idx = match(method, pLen, parameterTypes, convertParams);
-                for (int i = pLen; i < originalSize; i++) {
+            if (paramSize > invokeSize) {
+                Object[] newArgs = new Object[paramSize];
+                if (invokeSize > 0)
+                    System.arraycopy(invokeParams, 0, newArgs, 0, invokeSize);
+                int[] idx = match(method, invokeSize, parameterTypes, convertParams);
+                for (int i = invokeSize; i < paramSize; i++) {
                     newArgs[i] = (idx[i] == -1 ? null : convertParams[idx[i]]);
                 }
                 return newArgs;
             }
-            return originalParams;
+            return invokeParams;
         }
 
         /**

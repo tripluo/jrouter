@@ -17,6 +17,7 @@
 package jrouter.spring;
 
 import jrouter.ObjectFactory;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -84,5 +85,10 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
      */
     public void setAutowireMode(int autowireMode) {
         this.autowireMode = autowireMode;
+    }
+
+    @Override
+    public Class<?> getClass(Object obj) {
+        return AopProxyUtils.ultimateTargetClass(obj);
     }
 }

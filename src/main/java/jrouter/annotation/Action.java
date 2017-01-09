@@ -49,7 +49,7 @@ import java.lang.annotation.Target;
 public @interface Action {
 
     /**
-     * Action名称，可多个路径映射同一个Aciton。
+     * Action名称，可多个路径映射同一个Action。
      * 等同于{@link #name()}，name属性非空时优先选取name值，当仅需要name属性时提供便捷的注解方式。
      *
      * @return Action名称。

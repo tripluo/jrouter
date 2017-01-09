@@ -31,14 +31,14 @@ import org.junit.Test;
  */
 public class ActionFactory4Test {
 
-    private DefaultActionFactory factory;
+    private PathActionFactory factory;
 
     @Before
     public void init() {
         Map<String, Object> props = new HashMap<String, Object>();
         props.put("defaultInterceptorStack", DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK);
 
-        factory = new DefaultActionFactory(props);
+        factory = new PathActionFactory(props);
 
         assertEquals(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK, factory.getDefaultInterceptorStack());
 
@@ -61,18 +61,18 @@ public class ActionFactory4Test {
      */
     @Test
     public void testActionInterceptors() {
-        DefaultActionProxy ap11 = factory.getActions().get("/test1/1");
-        DefaultActionProxy ap12 = factory.getActions().get("/test1/2");
-        DefaultActionProxy ap13 = factory.getActions().get("/test1/3");
+        PathActionProxy ap11 = factory.getActions().get("/test1/1");
+        PathActionProxy ap12 = factory.getActions().get("/test1/2");
+        PathActionProxy ap13 = factory.getActions().get("/test1/3");
 
         assertEquals(ap11.getInterceptorProxies(), factory.getInterceptorStacks().get(factory.getDefaultInterceptorStack()).getInterceptors());
         assertEquals(ap12.getInterceptorProxies(), factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
         assertEquals(1, ap13.getInterceptorProxies().size());
         assertEquals(ap13.getInterceptorProxies().get(0).getName(), SampleInterceptor.TIMER);
 
-        DefaultActionProxy ap21 = factory.getActions().get("/test2/1");
-        DefaultActionProxy ap22 = factory.getActions().get("/test2/2");
-        DefaultActionProxy ap23 = factory.getActions().get("/test2/3");
+        PathActionProxy ap21 = factory.getActions().get("/test2/1");
+        PathActionProxy ap22 = factory.getActions().get("/test2/2");
+        PathActionProxy ap23 = factory.getActions().get("/test2/3");
 
         assertEquals(0, ap21.getInterceptorProxies().size());
         assertEquals(ap21.getInterceptorProxies(), factory.getInterceptorStacks().get(DefaultInterceptorStack.EMPTY_INTERCEPTOR_STACK).getInterceptors());
@@ -81,9 +81,9 @@ public class ActionFactory4Test {
         assertEquals(ap23.getInterceptorProxies().get(0).getName(), SampleInterceptor.TIMER);
 
 
-        DefaultActionProxy ap31 = factory.getActions().get("/test3/1");
-        DefaultActionProxy ap32 = factory.getActions().get("/test3/2");
-        DefaultActionProxy ap33 = factory.getActions().get("/test3/3");
+        PathActionProxy ap31 = factory.getActions().get("/test3/1");
+        PathActionProxy ap32 = factory.getActions().get("/test3/2");
+        PathActionProxy ap33 = factory.getActions().get("/test3/3");
 
         assertEquals(1, ap31.getInterceptorProxies().size());
         assertEquals(ap31.getInterceptorProxies().get(0).getName(), SampleInterceptor.LOGGING);

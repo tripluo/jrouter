@@ -29,8 +29,8 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import jrouter.ActionFactory;
 import jrouter.config.AopAction.Type;
-import jrouter.impl.DefaultActionFactory;
-import jrouter.impl.DefaultActionProxy;
+import jrouter.impl.PathActionFactory;
+import jrouter.impl.PathActionProxy;
 import jrouter.impl.Injector;
 import jrouter.impl.InterceptorProxy;
 import jrouter.util.AntPathMatcher;
@@ -53,7 +53,7 @@ import org.xml.sax.SAXParseException;
  * 通过Configuration类加载jrouter的配置文件（默认为jrouter.xml）初始化ActionFactory及加载相应的属性配置，最终得到ActionFactory具体实例。
  *
  * <p>
- * 如果jrouter.xml中未指明ActionFactory的具体实现类，则默认使用{@link DefaultActionFactory
+ * 如果jrouter.xml中未指明ActionFactory的具体实现类，则默认使用{@link PathActionFactory
  * }。
  * </p>
  *
@@ -169,8 +169,8 @@ public class Configuration implements Serializable {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /* ActionFactory的类型，默热为DefaultActionFactory类型 */
-    private Class<? extends ActionFactory> actionFactoryClass = DefaultActionFactory.class;
+    /* ActionFactory的类型，默热为PathActionFactory类型 */
+    private Class<? extends ActionFactory> actionFactoryClass = PathActionFactory.class;
 
     /** ActionFactory的属性 */
     private Map<String, Object> actionFactoryProperties;
@@ -915,8 +915,8 @@ public class Configuration implements Serializable {
             }
             printSeparator(true);
 
-            if (factory instanceof DefaultActionFactory) {
-                DefaultActionFactory defaultFactory = (DefaultActionFactory) factory;
+            if (factory instanceof PathActionFactory) {
+                PathActionFactory defaultFactory = (PathActionFactory) factory;
 
                 //先加载指定配置的类，再加载自动搜索的类
                 //排除指定配置的类
@@ -1048,14 +1048,14 @@ public class Configuration implements Serializable {
                     //倒序，最后匹配的路径优先
                     for (int i = aopActions.size() - 1; i > -1; i--) {
                         in:
-                        for (Map.Entry<String, DefaultActionProxy> e : defaultFactory.getActions().entrySet()) {
+                        for (Map.Entry<String, PathActionProxy> e : defaultFactory.getActions().entrySet()) {
                             AopAction aa = aopActions.get(i);
                             String path = e.getKey();
                             if (matcher.match(aa.getMatches(), path)) {
                                 if (existMatchPaths.contains(path))
                                     continue in;
                                 existMatchPaths.add(path);
-                                //exist can't be null by DefaultActionFactory
+                                //exist can't be null by PathActionFactory
                                 List<InterceptorProxy> exist = e.getValue().getInterceptorProxies();
                                 List<InterceptorProxy> news = new ArrayList<InterceptorProxy>();
                                 //TODO
@@ -1224,7 +1224,7 @@ public class Configuration implements Serializable {
      *
      * @return 此配置对象的引用。
      *
-     * @see DefaultActionFactory
+     * @see PathActionFactory
      */
     public Configuration addActionFactoryProperties(Map<String, Object> actionFactoryProperties) {
         this.actionFactoryProperties.putAll(actionFactoryProperties);

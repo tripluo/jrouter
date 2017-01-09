@@ -190,7 +190,7 @@ public class MethodUtil {
      *
      * @param proxy AbstractProxy子对象。
      * @param converter 转换底层方法调用参数的转换器。
-     * @param originalParams 用于方法调用的原始参数。
+     * @param invokeParams 用于方法调用的原始参数。
      * @param additionalParams 提供给转换器的参数。
      *
      * @return AbstractProxy子对象底层方法调用后的结果。
@@ -198,10 +198,10 @@ public class MethodUtil {
      * @see AbstractProxy#invoke(java.lang.Object...)
      */
     public static Object invoke(AbstractProxy proxy, ParameterConverter converter,
-            Object[] originalParams, Object[] additionalParams) {
+            Object[] invokeParams, Object[] additionalParams) {
         return converter == null
-                ? proxy.invoke(originalParams)
-                : proxy.invoke(converter.convert(proxy.getMethod(), proxy, originalParams, additionalParams));
+                ? proxy.invoke(invokeParams)
+                : proxy.invoke(converter.convert(proxy.getMethod(), proxy, invokeParams, additionalParams));
     }
 
     /**

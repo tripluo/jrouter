@@ -34,7 +34,7 @@ import org.junit.Test;
  */
 public class PathActionFactoryTest {
 
-    private DefaultActionFactory factory;
+    private PathActionFactory factory;
 
     @Before
     public void init() {
@@ -47,7 +47,7 @@ public class PathActionFactoryTest {
 
         //default result
         props.put("defaultResultType", DefaultResult.EMPTY);
-        factory = new DefaultActionFactory(props);
+        factory = new PathActionFactory(props);
 
         //interceptor
         factory.addInterceptors(new DemoThreadActionContextInterceptor(false));
@@ -167,7 +167,7 @@ public class PathActionFactoryTest {
      * @return 返回Action路径匹配的键值映射。
      */
     private Map<String, String> getActionPathParameters() {
-        return ((DefaultActionInvocation) DemoThreadActionContextInterceptor.get()).getActionPathParameters();
+        return ((PathActionInvocation) DemoThreadActionContextInterceptor.get()).getActionPathParameters();
     }
 
     /**

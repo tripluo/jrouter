@@ -23,7 +23,7 @@ import jrouter.annotation.Namespace;
 import jrouter.annotation.Parameter;
 import jrouter.annotation.Result;
 import jrouter.annotation.Scope;
-import jrouter.impl.DefaultActionInvocation;
+import jrouter.impl.PathActionInvocation;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;
@@ -242,7 +242,7 @@ public class SimpleAction {
      * @see jrouter.impl.LastPadParameterFactory
      */
     @Action
-    public String lastPadParameter(ActionInvocation invocation) {
+    public String lastPadParameter(ActionInvocation<String> invocation) {
         Assert.assertNotNull(invocation);
         return invocation.getActionPath();
     }
@@ -253,7 +253,7 @@ public class SimpleAction {
      * @see jrouter.impl.MultiParameterConverterFactory
      */
     @Action
-    public String lastPadParameter2(String test, DefaultActionInvocation invocation) {
+    public String lastPadParameter2(String test, PathActionInvocation invocation) {
         Assert.assertNotNull(invocation);
         return test + invocation.getActionPath();
     }

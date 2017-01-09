@@ -28,7 +28,7 @@ import jrouter.JRouterException;
 import jrouter.ObjectFactory;
 import jrouter.config.AopAction;
 import jrouter.config.Configuration;
-import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.PathActionFactory;
 import jrouter.util.AntPathMatcher;
 import jrouter.util.ClassUtil;
 import jrouter.util.CollectionUtil;
@@ -84,7 +84,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /**
      * @see Configuration#actionFactoryProperties
-     * @see jrouter.impl.DefaultActionFactory#setActionFactoryProperties(java.util.Map)
+     * @see jrouter.impl.PathActionFactory#setActionFactoryProperties(java.util.Map)
      */
     private Properties actionFactoryProperties = new Properties();
 
@@ -272,14 +272,14 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * 未设置actionFactoryClass属性时，提供默认的{@code DefaultActionFactory.class}属性。
+     * 未设置actionFactoryClass属性时，提供默认的{@code PathActionFactory.class}属性。
      *
      * @param config Configuration对象。
      *
      * @see #setActionFactoryClass(java.lang.Class)
      */
     protected void setDefaultActionFactoryClass(Configuration config) {
-        config.setActionFactoryClass(DefaultActionFactory.class);
+        config.setActionFactoryClass(PathActionFactory.class);
     }
 
     /**
@@ -472,7 +472,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      * @param actionFactoryProperties ActionFactory的属性映射集合。
      *
      * @see Configuration#addActionFactoryProperties(java.util.Map)
-     * @see jrouter.impl.DefaultActionFactory#setActionFactoryProperties(java.util.Map)
+     * @see jrouter.impl.PathActionFactory#setActionFactoryProperties(java.util.Map)
      */
     public void setActionFactoryProperties(Properties actionFactoryProperties) {
         this.actionFactoryProperties = actionFactoryProperties;

@@ -3,13 +3,13 @@
          xsi:noNamespaceSchemaLocation="jrouter-1.6.xsd">
 
     <!-- optional default -->
-    <action-factory class="jrouter.impl.DefaultActionFactory">
+    <action-factory class="jrouter.impl.PathActionFactory">
         <!-- optional default:null -->
         <property name="defaultInterceptorStack" value="empty"/>
         <!-- optional default:null -->
         <property name="defaultResultType" value="empty"/>
         <!-- optional default deprecated since 1.6.6 -->
-        <!--<property name="actionInvocationClass" value="jrouter.impl.DefaultActionInvocation"/>-->
+        <!--<property name="actionInvocationClass" value="jrouter.impl.PathActionInvocation"/>-->
         <!-- optional default -->
         <property name="pathSeparator" value="/"/>
         <!-- optional default -->

@@ -18,10 +18,11 @@ package jrouter.impl;
 
 import java.lang.reflect.Method;
 import jrouter.ActionFactory;
+import jrouter.annotation.Action;
 import jrouter.annotation.Interceptor;
 
 /**
- * 拦截器的代理类，包括了拦截器的名称及在对Action做拦截调用时是否将Action的运行时状态作为参数传递等信息。
+ * 拦截器的代理类，包括了拦截器的名称及在对{@link Action}做拦截调用时是否将{@link Action}的运行时状态作为参数传递等信息。
  */
 public final class InterceptorProxy extends DefaultProxy {
 

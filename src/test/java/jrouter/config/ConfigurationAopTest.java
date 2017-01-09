@@ -17,7 +17,7 @@
 package jrouter.config;
 
 import java.util.List;
-import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.PathActionFactory;
 import jrouter.impl.InterceptorProxy;
 import org.junit.After;
 import org.junit.Assert;
@@ -30,7 +30,7 @@ public class ConfigurationAopTest extends Assert {
 
     private Configuration config = new Configuration().load("/jrouter_aop.xml");
 
-    private DefaultActionFactory factory = config.buildActionFactory();
+    private PathActionFactory factory = config.buildActionFactory();
 
     @After
     public void tearDown() {

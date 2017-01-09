@@ -17,7 +17,7 @@
 package jrouter.spring;
 
 import java.util.List;
-import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.PathActionFactory;
 import jrouter.impl.InterceptorProxy;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -38,7 +38,7 @@ public class DefaultActionFactoryBeanAopTest {
     //singleton ActionFactory
     @Autowired
     @Qualifier("actionFactoryTest")
-    private DefaultActionFactory factory;
+    private PathActionFactory factory;
 
     @Before
     public void setUp() {
@@ -51,7 +51,7 @@ public class DefaultActionFactoryBeanAopTest {
     @Test
     public void test_aopAction() {
 
-        assertSame(DefaultActionFactory.class, factory.getClass());
+        assertSame(PathActionFactory.class, factory.getClass());
         assertSame(SpringObjectFactory.class, factory.getObjectFactory().getClass());
 
         assertInterceptorProxies("/test/param", "[timer, timer, springInject, logging]");

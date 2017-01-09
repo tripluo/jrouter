@@ -30,7 +30,7 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.7.2</version>
+    <version>1.7.3</version>
 </dependency>
 ```
 
@@ -41,7 +41,7 @@
     <!-- optional default:null -->
     <property name="configLocation" value="classpath:jrouter.xml" />
     <!-- optional default -->
-    <property name="actionFactoryClass" value="jrouter.impl.DefaultActionFactory"/>
+    <property name="actionFactoryClass" value="jrouter.impl.PathActionFactory"/>
     <!-- optional default -->
     <property name="objectFactory">
         <bean class="jrouter.spring.SpringObjectFactory"/>
@@ -50,7 +50,7 @@
     <property name="actionFactoryProperties">
         <value>
             <!-- optional default:null deprecated since 1.6.6 -->
-            <!--actionInvocationClass = jrouter.impl.DefaultActionInvocation-->
+            <!--actionInvocationClass = jrouter.impl.PathActionInvocation-->
             <!-- optional default:null -->
             defaultInterceptorStack = empty
             <!-- optional default:null -->

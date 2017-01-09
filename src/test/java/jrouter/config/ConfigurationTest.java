@@ -17,7 +17,7 @@
 package jrouter.config;
 
 import jrouter.ActionFactory;
-import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.PathActionFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class ConfigurationTest extends Assert {
         factory = config.buildActionFactory();
 
         assertNotNull(factory);
-        assertSame(DefaultActionFactory.class, factory.getClass());
+        assertSame(PathActionFactory.class, factory.getClass());
         assertNotNull(factory.getActions());
         assertNotNull(factory.getDefaultInterceptorStack());
         assertNotNull(factory.getDefaultResultType());

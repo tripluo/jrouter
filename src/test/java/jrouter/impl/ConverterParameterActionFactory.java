@@ -27,7 +27,7 @@ import jrouter.annotation.Result;
 /**
  * 测试ActionFactory的ConverterFactory传递参数的扩展性。
  */
-public class ConverterParameterActionFactory extends DefaultActionFactory {
+public class ConverterParameterActionFactory extends PathActionFactory {
 
     public ConverterParameterActionFactory(Map<String, Object> properties) {
         super(properties);
@@ -35,7 +35,7 @@ public class ConverterParameterActionFactory extends DefaultActionFactory {
 
     @Override
     protected ActionInvocation createActionInvocation(String path, Object... params) {
-        ActionInvocation ai = super.createActionInvocation(path, params);
+        ActionInvocation<String> ai = super.createActionInvocation(path, params);
         DemoActionInvocation invocation = new DefaultDemoActionInvocation("demo", ai);
         //重设调用ActionInvocation的参数转换器
         ai.setParameterConverter(invocation.getActionFactory().getConverterFactory().getParameterConverter(invocation));
@@ -47,7 +47,7 @@ public class ConverterParameterActionFactory extends DefaultActionFactory {
     /**
      * 自定义扩展ActionInvocation接口。
      */
-    public static interface DemoActionInvocation extends ActionInvocation {
+    public static interface DemoActionInvocation extends ActionInvocation<String> {
 
         String getName();
     }
@@ -61,9 +61,9 @@ public class ConverterParameterActionFactory extends DefaultActionFactory {
         private final String name;
 
         /* 代理的ActionInvocation */
-        private final ActionInvocation invocation;
+        private final ActionInvocation<String> invocation;
 
-        public DefaultDemoActionInvocation(String name, ActionInvocation invocation) {
+        public DefaultDemoActionInvocation(String name, ActionInvocation<String> invocation) {
             this.name = name;
             this.invocation = invocation;
         }

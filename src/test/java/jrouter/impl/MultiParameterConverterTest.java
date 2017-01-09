@@ -43,73 +43,73 @@ public class MultiParameterConverterTest {
         Object[] convert = null;
         //test()
         convert = new Object[]{obj};
-        assertArrayEquals(null, testConvertMethod(c, "test", null, convert));  //original params
-        assertArrayEquals(new Object[0], testConvertMethod(c, "test", new Object[0], convert));  //original params
+        assertArrayEquals(null, testConvertMethod(c, "test", null, convert));  //invoke params
+        assertArrayEquals(new Object[0], testConvertMethod(c, "test", new Object[0], convert));  //invoke params
 
         //test1(Object obj)
         assertArrayEquals(new Object[]{obj}, testConvertMethod(c, "test1", null, convert));  //match
-        assertArrayEquals(new Object[]{str1}, testConvertMethod(c, "test1", new Object[]{str1}, convert));  //original params
+        assertArrayEquals(new Object[]{str1}, testConvertMethod(c, "test1", new Object[]{str1}, convert));  //invoke params
 
         convert = new Object[]{str1};
         assertArrayEquals(new Object[]{str1}, testConvertMethod(c, "test1", null, convert));  //match
-        assertArrayEquals(new Object[]{str1}, testConvertMethod(c, "test1", new Object[]{str1}, convert)); //original params
-        assertArrayEquals(new Object[]{str2}, testConvertMethod(c, "test1", new Object[]{str2}, convert)); //original params
+        assertArrayEquals(new Object[]{str1}, testConvertMethod(c, "test1", new Object[]{str1}, convert)); //invoke params
+        assertArrayEquals(new Object[]{str2}, testConvertMethod(c, "test1", new Object[]{str2}, convert)); //invoke params
 
         //test2(String str)
         convert = new Object[]{obj, sb1};
         assertArrayEquals(new Object[]{null}, testConvertMethod(c, "test2", null, convert));  //no match fill null
-        assertArrayEquals(new Object[]{obj}, testConvertMethod(c, "test2", new Object[]{obj}, convert));  //original params
+        assertArrayEquals(new Object[]{obj}, testConvertMethod(c, "test2", new Object[]{obj}, convert));  //invoke params
         convert = new Object[]{str1};
         assertArrayEquals(new Object[]{str1}, testConvertMethod(c, "test2", null, convert));  //match
-        assertArrayEquals(new Object[]{obj}, testConvertMethod(c, "test2", new Object[]{obj}, convert));  //original params
+        assertArrayEquals(new Object[]{obj}, testConvertMethod(c, "test2", new Object[]{obj}, convert));  //invoke params
 
         //test3(Object obj, String str)
         convert = new Object[]{obj};
         assertArrayEquals(new Object[]{obj, null}, testConvertMethod(c, "test3", null, convert));  //match & fill null
-        assertArrayEquals(new Object[]{str1, null}, testConvertMethod(c, "test3", new Object[]{str1}, convert));  //original params & no match
-        assertArrayEquals(new Object[]{str1, str2}, testConvertMethod(c, "test3", new Object[]{str1, str2}, convert));  //original params
+        assertArrayEquals(new Object[]{str1, null}, testConvertMethod(c, "test3", new Object[]{str1}, convert));  //invoke params & no match
+        assertArrayEquals(new Object[]{str1, str2}, testConvertMethod(c, "test3", new Object[]{str1, str2}, convert));  //invoke params
 
         convert = new Object[]{obj, str2};
         assertArrayEquals(new Object[]{obj, str2}, testConvertMethod(c, "test3", null, convert));  //match
-        assertArrayEquals(new Object[]{str1, str2}, testConvertMethod(c, "test3", new Object[]{str1}, convert));  //original params & match
-        assertArrayEquals(new Object[]{str1, str2}, testConvertMethod(c, "test3", new Object[]{str1, str2}, convert));  //original params
+        assertArrayEquals(new Object[]{str1, str2}, testConvertMethod(c, "test3", new Object[]{str1}, convert));  //invoke params & match
+        assertArrayEquals(new Object[]{str1, str2}, testConvertMethod(c, "test3", new Object[]{str1, str2}, convert));  //invoke params
 
         //test4(String str, Object obj)
         convert = new Object[]{obj};
         assertArrayEquals(new Object[]{null, obj}, testConvertMethod(c, "test4", null, convert));  //match & fill null
-        assertArrayEquals(new Object[]{str1, obj}, testConvertMethod(c, "test4", new Object[]{str1}, convert));  //original params & match
+        assertArrayEquals(new Object[]{str1, obj}, testConvertMethod(c, "test4", new Object[]{str1}, convert));  //invoke params & match
         convert = new Object[]{str1};
         assertArrayEquals(new Object[]{str1, null}, testConvertMethod(c, "test4", null, convert));  //match
         convert = new Object[]{str1, str2};
         assertArrayEquals(new Object[]{str1, str2}, testConvertMethod(c, "test4", null, convert));  //match
-        assertArrayEquals(new Object[]{obj, sb2}, testConvertMethod(c, "test4", new Object[]{obj, sb2}, convert));  //original params
-        assertArrayEquals(new Object[]{str2, sb2}, testConvertMethod(c, "test4", new Object[]{str2, sb2}, convert));  //original params
+        assertArrayEquals(new Object[]{obj, sb2}, testConvertMethod(c, "test4", new Object[]{obj, sb2}, convert));  //invoke params
+        assertArrayEquals(new Object[]{str2, sb2}, testConvertMethod(c, "test4", new Object[]{str2, sb2}, convert));  //invoke params
 
         //test5(String str, StringBuilder sb)
         convert = new Object[]{obj};
         assertArrayEquals(new Object[]{null, null}, testConvertMethod(c, "test5", null, convert));  //no match & fill null
         convert = new Object[]{sb1};
         assertArrayEquals(new Object[]{null, sb1}, testConvertMethod(c, "test5", null, convert));  //match & fill null
-        assertArrayEquals(new Object[]{obj, sb1}, testConvertMethod(c, "test5", new Object[]{obj}, convert));  //original params & match
+        assertArrayEquals(new Object[]{obj, sb1}, testConvertMethod(c, "test5", new Object[]{obj}, convert));  //invoke params & match
 
         //test6(CharSequence s1, CharSequence s2, String obj)
         convert = new Object[]{obj};
         assertArrayEquals(new Object[]{null, null, null}, testConvertMethod(c, "test6", null, convert));  //no match & fill null
-        assertArrayEquals(new Object[]{obj, null, null}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //original params & no match & fill null
+        assertArrayEquals(new Object[]{obj, null, null}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //invoke params & no match & fill null
         convert = new Object[]{str1, str2};
         assertArrayEquals(new Object[]{str1, str2, null}, testConvertMethod(c, "test6", null, convert));  //match
-        assertArrayEquals(new Object[]{obj, str1, str2}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //original params & match
+        assertArrayEquals(new Object[]{obj, str1, str2}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //invoke params & match
         convert = new Object[]{sb1, sb2};
         assertArrayEquals(new Object[]{sb1, sb2, null}, testConvertMethod(c, "test6", null, convert));  //match & fill null
-        assertArrayEquals(new Object[]{obj, sb1, null}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //original params & match & fill null
+        assertArrayEquals(new Object[]{obj, sb1, null}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //invoke params & match & fill null
     }
 
     /**
      * @see MultiParameterConverter#convert(java.lang.reflect.Method, java.lang.Object, java.lang.Object[], java.lang.Object[])
      */
     private static Object[] testConvertMethod(MultiParameterConverter converter, String method,
-            Object[] originalParams, Object[] convertParams) throws JRouterException {
-        return converter.convert(TestAction.TEST_METHODS.get(method), null, originalParams, convertParams);
+            Object[] invokeParams, Object[] convertParams) throws JRouterException {
+        return converter.convert(TestAction.TEST_METHODS.get(method), null, invokeParams, convertParams);
     }
 
     /**

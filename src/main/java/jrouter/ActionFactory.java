@@ -17,11 +17,14 @@
 package jrouter;
 
 import java.util.Map;
+import jrouter.annotation.Action;
 
 /**
  * ActionFactory接口。
+ *
+ * @param <K> 调用{@link Action}的标识。
  */
-public interface ActionFactory {
+public interface ActionFactory<K> {
 
     /**
      * 返回创建对象的工厂对象。
@@ -48,14 +51,14 @@ public interface ActionFactory {
      * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。
      *
      * @param <T> 调用Action的结果类型。
-     * @param key Action的映射路径。
+     * @param key Action的映射标识。
      * @param params 用于Action的调用参数。
      *
      * @return 调用后的结果。
      *
      * @throws JRouterException 如果发生调用错误。
      */
-    <T> T invokeAction(String key, Object... params) throws JRouterException;
+    <T> T invokeAction(K key, Object... params) throws JRouterException;
 
     /**
      * 移除ActionFactory中所有关联关系。
@@ -69,7 +72,7 @@ public interface ActionFactory {
      *
      * @return Action集合。
      */
-    Map<String, ? extends ActionProxy> getActions();
+    Map<String, ?> getActions();
 
     /**
      * 返回拦截器集合。

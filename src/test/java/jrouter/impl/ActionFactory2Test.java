@@ -34,11 +34,11 @@ import org.junit.Test;
  */
 public class ActionFactory2Test {
 
-    private DefaultActionFactory factory;
+    private PathActionFactory factory;
 
     @Before
     public void init() {
-        factory = new DefaultActionFactory(Collections.EMPTY_MAP);
+        factory = new PathActionFactory(Collections.EMPTY_MAP);
 
         //interceptor
         factory.addInterceptors(SampleInterceptor.class);

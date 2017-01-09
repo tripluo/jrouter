@@ -18,7 +18,7 @@ package jrouter.spring;
 
 import jrouter.ActionFactory;
 import jrouter.JRouterException;
-import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.PathActionFactory;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;
@@ -55,13 +55,13 @@ public class DefaultActionFactoryBeanTest {
      */
     @Test
     public void testGetActionFactory() {
-        assertSame(DefaultActionFactory.class, factory.getClass());
+        assertSame(PathActionFactory.class, factory.getClass());
         assertSame(SpringObjectFactory.class, factory.getObjectFactory().getClass());
         assertEquals("empty", factory.getDefaultInterceptorStack());
         assertEquals("empty", factory.getDefaultResultType());
-        assertEquals(100000, ((DefaultActionFactory) factory).getActionCacheNumber());
-        assertEquals("", ((DefaultActionFactory) factory).getExtension());
-        assertEquals('/', ((DefaultActionFactory) factory).getPathSeparator());
+        assertEquals(100000, ((PathActionFactory) factory).getActionCacheNumber());
+        assertEquals("", ((PathActionFactory) factory).getExtension());
+        assertEquals('/', ((PathActionFactory) factory).getPathSeparator());
 
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.LOGGING));
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.TIMER));

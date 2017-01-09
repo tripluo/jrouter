@@ -17,7 +17,7 @@
 package jrouter.config;
 
 import jrouter.ActionFactory;
-import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.PathActionFactory;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.DemoInterceptor;
 import jrouter.interceptor.SampleInterceptor;
@@ -53,10 +53,10 @@ public class ConfigurationScanComponentTest extends Assert {
         assertEquals("empty", factory.getDefaultInterceptorStack());
         assertEquals("empty", factory.getDefaultResultType());
 
-        assertSame(DefaultActionFactory.class, factory.getClass());
+        assertSame(PathActionFactory.class, factory.getClass());
 
-        assertEquals(100000, ((DefaultActionFactory) factory).getActionCacheNumber());
-        assertEquals(".", ((DefaultActionFactory) factory).getExtension());
+        assertEquals(100000, ((PathActionFactory) factory).getActionCacheNumber());
+        assertEquals(".", ((PathActionFactory) factory).getExtension());
 
         assertNotNull(factory.getInterceptorStacks().get(DefaultInterceptorStack.EMPTY_INTERCEPTOR_STACK));
         assertNotNull(factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK));

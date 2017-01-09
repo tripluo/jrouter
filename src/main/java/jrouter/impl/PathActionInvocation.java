@@ -23,6 +23,7 @@ import jrouter.ActionFactory;
 import jrouter.ActionInvocation;
 import jrouter.ActionProxy;
 import jrouter.ParameterConverter;
+import jrouter.annotation.Action;
 import jrouter.annotation.Dynamic;
 import jrouter.annotation.Result;
 import jrouter.util.MethodUtil;
@@ -30,13 +31,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Action运行时上下文的默认代理类，记录了Action运行时的状态、调用参数、拦截器、结果对象、ActionFactory等信息。
+ * 基于{@code String}类型路径的{@link Action}运行时上下文代理类，
+ * 记录了{@link Action}运行时的状态、调用参数、拦截器、结果对象、{@link ActionFactory}等信息。
  */
 @Dynamic
-public class DefaultActionInvocation implements ActionInvocation {
+public class PathActionInvocation implements ActionInvocation<String> {
 
     /** 日志 */
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultActionInvocation.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PathActionInvocation.class);
 
     /** Action是否已调用 */
     private boolean executed = false;
@@ -44,8 +46,8 @@ public class DefaultActionInvocation implements ActionInvocation {
     /** ActionFactory */
     private final ActionFactory actionFactory;
 
-    /** DefaultActionProxy */
-    private final DefaultActionProxy actionProxy;
+    /** PathActionProxy */
+    private final PathActionProxy actionProxy;
 
     /** interceptors reference */
     private final List<InterceptorProxy> interceptors;
@@ -83,25 +85,14 @@ public class DefaultActionInvocation implements ActionInvocation {
      * @param actionProxy Action代理对象。
      * @param originalParams Action代理对象中方法调用的原始参数。
      */
-    public DefaultActionInvocation(String realPath, ActionFactory actionFactory,
-            DefaultActionProxy actionProxy, Object... originalParams) {
+    public PathActionInvocation(String realPath, ActionFactory actionFactory,
+            PathActionProxy actionProxy, Object... originalParams) {
         this.actionPath = realPath;
         this.actionFactory = actionFactory;
         this.actionProxy = actionProxy;
         this.originalParams = originalParams;
         this.convertParameters = new Object[]{this};
         this.interceptors = actionProxy.getInterceptorProxies();
-    }
-
-    /**
-     * 在调用Action之前初始化参数转换器（如果已设置参数转换器则不调用），通过继承提供在Action调用时传递自定义的参数转换。
-     *
-     * @return 初始化后的参数转换器或已设置的参数转换器。
-     */
-    protected ParameterConverter buildParameterConverterBeforeActionInvocation() {
-        if (actionFactory.getConverterFactory() != null)
-            parameterConverter = actionFactory.getConverterFactory().getParameterConverter(this);
-        return parameterConverter;
     }
 
     @Override
@@ -122,8 +113,8 @@ public class DefaultActionInvocation implements ActionInvocation {
         if (executed) {
             throw new IllegalStateException("Action [" + actionProxy.getPath() + "] has already been executed");
         }
-        if (parameterConverter == null) {
-            parameterConverter = buildParameterConverterBeforeActionInvocation();
+        if (parameterConverter == null && actionFactory.getConverterFactory() != null) {
+            parameterConverter = actionFactory.getConverterFactory().getParameterConverter(this);
         }
         //recursive invoke
         if (interceptors != null && _index < interceptors.size()) {
@@ -132,9 +123,9 @@ public class DefaultActionInvocation implements ActionInvocation {
             //pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
             invokeResult = MethodUtil.invoke(interceptor, parameterConverter, null, getConvertParameters());
         } else //action invoke
-        if (!executed) {
-            invokeActionOnly(params);
-        }
+            if (!executed) {
+                invokeActionOnly(params);
+            }
         return invokeResult;
     }
 

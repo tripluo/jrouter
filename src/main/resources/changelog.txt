@@ -3,6 +3,19 @@ JROUTER CHANGELOG
 ==========================
 http://jrouter.net/
 
+Changes in version 1.7.3 (2017-01-06)
+* 更新版本jrouter 1.7.3, 更新pom.xml.
+* ActionFactory/ActionInvocation/ActionProxy抽象化Action调用路径，修改参数String类型为泛型。
+* 新增ObjectFactory接口方法getClass(...)，提供查找Class类型（原对象可能被代理）。
+* 新增AbstractActionFactory抽象基类，方便继承扩展。
+* 新增PathActionFactory，废弃DefaultActionFactory。
+* 重命名DefaultActionInvocation为PathActionInvocation。
+* 重命名DefaultActionProxy为PathActionProxy。
+* 更新依赖包slf4j至 1.7.22.
+* 更新可选依赖包javassist至 3.21.0-GA.
+* 更新可选依赖包springframework至 4.3.4.
+
+
 Changes in version 1.7.2 (2016-08-04)
 * 重命名Proxy接口为Invoker，避免于ActionProxy、AbstractProxy名称歧义。
 * 重命名ProxyFactory接口为MethodInvokerFactory。

@@ -18,10 +18,11 @@ package jrouter.impl;
 
 import java.lang.reflect.Method;
 import jrouter.ActionFactory;
+import jrouter.annotation.Action;
 import jrouter.annotation.ResultType;
 
 /**
- * 结果类型的代理类，包括了结果类型的名称及在对Action做结果调用时是否将Action的运行时状态作为参数传递。
+ * 结果类型的代理类，包括了结果类型的名称及在对{@link Action}做结果调用时是否将{@link Action}的运行时状态作为参数传递。
  */
 public final class ResultTypeProxy extends DefaultProxy {
 

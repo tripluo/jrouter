@@ -18,9 +18,10 @@ package jrouter.config;
 
 import java.io.Serializable;
 import java.util.List;
+import jrouter.annotation.Action;
 
 /**
- * 针对相应路径的所有Action，添加/修改其对应的拦截器集合。
+ * 针对相应路径的所有{@link Action}，添加/修改其对应的拦截器集合。
  */
 public class AopAction implements Serializable {
 

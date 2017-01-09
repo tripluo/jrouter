@@ -16,7 +16,7 @@
  */
 package jrouter.config;
 
-import jrouter.impl.DefaultActionFactory;
+import jrouter.impl.PathActionFactory;
 import jrouter.impl.MultiParameterConverterFactory;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.DemoInterceptor;
@@ -34,7 +34,7 @@ public class Configuration2Test extends Assert {
 
     private Configuration config = null;
 
-    private DefaultActionFactory factory;
+    private PathActionFactory factory;
 
     @After
     public void tearDown() {

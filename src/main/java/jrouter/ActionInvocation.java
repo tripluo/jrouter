@@ -16,30 +16,36 @@
  */
 package jrouter;
 
+import jrouter.annotation.Action;
 import jrouter.annotation.Dynamic;
 import jrouter.annotation.Result;
 
 /**
- * Action运行时上下文的代理接口。在Action调用时记录并返回其状态、调用参数、结果对象、ActionFactory等信息。
- *
- * @param <T> Action调用结果的类型。
+ * {@link Action}运行时上下文的代理接口。在{@link Action}调用时记录并返回其状态、调用参数、结果对象、ActionFactory等信息。
  */
 @Dynamic
-public interface ActionInvocation<T> {
+public interface ActionInvocation<K> {
 
     /**
      * 返回ActionFactory。
      *
      * @return ActionFactory。
      */
-    ActionFactory getActionFactory();
+    <T> ActionFactory<T> getActionFactory();
 
     /**
      * 返回ActionInvocation持有的ActionProxy。
      *
      * @return ActionInvocation持有的ActionProxy。
      */
-    ActionProxy getActionProxy();
+    <T> ActionProxy<T> getActionProxy();
+
+    /**
+     * 返回Aciton调用的路径参数。
+     *
+     * @return Aciton调用的真实路径参数。
+     */
+    K getActionPath();
 
     /**
      * 返回Action是否已调用。
@@ -47,13 +53,6 @@ public interface ActionInvocation<T> {
      * @return Action是否已调用。
      */
     boolean isExecuted();
-
-    /**
-     * 返回Aciton调用的真实路径。
-     *
-     * @return Aciton调用的真实路径。
-     */
-    String getActionPath();
 
     /**
      * 返回Action的调用参数。
@@ -65,24 +64,26 @@ public interface ActionInvocation<T> {
     /**
      * 由指定参数调用Action，并激发下一步操作（通常指拦截器调用）。
      *
+     * @param <T> Action调用结果的类型。
      * @param params 调用参数。
      *
      * @return 调用后的结果。
      *
      * @throws JRouterException 如果发生调用错误。
      */
-    T invoke(Object... params) throws JRouterException;
+    <T> T invoke(Object... params) throws JRouterException;
 
     /**
      * 由指定参数调用Action（通常不触发拦截器调用）。
      *
+     * @param <T> Action调用结果的类型。
      * @param params 调用参数。
      *
      * @return 调用后的结果。
      *
      * @throws JRouterException 如果发生调用错误。
      */
-    T invokeActionOnly(Object... params) throws JRouterException;
+    <T> T invokeActionOnly(Object... params) throws JRouterException;
 
     /**
      * 返回Action调用的结果，如果Action尚未被调用或者尚未设置指定的值则返回null。

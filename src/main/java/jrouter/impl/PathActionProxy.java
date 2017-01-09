@@ -31,10 +31,10 @@ import org.slf4j.LoggerFactory;
 /**
  * Action代理类，包含了Action的命名空间、全路径、所对应的拦截器集合、结果对象集合等信息。
  */
-public final class DefaultActionProxy extends DefaultProxy implements ActionProxy {
+public final class PathActionProxy extends DefaultProxy implements ActionProxy<String> {
 
     /** 日志 */
-    private static final Logger LOG = LoggerFactory.getLogger(DefaultActionProxy.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PathActionProxy.class);
 
     /** ActionFactory */
     private final ActionFactory actionFactory;
@@ -69,7 +69,7 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public DefaultActionProxy(ActionFactory actionFactory, String namespace, String path,
+    public PathActionProxy(ActionFactory actionFactory, String namespace, String path,
             Action action, Method method, Object object) {
         super(method, object, actionFactory.getMethodInvokerFactory());
         this.actionFactory = actionFactory;
@@ -83,7 +83,7 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
      *
      * @return 如果Action为单例则返回其代理对象，否则创建并返回新的代理对象。
      */
-    public DefaultActionProxy getInstance() {
+    public PathActionProxy getInstance() {
         if (action != null) {
             switch (action.scope()) {
                 case SINGLETON:
@@ -95,7 +95,7 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
                             Object invoker = actionFactory.getObjectFactory().newInstance(object.getClass());
                             //inject properties
                             Injector.injectAction(path, invoker);
-                            DefaultActionProxy ap = this.clone();
+                            PathActionProxy ap = this.clone();
                             ap.object = invoker;
                             LOG.debug("Get prototype ActionProxy [{}] at : {}", ap, getMethodInfo());
                             return ap;
@@ -115,8 +115,8 @@ public final class DefaultActionProxy extends DefaultProxy implements ActionProx
     }
 
     @Override
-    protected DefaultActionProxy clone() {
-        DefaultActionProxy ap = new DefaultActionProxy(actionFactory, namespace, path, action, method, object);
+    protected PathActionProxy clone() {
+        PathActionProxy ap = new PathActionProxy(actionFactory, namespace, path, action, method, object);
         ap.actionParameters = this.actionParameters;
         ap.interceptors = this.interceptors;
         ap.results = this.results;

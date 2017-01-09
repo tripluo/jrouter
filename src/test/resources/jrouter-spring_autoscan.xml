@@ -21,7 +21,7 @@
 
     <!-- JRouter ActionFactory Test -->
     <bean id="actionFactoryTest" class="jrouter.spring.DefaultActionFactoryBean">
-        <property name="actionFactoryClass" value="jrouter.impl.DefaultActionFactory"/>
+        <property name="actionFactoryClass" value="jrouter.impl.PathActionFactory"/>
         <property name="objectFactory">
             <bean class="jrouter.spring.SpringObjectFactory"/>
         </property>

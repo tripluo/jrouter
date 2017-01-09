@@ -23,9 +23,9 @@ import jrouter.annotation.Interceptor;
 import jrouter.annotation.Result;
 
 /**
- * Action代理类接口。
+ * {@link Action}代理类接口。
  */
-public interface ActionProxy {
+public interface ActionProxy<K> {
 
     /**
      * 返回所代理的Action对象。
@@ -39,7 +39,7 @@ public interface ActionProxy {
      *
      * @return Action所对应的全路径（可能为带参数的动态路径，而非真实调用路径）。
      */
-    String getPath();
+    K getPath();
 
     /**
      * 返回Action的命名空间。
