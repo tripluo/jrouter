@@ -30,7 +30,7 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.7.3</version>
+    <version>1.7.4</version>
 </dependency>
 ```
 
@@ -67,6 +67,8 @@
             converterFactory = jrouter.impl.MultiParameterConverterFactory
             <!-- optional default:null -->
             interceptorMethodChecker = jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)
+            <!-- optional default:null -->
+            actionFilter = 
         </value>
     </property>
 
