@@ -47,8 +47,10 @@ public class JavassistMethodCheckerTest {
         assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals").check(method));
         assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(**)").check(method));
         assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(*,*)").check(method));
+        assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(*, *)").check(method));
         assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(Object, Object)").check(method));
         assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(Object,java.lang.Object)").check(method));
+        assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(Object, java.lang.Object)").check(method));
         assertTrue(new JavassistMethodChecker("jrouter.ActionInvocation.invoke & org.junit.Assert.assertEquals").check(method));
         assertTrue(new JavassistMethodChecker("jrouter.ActionInvocation.invoke & org.junit.Assert.assertEquals | NoMethod").check(method));
         assertTrue(new JavassistMethodChecker("jrouter.ActionInvocation.invoke|NoMethod2|NoMethod3").check(method));

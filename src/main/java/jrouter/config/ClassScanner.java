@@ -61,7 +61,7 @@ class ClassScanner implements Serializable {
      *
      * @return 扫描结果的类集合。
      */
-    public Set<Class<?>> calculateScanComponents() throws ClassNotFoundException {
+    public Set<Class<?>> calculateScanComponents() {
         Set<Class<?>> includes = ClassUtil.getClasses(includePackages.toArray(new String[includePackages.size()]));
         //filter the scan classes
         Iterator<Class<?>> it = includes.iterator();

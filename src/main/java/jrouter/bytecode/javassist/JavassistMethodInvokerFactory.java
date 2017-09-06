@@ -31,11 +31,11 @@ import jrouter.MethodInvokerFactory;
  * <p>
  * 通常如下使用：
  * <code><blockquote><pre>
- Method method = ...
- JavassistMethodInvokerFactory factory = new JavassistMethodInvokerFactory();
- JavassistInvoker invoker = factory.createInvokeClass(method);
- invoker.invoke(...);
- </pre></blockquote></code>
+ * Method method = ...
+ * JavassistMethodInvokerFactory factory = new JavassistMethodInvokerFactory();
+ * JavassistInvoker invoker = factory.createInvokeClass(method);
+ * invoker.invoke(...);
+ * </pre></blockquote></code>
  * </p>
  */
 public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
@@ -58,12 +58,14 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
     public JavassistInvoker newInstance(Method method) {
         //only public method can be proxied
         if (!Modifier.isPublic(method.getModifiers())) {
-            LOG.warn("Only public method can be proxied, no proxy at : " + MethodUtil.getFullMethod(method));
+            LOG.warn("Only public method can be proxied, no proxy at : {}", MethodUtil.getFullMethod(method));
             return null;
         }
         Class<?> srcClass = method.getDeclaringClass();
         try {
-            LOG.debug("Create JavassistInvoker at : " + MethodUtil.getMethod(method));
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Create JavassistInvoker at : {}", MethodUtil.getMethod(method));
+            }
             JavassistInvoker invoker = (JavassistInvoker) (createInvokeClass(method).
                     toClass(srcClass.getClassLoader(), srcClass.getProtectionDomain()).newInstance());
             return invoker;
@@ -82,7 +84,8 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
      * @throws CannotCompileException when bytecode transformation has failed.
      * @throws NotFoundException when class is not found.
      */
-    private CtClass createInvokeClass(Method method) throws CannotCompileException, NotFoundException {
+    private CtClass createInvokeClass(Method method) throws CannotCompileException,
+            NotFoundException {
         ClassPool classPool = ClassPool.getDefault();
         ClassClassPath classPath = new ClassClassPath(method.getClass());
         classPool.insertClassPath(classPath);

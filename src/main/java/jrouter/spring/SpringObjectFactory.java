@@ -21,6 +21,7 @@ import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.config.AutowireCapableBeanFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.ConfigurableApplicationContext;
 
 /**
  * 借由 springframework 的工厂对象创建新的对象实例。
@@ -61,7 +62,29 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
 
     @Override
     public final void setApplicationContext(ApplicationContext applicationContext) {
-        autowireCapableBeanFactory = applicationContext.getAutowireCapableBeanFactory();
+        autowireCapableBeanFactory = findAutoWiringBeanFactory(applicationContext);
+    }
+
+    /**
+     * If the given context is assignable to AutowireCapbleBeanFactory or contains a parent or a factory that is, then
+     * set the autoWiringFactory appropriately.
+     *
+     * @param context the application context
+     *
+     * @return the bean factory
+     */
+    protected AutowireCapableBeanFactory findAutoWiringBeanFactory(ApplicationContext context) {
+        if (context instanceof AutowireCapableBeanFactory) {
+            // Check the context
+            return (AutowireCapableBeanFactory) context;
+        } else if (context instanceof ConfigurableApplicationContext) {
+            // Try and grab the beanFactory
+            return ((ConfigurableApplicationContext) context).getBeanFactory();
+        } else if (context.getParent() != null) {
+            // And if all else fails, try again with the parent context
+            return findAutoWiringBeanFactory(context.getParent());
+        }
+        return null;
     }
 
     /**

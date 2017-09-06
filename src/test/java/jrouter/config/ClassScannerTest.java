@@ -65,7 +65,7 @@ public class ClassScannerTest {
         //include packages
         classScanner.setIncludePackages(stringToSet("jrouter.result, jrouter.interceptor"));
         assertCollectionEqualContains(
-                new Class[]{
+                new Class<?>[]{
                     DefaultInterceptorStack.class,
                     SampleInterceptor.class,
                     DefaultResult.class,
@@ -80,7 +80,7 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("jrouter.result, jrouter.interceptor"));
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
         assertCollectionEqualContains(
-                new Class[]{
+                new Class<?>[]{
                     DefaultInterceptorStack.class,
                     DemoThreadActionContextInterceptor.class,
                     DefaultResult.class,
@@ -95,7 +95,7 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("jrouter"));
         classScanner.setIncludeExpressions(stringToSet("jrouter.interceptor.DefaultInterceptorStack"));
         assertCollectionEqualContains(
-                new Class[]{
+                new Class<?>[]{
                     DefaultInterceptorStack.class,},
                 classScanner.calculateScanComponents());
         clear();
@@ -104,7 +104,7 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("jrouter.result, jrouter.interceptor"));
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
         assertCollectionEqualContains(
-                new Class[]{
+                new Class<?>[]{
                     DefaultInterceptorStack.class,
                     DemoThreadActionContextInterceptor.class,
                     DefaultResult.class,
@@ -130,7 +130,7 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("jrouter.result, jrouter.interceptor"));
         classScanner.setExcludeExpressions(stringToSet("jrouter.interceptor.*"));
         assertCollectionEqualContains(
-                new Class[]{
+                new Class<?>[]{
                     DefaultResult.class,
                     DemoResult.class
                 },
@@ -141,7 +141,7 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("jrouter.result, jrouter.interceptor"));
         classScanner.setExcludeExpressions(stringToSet("jrouter.interceptor.DefaultInterceptorStack"));
         assertCollectionEqualContains(
-                new Class[]{
+                new Class<?>[]{
                     SampleInterceptor.class,
                     DefaultResult.class,
                     DemoInterceptor.class,
@@ -155,7 +155,7 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("jrouter.result, jrouter.interceptor"));
         classScanner.setExcludeExpressions(stringToSet("**.Demo*"));
         assertCollectionEqualContains(
-                new Class[]{
+                new Class<?>[]{
                     DefaultInterceptorStack.class,
                     SampleInterceptor.class,
                     DefaultResult.class,},
@@ -167,7 +167,7 @@ public class ClassScannerTest {
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
         classScanner.setExcludeExpressions(stringToSet("**.Demo*, jrouter.interceptor.DefaultInterceptorStack"));
         assertCollectionEqualContains(
-                new Class[]{
+                new Class<?>[]{
                     DefaultResult.class
                 },
                 classScanner.calculateScanComponents());

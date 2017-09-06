@@ -51,11 +51,13 @@ public class SampleInterceptor {
             //invoke
             result = invocation.invoke();
         } finally {
-            long executionTime = System.currentTimeMillis() - startTime;
-            StringBuilder message = new StringBuilder(64);
-            message.append("Executed action [").append(invocation.getActionPath());
-            message.append("] took ").append(executionTime).append(" ms.");
-            LOG.info(message.toString());
+            if (LOG.isInfoEnabled()) {
+                long executionTime = System.currentTimeMillis() - startTime;
+                StringBuilder message = new StringBuilder(64);
+                message.append("Executed action [").append(invocation.getActionPath());
+                message.append("] took ").append(executionTime).append(" ms.");
+                LOG.info(message.toString());
+            }
         }
         return result;
     }

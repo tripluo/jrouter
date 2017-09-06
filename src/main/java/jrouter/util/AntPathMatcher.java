@@ -326,7 +326,9 @@ public class AntPathMatcher {
     public Map<String, String> extractUriTemplateVariables(String pattern, String path) {
         Map<String, String> variables = new LinkedHashMap<String, String>();
         boolean result = doMatch(pattern, path, true, variables);
-        //Assert.state(result, "Pattern \"" + pattern + "\" is not a match for \"" + path + "\"");
+        if (!result) {
+            throw new IllegalStateException("Pattern \"" + pattern + "\" is not a match for \"" + path + "\"");
+        }
         return variables;
     }
 
@@ -443,23 +445,34 @@ public class AntPathMatcher {
      * <li>if it's shorter than the other pattern</li>
      * </ul>
      */
-    private static class AntPatternComparator implements Comparator<String> {
+    protected static class AntPatternComparator implements Comparator<String> {
 
         private final String path;
 
-        private AntPatternComparator(String path) {
+        public AntPatternComparator(String path) {
             this.path = path;
         }
 
+        /**
+         * Compare two patterns to determine which should match first, i.e. which
+         * is the most specific regarding the current path.
+         *
+         * @return a negative integer, zero, or a positive integer as pattern1 is
+         * more specific, equally specific, or less specific than pattern2.
+         */
         @Override
         public int compare(String pattern1, String pattern2) {
-            if (pattern1 == null && pattern2 == null) {
+            PatternInfo info1 = new PatternInfo(pattern1);
+            PatternInfo info2 = new PatternInfo(pattern2);
+
+            if (info1.isLeastSpecific() && info2.isLeastSpecific()) {
                 return 0;
-            } else if (pattern1 == null) {
+            } else if (info1.isLeastSpecific()) {
                 return 1;
-            } else if (pattern2 == null) {
+            } else if (info2.isLeastSpecific()) {
                 return -1;
             }
+
             boolean pattern1EqualsPath = pattern1.equals(path);
             boolean pattern2EqualsPath = pattern2.equals(path);
             if (pattern1EqualsPath && pattern2EqualsPath) {
@@ -469,64 +482,126 @@ public class AntPathMatcher {
             } else if (pattern2EqualsPath) {
                 return 1;
             }
-            int wildCardCount1 = getWildCardCount(pattern1);
-            int wildCardCount2 = getWildCardCount(pattern2);
 
-            int bracketCount1 = StringUtil.countOccurrencesOf(pattern1, "{");
-            int bracketCount2 = StringUtil.countOccurrencesOf(pattern2, "{");
-
-            int totalCount1 = wildCardCount1 + bracketCount1;
-            int totalCount2 = wildCardCount2 + bracketCount2;
-
-            if (totalCount1 != totalCount2) {
-                return totalCount1 - totalCount2;
-            }
-
-            int pattern1Length = getPatternLength(pattern1);
-            int pattern2Length = getPatternLength(pattern2);
-
-            if (pattern1Length != pattern2Length) {
-                return pattern2Length - pattern1Length;
-            }
-
-            if (wildCardCount1 < wildCardCount2) {
+            if (info1.isPrefixPattern() && info2.getDoubleWildcards() == 0) {
+                return 1;
+            } else if (info2.isPrefixPattern() && info1.getDoubleWildcards() == 0) {
                 return -1;
-            } else if (wildCardCount2 < wildCardCount1) {
+            }
+
+            if (info1.getTotalCount() != info2.getTotalCount()) {
+                return info1.getTotalCount() - info2.getTotalCount();
+            }
+
+            if (info1.getLength() != info2.getLength()) {
+                return info2.getLength() - info1.getLength();
+            }
+
+            if (info1.getSingleWildcards() < info2.getSingleWildcards()) {
+                return -1;
+            } else if (info2.getSingleWildcards() < info1.getSingleWildcards()) {
                 return 1;
             }
 
-            if (bracketCount1 < bracketCount2) {
+            if (info1.getUriVars() < info2.getUriVars()) {
                 return -1;
-            } else if (bracketCount2 < bracketCount1) {
+            } else if (info2.getUriVars() < info1.getUriVars()) {
                 return 1;
             }
 
             return 0;
         }
 
-        private int getWildCardCount(String pattern) {
-            if (pattern.endsWith(".*")) {
-                pattern = pattern.substring(0, pattern.length() - 2);
-            }
-            return StringUtil.countOccurrencesOf(pattern, "*");
-        }
-
         /**
-         * Returns the length of the given pattern, where template variables are considered to be 1
-         * long.
+         * Value class that holds information about the pattern, e.g. number of
+         * occurrences of "*", "**", and "{" pattern elements.
          */
-        private int getPatternLength(String pattern) {
-            Matcher m = VARIABLE_PATTERN.matcher(pattern);
-            return m.replaceAll("#").length();
+        private static class PatternInfo {
+
+            private final String pattern;
+
+            private int uriVars;
+
+            private int singleWildcards;
+
+            private int doubleWildcards;
+
+            private boolean catchAllPattern;
+
+            private boolean prefixPattern;
+
+            private Integer length;
+
+            public PatternInfo(String pattern) {
+                this.pattern = pattern;
+                if (this.pattern != null) {
+                    initCounters();
+                    this.catchAllPattern = this.pattern.equals("/**");
+                    this.prefixPattern = !this.catchAllPattern && this.pattern.endsWith("/**");
+                }
+                if (this.uriVars == 0) {
+                    this.length = (this.pattern != null ? this.pattern.length() : 0);
+                }
+            }
+
+            protected void initCounters() {
+                int pos = 0;
+                while (pos < this.pattern.length()) {
+                    if (this.pattern.charAt(pos) == '{') {
+                        this.uriVars++;
+                        pos++;
+                    } else if (this.pattern.charAt(pos) == '*') {
+                        if (pos + 1 < this.pattern.length() && this.pattern.charAt(pos + 1) == '*') {
+                            this.doubleWildcards++;
+                            pos += 2;
+                        } else if (pos > 0 && !this.pattern.substring(pos - 1).equals(".*")) {
+                            this.singleWildcards++;
+                            pos++;
+                        } else {
+                            pos++;
+                        }
+                    } else {
+                        pos++;
+                    }
+                }
+            }
+
+            public int getUriVars() {
+                return this.uriVars;
+            }
+
+            public int getSingleWildcards() {
+                return this.singleWildcards;
+            }
+
+            public int getDoubleWildcards() {
+                return this.doubleWildcards;
+            }
+
+            public boolean isLeastSpecific() {
+                return (this.pattern == null || this.catchAllPattern);
+            }
+
+            public boolean isPrefixPattern() {
+                return this.prefixPattern;
+            }
+
+            public int getTotalCount() {
+                return this.uriVars + this.singleWildcards + (2 * this.doubleWildcards);
+            }
+
+            /**
+             * Returns the length of the given pattern, where template variables are considered to be 1 long.
+             */
+            public int getLength() {
+                if (this.length == null) {
+                    this.length = VARIABLE_PATTERN.matcher(this.pattern).replaceAll("#").length();
+                }
+                return this.length;
+            }
         }
     }
 
-    /**
-     * Tests whether or not a string matches against a pattern via a {@link Pattern}.
-     * <p>
-     * The pattern may contain special characters: '*' means zero or more characters; '?' means one and
-     * only one character; '{' and '}' indicate a URI template pattern. For example <tt>/users/{user}</tt>.
-     */
     /**
      * Tests whether or not a string matches against a pattern via a {@link Pattern}.
      * <p>
@@ -544,12 +619,16 @@ public class AntPathMatcher {
         private final List<String> variableNames = new LinkedList<String>();
 
         public AntPathStringMatcher(String pattern) {
+            this(pattern, true);
+        }
+
+        public AntPathStringMatcher(String pattern, boolean caseSensitive) {
             StringBuilder patternBuilder = new StringBuilder();
-            Matcher m = GLOB_PATTERN.matcher(pattern);
+            Matcher matcher = GLOB_PATTERN.matcher(pattern);
             int end = 0;
-            while (m.find()) {
-                patternBuilder.append(quote(pattern, end, m.start()));
-                String match = m.group();
+            while (matcher.find()) {
+                patternBuilder.append(quote(pattern, end, matcher.start()));
+                String match = matcher.group();
                 if ("?".equals(match)) {
                     patternBuilder.append('.');
                 } else if ("*".equals(match)) {
@@ -558,7 +637,7 @@ public class AntPathMatcher {
                     int colonIdx = match.indexOf(':');
                     if (colonIdx == -1) {
                         patternBuilder.append(DEFAULT_VARIABLE_PATTERN);
-                        this.variableNames.add(m.group(1));
+                        this.variableNames.add(matcher.group(1));
                     } else {
                         String variablePattern = match.substring(colonIdx + 1, match.length() - 1);
                         patternBuilder.append('(');
@@ -568,10 +647,11 @@ public class AntPathMatcher {
                         this.variableNames.add(variableName);
                     }
                 }
-                end = m.end();
+                end = matcher.end();
             }
             patternBuilder.append(quote(pattern, end, pattern.length()));
-            this.pattern = Pattern.compile(patternBuilder.toString());
+            this.pattern = (caseSensitive ? Pattern.compile(patternBuilder.toString())
+                    : Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE));
         }
 
         private String quote(String s, int start, int end) {
@@ -592,10 +672,10 @@ public class AntPathMatcher {
                 if (uriTemplateVariables != null) {
                     // SPR-8455
                     if (this.variableNames.size() != matcher.groupCount()) {
-                        throw new IllegalArgumentException(
-                                "The number of capturing groups in the pattern segment " + this.pattern
-                                + " does not match the number of URI template variables it defines, which can occur if "
-                                + " capturing groups are used in a URI template regex. Use non-capturing groups instead.");
+                        throw new IllegalArgumentException("The number of capturing groups in the pattern segment "
+                                + this.pattern + " does not match the number of URI template variables it defines, "
+                                + "which can occur if capturing groups are used in a URI template regex. "
+                                + "Use non-capturing groups instead.");
                     }
                     for (int i = 1; i <= matcher.groupCount(); i++) {
                         String name = this.variableNames.get(i - 1);

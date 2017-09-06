@@ -16,19 +16,31 @@
  */
 package jrouter;
 
+import java.lang.reflect.Method;
+import jrouter.annotation.Action;
+
 /**
- * ConverterFactory接口。负责创建转换对象。
+ * ActionFilter接口。提供过滤{@code Method}和转换自定义注解类至{@link Action}。
  *
- * @param <T> ActionInvocation type.
+ * @since 1.7.4
  */
-public interface ConverterFactory<T extends ActionInvocation<?>> {
+public interface ActionFilter {
 
     /**
-     * 根据参数创建或返回参数转换对象。
+     * 是否接受指定的方法。
      *
-     * @param actionInvocation Action运行时上下文。
+     * @param method 指定的方法。
      *
-     * @return 参数转换对象。
+     * @return 是否接受指定的方法。
      */
-    ParameterConverter getParameterConverter(T actionInvocation);
+    boolean accept(Method method);
+
+    /**
+     * 根据指定的方法获取{@code Action}对象。
+     *
+     * @param method 指定的方法。
+     *
+     * @return {@code Action}对象。
+     */
+    Action getAnnotation(Method method);
 }

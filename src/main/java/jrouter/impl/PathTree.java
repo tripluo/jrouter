@@ -26,7 +26,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * 适配Map接口的树结构路径。包含了一个树结构路径和一个含相关联值的最终路径的{@code Set}集合。
+ * 适配{@code Map}接口的树结构路径。包含了一个树结构路径和一个含相关联值的最终路径的{@code Set}集合。
  *
  * @param <V> 与路径相关联值的类型。
  */
@@ -122,6 +122,7 @@ class PathTree<V> implements Serializable {
      *
      * @deprecated
      */
+    @Deprecated
     private static final String Last_Match = "**";
 
     /** 树路径的根节点 */
@@ -141,7 +142,7 @@ class PathTree<V> implements Serializable {
      */
     PathTree(char pathSeparator) {
         this.pathSeparator = pathSeparator;
-        root = new TreeNode<V>(pathSeparator + "", null);
+        root = new TreeNode<V>(Character.toString(pathSeparator), null);
         root.code = 1;
     }
 

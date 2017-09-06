@@ -45,7 +45,7 @@ public interface ActionFactory<K> {
      *
      * @return 创建底层方法转换器的工厂对象。
      */
-    ConverterFactory getConverterFactory();
+    <T extends ActionInvocation<?>> ConverterFactory<T> getConverterFactory();
 
     /**
      * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。

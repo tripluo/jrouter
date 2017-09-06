@@ -23,7 +23,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import jrouter.ActionFactory;
 import jrouter.ConverterFactory;
 import jrouter.JRouterException;
@@ -159,13 +158,13 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             if ("defaultInterceptorStack".equalsIgnoreCase(name)) {
                 //设置默认拦截栈名称
                 this.defaultInterceptorStack = strValue;
-                LOG.info("Set defaultInterceptorStack : " + defaultInterceptorStack);
+                LOG.info("Set defaultInterceptorStack : {}", defaultInterceptorStack);
             } else if ("defaultResultType".equalsIgnoreCase(name)) {
                 //设置默认结果视图类型
                 this.defaultResultType = strValue;
-                LOG.info("Set defaultResultType : " + defaultResultType);
+                LOG.info("Set defaultResultType : {}", defaultResultType);
             } else if ("objectFactory".equalsIgnoreCase(name)) {
-                if (value instanceof String) {
+                if (value instanceof String && StringUtil.isNotBlank(strValue)) {
                     try {
                         this.objectFactory = (ObjectFactory) (DefaultObjectFactory._newInstance(ClassUtil.loadClass(strValue)));
                     } catch (ClassNotFoundException ex) {
@@ -177,32 +176,33 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
                     //设置创建对象的工厂对象
                     this.objectFactory = (ObjectFactory) value; //throw exception if not matched
                 }
-                LOG.info("Set objectFactory : " + this.objectFactory);
+                LOG.info("Set objectFactory : {}", this.objectFactory);
             } else if ("bytecode".equalsIgnoreCase(name)) {
                 setBytecode = true;
-                if (value instanceof String) {
+                if (value instanceof String && StringUtil.isNotBlank(strValue)) {
                     //default to use java reflect directly
                     if ("default".equalsIgnoreCase(strValue)) {
                         methodInvokerFactory = null;
                         LOG.info("Set methodInvokerFactory : " + strValue);
                     } else if ("javassist".equalsIgnoreCase(strValue)) {
                         methodInvokerFactory = new JavassistMethodInvokerFactory();
-                        LOG.info("Set methodInvokerFactory : " + this.methodInvokerFactory);
+                        LOG.info("Set methodInvokerFactory : {}", this.methodInvokerFactory);
                     } else {
                         setBytecode = false;
-                        LOG.warn("Unknown bytecode property : " + strValue);
+                        LOG.warn("Unknown bytecode property : {}", strValue);
                     }
                 } else {
                     //throw exception if not matched
                     methodInvokerFactory = (MethodInvokerFactory) value;
-                    LOG.info("Set methodInvokerFactory : " + this.methodInvokerFactory);
+                    LOG.info("Set methodInvokerFactory : {}", this.methodInvokerFactory);
                 }
             } else if ("converterFactory".equalsIgnoreCase(name)) {
-                if (value instanceof String) {
+                if (value instanceof String && StringUtil.isNotBlank(strValue)) {
                     try {
+                        //此时objectFactory未必初始化完成
                         converterFactoryClass = (Class<ConverterFactory>) ClassUtil.loadClass(strValue);
                     } catch (ClassNotFoundException ex) {
-                        LOG.error("Can't set ConverterFactory of class : " + strValue);
+                        LOG.error("Can't set ConverterFactory of class : {}", strValue);
                         throw new JRouterException(ex);
                     }
                 } else if (value instanceof Class) {
@@ -210,13 +210,13 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
                 } else {
                     //throw exception if not matched
                     converterFactory = (ConverterFactory) value;
-                    LOG.info("Set converterFactory : " + this.converterFactory);
+                    LOG.info("Set converterFactory : {}", this.converterFactory);
                 }
             } else if ("interceptorMethodChecker".equalsIgnoreCase(name)) {
                 //create interceptorMethodChecker
                 if (ClassUtil.isJavassistSupported() && StringUtil.isNotBlank(strValue)) {
                     methodChecker = new JavassistMethodChecker(strValue);
-                    LOG.info("Set methodChecker : " + this.methodChecker);
+                    LOG.info("Set methodChecker : {}", this.methodChecker);
                 }
             }
         }
@@ -235,6 +235,33 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
     }
 
     /**
+     * {@code ObjectFactory}初始化完成后提供便捷地加载所需组件.
+     *
+     * @param <T> 所加载组件的类型。
+     * @param componentClass 所加载组件的类型。
+     * @param value 所加载组件的值。
+     *
+     * @return 已加载组件的值。
+     *
+     * @see #getObjectFactory()
+     */
+    protected <T> T loadComponent(Class<T> componentClass, Object value) {
+        if (value instanceof String && StringUtil.isNotBlank((String) value)) {
+            try {
+                return objectFactory.newInstance((Class<T>) ClassUtil.loadClass((String) value));
+            } catch (ClassNotFoundException ex) {
+                LOG.error("Can't set {} of class : {}", componentClass, value);
+                throw new JRouterException(ex);
+            }
+        } else if (value instanceof Class) {
+            return objectFactory.newInstance((Class<T>) value);
+        } else {
+            //throw exception if not matched
+            return (T) value;
+        }
+    }
+
+    /**
      * 未设置objectFactory属性时，提供默认的{@code ObjectFactory}实现。
      * 默认提供{@link DefaultObjectFactory}。
      *
@@ -242,7 +269,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
      */
     protected ObjectFactory createDefaultObjectFactory() {
         ObjectFactory defaultObjectFactory = new DefaultObjectFactory();
-        LOG.info("No objectFactory setting, use default : " + defaultObjectFactory);
+        LOG.info("No objectFactory setting, use default : {}", defaultObjectFactory);
         return defaultObjectFactory;
     }
 
@@ -256,7 +283,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
         //check if javassist is supported
         if (ClassUtil.isJavassistSupported()) {
             JavassistMethodInvokerFactory javassistMethodInvokerFactory = new JavassistMethodInvokerFactory();
-            LOG.info("No methodInvokerFactory setting, use javassist as default : " + javassistMethodInvokerFactory);
+            LOG.info("No methodInvokerFactory setting, use javassist as default : {}", javassistMethodInvokerFactory);
             return javassistMethodInvokerFactory;
         } else {
             LOG.info("No methodInvokerFactory setting and no javassist jar found, use java reflect as default");
@@ -273,7 +300,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
     private void createConverterFactory(Class<? extends ConverterFactory> converterFactoryClass) {
         if (converterFactoryClass != null) {
             converterFactory = objectFactory.newInstance(converterFactoryClass);
-            LOG.info("Set converterFactory : " + this.converterFactory);
+            LOG.info("Set converterFactory : {}", this.converterFactory);
         }
         //finally check if converterFactory is still not set
         if (converterFactory == null) {
@@ -289,7 +316,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
      */
     protected ConverterFactory createDefaultConverterFactory() {
         ConverterFactory multiParameterConverterFactory = new MultiParameterConverterFactory(true);
-        LOG.info("No converterFactory setting, use default : " + multiParameterConverterFactory);
+        LOG.info("No converterFactory setting, use default : {}", multiParameterConverterFactory);
         return multiParameterConverterFactory;
 
     }
@@ -318,7 +345,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             throw new JRouterException("Duplicate Interceptor [" + name + "] : "
                     + ip.getMethodInfo() + " override "
                     + interceptors.get(name).getMethodInfo());
-        } else {
+        } else if (LOG.isInfoEnabled()) {
             LOG.info("Add Interceptor [{}] at : {} ", name, ip.getMethodInfo());
         }
         interceptors.put(name, ip);
@@ -342,7 +369,9 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(Interceptor.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
-                    LOG.info("Ignore Interceptor : " + MethodUtil.getMethod(m));
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("Ignore Interceptor : {}", MethodUtil.getMethod(m));
+                    }
                     continue;
                 }
                 m.setAccessible(true);
@@ -375,7 +404,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             throw new JRouterException("Duplicate InterceptorStack [" + name + "] : "
                     + isp.getFieldName() + " override "
                     + interceptorStacks.get(name).getFieldName());
-        } else {
+        } else if (LOG.isInfoEnabled()) {
             LOG.info("Add InterceptorStack [{}] : {}", name, isp);
         }
         interceptorStacks.put(name, isp);
@@ -389,11 +418,6 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
      * @see jrouter.annotation.InterceptorStack
      */
     public void addInterceptorStacks(Object obj) {
-        //TODO 添加一个{@code String}类型的支持??? key=value1,value2,value3...
-        if (obj instanceof String) {
-            //TODO
-            return;
-        }
         boolean isCls = obj instanceof Class;
         Class<?> cls = isCls ? (Class) obj : objectFactory.getClass(obj);
         Object invoker = isCls ? null : obj;
@@ -438,7 +462,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             throw new JRouterException("Duplicate ResultType [" + type + "] : "
                     + rtp.getMethodInfo() + " override "
                     + resultTypes.get(type).getMethodInfo());
-        } else {
+        } else if (LOG.isInfoEnabled()) {
             LOG.info("Add ResultType [{}] at : {}", type, rtp.getMethodInfo());
         }
         resultTypes.put(type, rtp);
@@ -462,7 +486,9 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(ResultType.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
-                    LOG.info("Ignore ResultType : " + MethodUtil.getMethod(m));
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("Ignore ResultType : {}", MethodUtil.getMethod(m));
+                    }
                     continue;
                 }
                 m.setAccessible(true);
@@ -495,7 +521,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             throw new JRouterException("Duplicate Result [" + name + "] : "
                     + rp.getMethodInfo() + " override "
                     + results.get(name).getMethodInfo());
-        } else {
+        } else if (LOG.isInfoEnabled()) {
             LOG.info("Add Result [{}] : {}", name, rp.getMethodInfo());
         }
         results.put(name, rp);
@@ -519,7 +545,9 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(Result.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
-                    LOG.info("Ignore Result : " + MethodUtil.getMethod(m));
+                    if (LOG.isInfoEnabled()) {
+                        LOG.info("Ignore Result : {}", MethodUtil.getMethod(m));
+                    }
                     continue;
                 }
                 m.setAccessible(true);

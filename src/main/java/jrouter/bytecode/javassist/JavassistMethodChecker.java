@@ -16,7 +16,6 @@
  */
 package jrouter.bytecode.javassist;
 
-import java.io.Serializable;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.BitSet;
@@ -46,7 +45,7 @@ public class JavassistMethodChecker {
     /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(JavassistMethodChecker.class);
 
-    private final static String OPCODES[] = Mnemonic.OPCODE;
+    private static final String OPCODES[] = Mnemonic.OPCODE;
 
     /** 方法名匹配器 */
     private final AntPathMatcher methodMatcher = new AntPathMatcher(".");
@@ -179,7 +178,7 @@ public class JavassistMethodChecker {
     }
 
     /** Method object */
-    private static final class MethodInfo implements Serializable {
+    private static final class MethodInfo {
 
         //simplify name
         private static final String JAVA_LANG = "java.lang.";
@@ -233,7 +232,8 @@ public class JavassistMethodChecker {
         public void setParametersDescription(String parametersDescription) {
             if (parametersDescription.startsWith(JAVA_LANG))
                 parametersDescription = parametersDescription.substring(JAVA_LANG.length());
-            parametersDescription = parametersDescription.replace("," + JAVA_LANG, ",");
+            //remove "java.lang."
+            parametersDescription = parametersDescription.replaceAll("\\s*,\\s*(?:java.lang.)?", ",");
             this.parametersDescription = parametersDescription;
         }
 

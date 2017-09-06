@@ -135,7 +135,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
          *
          * @see #methodParametersCache
          */
-        private int[] match(Method method, int matchStart, Class[] parameterTypes,
+        private int[] match(Method method, int matchStart, Class<?>[] parameterTypes,
                 Object[] convertParams) {
             int[] idx = null;
             if (fixedOrder) {
@@ -153,7 +153,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
                 //初始值-1, 无匹配
                 idx[i] = -1;
                 if (convertParams != null) {
-                    Class parameterType = parameterTypes[i];
+                    Class<?> parameterType = parameterTypes[i];
                     for (int j = 0; j < convertParams.length; j++) {
                         //不考虑父子优先级，参数按顺序优先匹配。
                         if (!convertMatched[j] && parameterType.isInstance(convertParams[j])) {

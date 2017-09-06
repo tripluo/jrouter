@@ -101,8 +101,10 @@ public class PathActionInvocation implements ActionInvocation<String> {
         if (params == null || params.length == 0)
             params = this.originalParams; //TODO
         setExecuted(true);
-        LOG.debug("Invoke Action [{}]; Parameters {} at : {}",
-                actionProxy.getPath(), java.util.Arrays.toString(params), actionProxy.getMethodInfo());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Invoke Action [{}]; Parameters {} at : {}",
+                    actionProxy.getPath(), java.util.Arrays.toString(params), actionProxy.getMethodInfo());
+        }
         //set invokeResult
         invokeResult = MethodUtil.invoke(actionProxy, parameterConverter, params, getConvertParameters());
         return invokeResult;
@@ -119,7 +121,9 @@ public class PathActionInvocation implements ActionInvocation<String> {
         //recursive invoke
         if (interceptors != null && _index < interceptors.size()) {
             final InterceptorProxy interceptor = interceptors.get(_index++);
-            LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
+            }
             //pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
             invokeResult = MethodUtil.invoke(interceptor, parameterConverter, null, getConvertParameters());
         } else //action invoke

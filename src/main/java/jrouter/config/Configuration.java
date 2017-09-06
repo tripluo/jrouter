@@ -266,7 +266,7 @@ public class Configuration implements Serializable {
      * @throws ConfigurationException 如果发生配置错误。
      */
     public Configuration load(URL url) throws ConfigurationException {
-        LOG.info("Configuring from url : " + url.toString());
+        LOG.info("Configuring from url : {}", url);
         try {
             return load(url.openStream(), url.toString());
         } catch (IOException ioe) {
@@ -284,7 +284,7 @@ public class Configuration implements Serializable {
      * @throws ConfigurationException 如果发生配置错误。
      */
     public Configuration load(String resource) throws ConfigurationException {
-        LOG.info("Configuration from resource : " + resource);
+        LOG.info("Configuration from resource : {}", resource);
         return load(getResource(resource));
     }
 
@@ -298,7 +298,7 @@ public class Configuration implements Serializable {
      * @throws ConfigurationException 如果发生配置错误。
      */
     public Configuration load(File configFile) throws ConfigurationException {
-        LOG.info("Configuring from file : " + configFile.getName());
+        LOG.info("Configuring from file : {}", configFile.getName());
         try {
             return load(new FileInputStream(configFile), configFile.toString());
         } catch (FileNotFoundException fnfe) {
@@ -438,7 +438,7 @@ public class Configuration implements Serializable {
                 String cls = e.getAttribute(CLASS);
                 if (StringUtil.isNotBlank(cls))
                     actionFactoryClass = (Class<? extends ActionFactory>) ClassUtil.loadClass(cls);
-                LOG.info("Configured SessionFactory : " + cls);
+                LOG.info("Configured SessionFactory : {}", cls);
                 //ActionFactory's properties
                 list = getChildNodesByTagName(e, PROPERTY);
                 //parse ActionFactory's properties
@@ -491,7 +491,7 @@ public class Configuration implements Serializable {
         for (Element prop : propnodes) {
             String pName = prop.getAttribute(NAME);
             if (null != properties.put(pName, prop.getAttribute(VALUE))) {
-                LOG.warn("Override property [{}] value [{}] in " + cls, pName, prop.getAttribute(VALUE));
+                LOG.warn("Override property [{}] value [{}] in {}", pName, prop.getAttribute(VALUE), cls);
             }
         }
         return properties;
@@ -505,7 +505,7 @@ public class Configuration implements Serializable {
      * @param record 指定的被包含/包含文件的映射。
      */
     private void parseInclude(String from, String includeFile, Map<String, String> record) {
-        LOG.info("Load included file : " + includeFile);
+        LOG.info("Load included file : {}", includeFile);
         printSeparator(true);
 
         URL include = getResource(includeFile);
@@ -660,7 +660,7 @@ public class Configuration implements Serializable {
                 String pathName = path.getAttribute(NAME);
                 //记录path对应的Action
                 pathActions.put(pathName, cls);
-                LOG.debug("Load path properties : " + pathName);
+                LOG.debug("Load path properties : {}", pathName);
                 //path <property> nodes
                 List<Element> pathpropnodes = getChildNodesByTagName(path, PROPERTY);
                 Map<String, Object> pathProps = new LinkedHashMap<String, Object>();
@@ -899,18 +899,22 @@ public class Configuration implements Serializable {
             //计算扫描类集合
             if (!classScanners.isEmpty()) {
                 for (ClassScanner scanner : classScanners) {
-                    LOG.info("Add classes scanner : " + scanner);
+                    LOG.info("Add classes scanner : {}", scanner);
                     scanComponents.addAll(scanner.calculateScanComponents());
                 }
-                if (!scanComponents.isEmpty()) {
-                    LOG.debug("Checking auto scan classes as follows :");
-                    Iterator<Class<?>> it = scanComponents.iterator();
-                    while (it.hasNext()) {
-                        LOG.debug(it.next().toString());
+                //just for debug log
+                if (LOG.isDebugEnabled()) {
+                    if (!scanComponents.isEmpty()) {
+                        LOG.debug("Checking auto scan classes as follows :");
+                        Iterator<Class<?>> it = scanComponents.iterator();
+                        while (it.hasNext()) {
+                            Class<?> cls = it.next();
+                            LOG.debug(cls.toString());
+                        }
+                        LOG.debug("Finish check auto scan classes : {}", scanComponents.size());
+                    } else {
+                        LOG.debug("No auto scan classes");
                     }
-                    LOG.debug("Finish check auto scan classes : " + scanComponents.size());
-                } else {
-                    LOG.debug("No auto scan classes");
                 }
             }
             printSeparator(true);
@@ -1093,8 +1097,10 @@ public class Configuration implements Serializable {
                                         break;
                                     }
                                 }
-                                LOG.info("Aop Action [{}] interceptors {} -> {}, matches {}",
-                                        path, existName, interceptorsToString(exist), aa.toString());
+                                if (LOG.isInfoEnabled()) {
+                                    LOG.info("Aop Action [{}] interceptors {} -> {}, matches {}",
+                                            path, existName, interceptorsToString(exist), aa.toString());
+                                }
                             }
                         }
                     }
@@ -1174,7 +1180,7 @@ public class Configuration implements Serializable {
      *
      * @return ActionFactory。
      *
-     * @deprecated 由{@code {@link #buildActionFactory()}}取代。
+     * @deprecated 由{@link #buildActionFactory()}取代。
      */
     @Deprecated
     public <T extends ActionFactory> T getFactory() {

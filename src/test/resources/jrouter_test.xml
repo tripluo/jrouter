@@ -9,6 +9,7 @@
         <property name="extension" value="."/>
         <property name="actionCacheNumber" value="100000"/>
         <property name="converterFactory" value="jrouter.impl.MultiParameterConverterFactory"/>
+        <property name="actionFilter" value="jrouter.spring.RequestMappingActionFilter"/>
         <property name="notExist" value="-1-1-1"/>
     </action-factory>
 

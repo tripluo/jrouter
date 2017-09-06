@@ -65,7 +65,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
      */
     private int actionCacheNumber = 10000;
 
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 实际的Action树结构路径映射。
      */
@@ -75,6 +75,14 @@ public class PathActionFactory extends AbstractActionFactory<String> {
      * Action路径与代理对象的映射缓存。
      */
     private ActionCache actionCache;
+
+    /**
+     * ActionFilter接口。
+     *
+     * @since 1.7.4
+     */
+    private ActionFilter actionFilter;
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 根据指定的键值映射构造初始化数据的PathActionFactory对象。
@@ -95,17 +103,18 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             if ("pathSeparator".equalsIgnoreCase(name)) {
                 if (StringUtil.isNotBlank(strValue)) {
                     pathSeparator = strValue.charAt(0);
-                    LOG.info("Set pathSeparator : " + this.pathSeparator);
+                    LOG.info("Set pathSeparator : {}", this.pathSeparator);
                 }
             } else if ("extension".equalsIgnoreCase(name)) {
                 //设置路径后缀名称，不为null，可设置为空串
                 this.extension = strValue;
-                LOG.info("Set extension : " + this.extension);
+                LOG.info("Set extension : {}", this.extension);
             } else if ("actionCacheNumber".equalsIgnoreCase(name)) {
                 actionCacheNumber = Integer.parseInt(strValue);
-                LOG.info("Set actionCacheNumber : " + this.actionCacheNumber);
-            } else {
-                LOG.warn("Ignore unknown property [{}] : [{}]", name, value);
+                LOG.info("Set actionCacheNumber : {}", this.actionCacheNumber);
+            } else if ("actionFilter".equalsIgnoreCase(name)) {
+                actionFilter = loadComponent(ActionFilter.class, value);
+                LOG.info("Set actionFilter : {}", this.actionFilter);
             }
         }
 
@@ -280,7 +289,9 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                     + invocation.getActionProxy().getMethodInfo());
 
         invocation.setResult(result);
-        LOG.debug("Invoke ResultType [{}] at : {}", type, rtp.getMethodInfo());
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("Invoke ResultType [{}] at : {}", type, rtp.getMethodInfo());
+        }
         //结果类型调用
         return MethodUtil.invoke(rtp, invocation);
     }
@@ -361,7 +372,9 @@ public class PathActionFactory extends AbstractActionFactory<String> {
      * @return 非字符串对象。
      */
     protected Object invokeObjectResult(ActionInvocation invocation, Object res) {
-        LOG.warn("Invoking Object Result [{}] and return directly at : {}", res, invocation.getActionProxy().getMethodInfo());
+        if (LOG.isWarnEnabled()) {
+            LOG.warn("Invoking Object Result [{}] and return directly at : {}", res, invocation.getActionProxy().getMethodInfo());
+        }
         return res;
     }
 
@@ -375,7 +388,9 @@ public class PathActionFactory extends AbstractActionFactory<String> {
      * @return 结果字符串。
      */
     protected Object invokeUndefinedResult(ActionInvocation invocation, String resInfo) {
-        LOG.warn("Invoking undefined String Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethodInfo());
+        if (LOG.isWarnEnabled()) {
+            LOG.warn("Invoking undefined String Result [{}] at {}, return string directly", resInfo, invocation.getActionProxy().getMethodInfo());
+        }
         //throw new NotFoundException("No match Result [" + resInfo + "] at " + ap.getMethodInfo(), ap);
         //不作处理直接跳过，直接返回调用结果字符串
         return resInfo;
@@ -408,14 +423,14 @@ public class PathActionFactory extends AbstractActionFactory<String> {
 
     @Override
     public void clear() {
-        LOG.info("Clearing JRouter ActionFactory : " + this);
+        LOG.info("Clearing JRouter ActionFactory : {}", this);
         actionCache.clear();
         pathActions.clear();
         super.clear();
         Injector.clear();
     }
 
-/////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 添加Action。
      *
@@ -449,11 +464,11 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                 //                        + exist.getMethodInfo());
                 //            }
                 //原有路径模糊匹配，继续添加新路径；或反之
-                else {
+                else if (LOG.isWarnEnabled()) {
                     LOG.warn("Exist matched path [{}] : {}, add [{}] : {}",
                             exist.getPath(), exist.getMethodInfo(), aPath, ap.getMethodInfo());
                 }
-            } else {
+            } else if (LOG.isWarnEnabled()) {
                 LOG.info("Add Action [{}] at : {}", aPath, ap.getMethodInfo());
             }
         }
@@ -469,61 +484,47 @@ public class PathActionFactory extends AbstractActionFactory<String> {
     public void addActions(Object obj) {
         //判断传入参数为类或实例对象
         boolean isCls = obj instanceof Class;
-        Class<?> cls = isCls ? (Class) obj : obj.getClass();
+        Class<?> cls = isCls ? (Class) obj : getObjectFactory().getClass(obj);
         Object invoker = isCls ? null : obj;
 
         //declared methods
         Method[] ms = cls.getDeclaredMethods();
-        List<Method> methods = new ArrayList<Method>(ms.length);
         Namespace ns = cls.getAnnotation(Namespace.class);
-        if (ns != null && ns.autoIncluded()) {
-            for (Method m : ms) {
-                int mod = m.getModifiers();
-                //全部public/protected方法
-                if (Modifier.isPublic(mod) || Modifier.isProtected(mod)) {
-                    methods.add(m);
-                }
-            }
-        } //no @Namespace
-        else {
-            for (Method m : ms) {
-                //指定带@Action方法
-                if (m.isAnnotationPresent(Action.class))
-                    methods.add(m);
-            }
-        }
-
-        for (Method m : methods) {
-            int mod = m.getModifiers();
-            //带@Action的public/protected方法
-//            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
-//                    && m.isAnnotationPresent(Action.class)) {
+        boolean autoIncluded = ns != null && ns.autoIncluded();
+        for (Method m : ms) {
             if (m.isAnnotationPresent(Ignore.class)) {
-                LOG.info("Ignore Action : " + MethodUtil.getMethod(m));
+                if (LOG.isInfoEnabled()) {
+                    LOG.info("Ignore Action : {}", MethodUtil.getMethod(m));
+                }
                 continue;
             }
-            m.setAccessible(true);
-            try {
-                //static method
-                if (Modifier.isStatic(mod)) {
-                    addAction(createActionProxy(m, null));
-                } else {
-                    if (isCls && invoker == null) {
-                        invoker = getObjectFactory().newInstance(cls);
+            int mod = m.getModifiers();
+            //include all public/protected methods
+            if ((autoIncluded && (Modifier.isPublic(mod) || Modifier.isProtected(mod)))
+                    || m.isAnnotationPresent(Action.class)
+                    || (actionFilter != null && actionFilter.accept(m))) {
+                m.setAccessible(true);
+                try {
+                    //static method
+                    if (Modifier.isStatic(mod)) {
+                        addAction(createActionProxy(m, null));
+                    } else {
+                        if (isCls && invoker == null) {
+                            invoker = getObjectFactory().newInstance(cls);
+                        }
+                        //the same object
+                        addAction(createActionProxy(m, invoker));
                     }
-                    //the same object
-                    addAction(createActionProxy(m, invoker));
+                } catch (IllegalAccessException e) {
+                    throw new JRouterException(e);
+                } catch (InvocationTargetException e) {
+                    throw new JRouterException(e);
                 }
-            } catch (IllegalAccessException e) {
-                throw new JRouterException(e);
-            } catch (InvocationTargetException e) {
-                throw new JRouterException(e);
             }
-//            }
         }
     }
 
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 创建Action代理对象。
      *
@@ -536,12 +537,24 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             IllegalAccessException, InvocationTargetException {
         Namespace ns = method.getDeclaringClass().getAnnotation(Namespace.class);
         //trim empty and '/'
-        String namespace = ns == null ? pathSeparator + "" : pathSeparator + StringUtil.trim(ns.name(), pathSeparator);
-        //not nullable Action
+        String namespace = ns == null ? Character.toString(pathSeparator) : pathSeparator + StringUtil.trim(ns.name(), pathSeparator);
+        //use @Action first
         Action action = method.getAnnotation(Action.class);
         //如果Action为null
         if (action == null) {
-            action = EMPTY_ACTION;
+            //use actionFilter
+            if (actionFilter != null) {
+                action = actionFilter.getAnnotation(method);
+            }
+            if (action == null) {
+                //auto included default empty action
+                if (ns != null && ns.autoIncluded()) {
+                    action = EMPTY_ACTION;
+                }
+            }
+            if (action == null) {
+                throw new NullPointerException("Action is required : " + MethodUtil.getMethod(method));
+            }
         }
 
         String[] names = action.name();
@@ -567,7 +580,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             //包含指定path的属性注入，其Action需重新生成对象
             Object _obj = obj;
             if (_obj != null && Injector.actionInjection.containsKey(path)) {
-                _obj = getObjectFactory().newInstance(_obj.getClass());
+                _obj = getObjectFactory().newInstance(getObjectFactory().getClass(_obj));
                 Injector.injectAction(path, _obj);
             }
 
@@ -575,9 +588,11 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             PathActionProxy ap = new PathActionProxy(this, namespace, path, action, method, _obj);
             aps[_idx++] = ap;
             //void method
-            if (void.class == method.getReturnType())
-                LOG.warn("Mapping [{}] void method at : {}", ap.getPath(), ap.getMethodInfo());
-
+            if (void.class == method.getReturnType()) {
+                if (LOG.isWarnEnabled()) {
+                    LOG.warn("Mapping [{}] void method at : {}", ap.getPath(), ap.getMethodInfo());
+                }
+            }
             //interceptorStack
             String stackName = action.interceptorStack().trim();
             //not not nullable action's interceptors
@@ -594,7 +609,9 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                 for (String name : action.interceptors()) {
                     InterceptorProxy ip = getInterceptors().get(name);
                     if (ip == null) {
-                        LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
+                        if (LOG.isWarnEnabled()) {
+                            LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
+                        }
                     } else {
                         inters.add(ip);
                     }
@@ -618,7 +635,9 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                         for (String name : ns.interceptors()) {
                             InterceptorProxy ip = getInterceptors().get(name);
                             if (ip == null) {
-                                LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
+                                if (LOG.isWarnEnabled()) {
+                                    LOG.warn("No such Interceptor [{}] at : {}", name, ap.getMethodInfo());
+                                }
                             } else {
                                 inters.add(ip);
                             }
@@ -656,7 +675,8 @@ public class PathActionFactory extends AbstractActionFactory<String> {
 
     /**
      * 提供继承修改构建Action路径。
-     * 最终构建的路径已删除前导空白和尾部空白、以{@linkplain #getPathSeparator() pathSeparator}起始、并截去尾部{@linkplain #getPathSeparator() pathSeparator}（如果包含）。
+     * 最终构建的路径已删除前导空白和尾部空白、以{@linkplain #getPathSeparator() pathSeparator}起始、
+     * 并截去尾部{@linkplain #getPathSeparator() pathSeparator}（如果包含）。
      *
      * @param namespace Namespace名称。
      * @param aname Action的原路径。
@@ -700,11 +720,13 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             PathActionProxy ap) {
         InterceptorStackProxy isp = getInterceptorStacks().get(stackName);
         if (isp == null) {
-            LOG.warn("No such InterceptorStack [{}] at : {}", stackName, ap.getMethodInfo());
+            if (LOG.isWarnEnabled()) {
+                LOG.warn("No such InterceptorStack [{}] at : {}", stackName, ap.getMethodInfo());
+            }
         } else if (isp.getInterceptors() != null)
             interceptors.addAll(isp.getInterceptors());
     }
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public Map<String, PathActionProxy> getActions() {
@@ -718,6 +740,15 @@ public class PathActionFactory extends AbstractActionFactory<String> {
      */
     public Map<String, Object> getActionCache() {
         return (Map) actionCache.toMap();
+    }
+
+    /**
+     * 返回ActionFilter实现。
+     *
+     * @return ActionFilter实现。
+     */
+    public ActionFilter getActionFilter() {
+        return actionFilter;
     }
 
     /**

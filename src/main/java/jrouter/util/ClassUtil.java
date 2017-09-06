@@ -46,43 +46,28 @@ public class ClassUtil {
     private static final String JAVA_CLASS_SUFFIX = ".class";
 
     /** 检测是否引入javassist */
-    private static boolean JAVASSIST_SUPPORTED = false;
-
-    static {
-        try {
-            //check javassist jar
-            ClassUtil.loadClass("javassist.ClassPool");
-            JAVASSIST_SUPPORTED = true;
-        } catch (ClassNotFoundException ex) {
-            //ignore
-        }
-    }
+    private static final boolean JAVASSIST_SUPPORTED = loadClassQuietly("javassist.ClassPool") != null;
 
     /**
-     * 从指定的包名中获取所有Class的名称集合。
+     * 从指定的包名中获取所有Class的名称集合，忽略类加载异常。
      *
      * @param packageNames 指定的包的名称。
      *
      * @return 指定的包名中所有Class的名称集合。
-     *
-     * @throws ClassNotFoundException 如果无法定位该类。
      */
-    public static Set<Class<?>> getClasses(String... packageNames) throws ClassNotFoundException {
+    public static Set<Class<?>> getClasses(String... packageNames) {
         Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
         getClasses(classes, packageNames);
         return classes;
     }
 
     /**
-     * 从指定的包名中获取所有Class的名称添加至指定的集合。
+     * 从指定的包名中获取所有Class的名称添加至指定的集合，忽略类加载异常。
      *
      * @param classes 指定的Class名称集合。
      * @param packageNames 指定的包的名称。
-     *
-     * @throws ClassNotFoundException 如果无法定位该类。
      */
-    private static void getClasses(Collection<Class<?>> classes, String... packageNames) throws
-            ClassNotFoundException {
+    private static void getClasses(Collection<Class<?>> classes, String... packageNames) {
         //recursive
         boolean recursive = true;
         for (String packageName : packageNames) {
@@ -129,7 +114,9 @@ public class ClassUtil {
                                         if (name.endsWith(JAVA_CLASS_SUFFIX) && !entry.isDirectory()) {
                                             //去掉后面的".class" 获取真正的类名
                                             String className = name.substring(packageName.length() + 1, name.length() - 6);
-                                            classes.add(loadClass(packageName + '.' + className));
+                                            Class<?> cls = loadClassQuietly(packageName + '.' + className);
+                                            if (cls != null)
+                                                classes.add(cls);
                                         }
                                     }
                                 }
@@ -146,17 +133,15 @@ public class ClassUtil {
     }
 
     /**
-     * 以文件的形式来获取指定包中所有Class的名称添加至指定的集合。
+     * 以文件的形式来获取指定包中所有Class的名称添加至指定的集合，忽略类加载异常。
      *
      * @param packageName 包名的目录形式。
      * @param packagePath 包所在的目录。
      * @param recursive 是否递归文件目录。
      * @param classes 指定的Class名称集合。
-     *
-     * @throws ClassNotFoundException 如果无法定位该类。
      */
     private static void getClassesByPackageFile(String packageName, String packagePath,
-            final boolean recursive, Collection<Class<?>> classes) throws ClassNotFoundException {
+            final boolean recursive, Collection<Class<?>> classes) {
         //package directory
         File dir = new File(packagePath);
         //not exists or not directory
@@ -180,9 +165,29 @@ public class ClassUtil {
             } else {
                 //remove .class suffix
                 String className = file.getName().substring(0, file.getName().length() - 6);
-                classes.add(loadClass(packageName + '.' + className));
+                Class<?> cls = loadClassQuietly(packageName + '.' + className);
+                if (cls != null)
+                    classes.add(cls);
             }
         }
+    }
+
+    /**
+     * 返回与带有给定字符串名的类或接口相关联的 Class 对象，如果 Class 对象不存在则返回{@code null}。
+     *
+     * @param className 所需类的完全限定名。
+     *
+     * @return 具有指定名的类的 Class 对象。
+     */
+    private static Class<?> loadClassQuietly(String className) {
+        try {
+            return loadClass(className);
+        } catch (ClassNotFoundException e) {
+            //ignore
+        } catch (NoClassDefFoundError e) {
+            //ignore
+        }
+        return null;
     }
 
     /**
@@ -195,7 +200,9 @@ public class ClassUtil {
      * @throws ClassNotFoundException 如果无法定位该类。
      */
     public static Class<?> loadClass(String className) throws ClassNotFoundException {
-        return Thread.currentThread().getContextClassLoader().loadClass(className);
+        ClassLoader contextCL = Thread.currentThread().getContextClassLoader();
+        ClassLoader loader = contextCL == null ? ClassUtil.class.getClassLoader() : contextCL;
+        return loader.loadClass(className);
     }
 
     /**

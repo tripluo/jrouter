@@ -21,19 +21,21 @@ import java.util.Map;
 import jrouter.ActionProxy;
 import jrouter.JRouterException;
 import jrouter.SimpleAction;
+import jrouter.annotation.Namespace;
 import jrouter.bytecode.javassist.JavassistMethodInvokerFactory;
 import jrouter.config.Configuration;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.SampleInterceptor;
 import jrouter.result.DefaultResult;
 import jrouter.result.DemoResult;
+import jrouter.spring.RequestMappingActionFilter;
 import org.junit.After;
 import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
 /**
- * ActionFactoryTest对应SimpleAction的测试。
+ * ActionFactoryTest对应{@link SimpleAction}的测试。
  */
 public class ActionFactoryTest {
 
@@ -55,6 +57,7 @@ public class ActionFactoryTest {
         assertEquals(".", factory.getExtension());
         assertEquals('/', factory.getPathSeparator());
         assertEquals(MultiParameterConverterFactory.class, factory.getConverterFactory().getClass());
+        assertEquals(RequestMappingActionFilter.class, factory.getActionFilter().getClass());
 
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.LOGGING));
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.TIMER));
@@ -443,5 +446,18 @@ public class ActionFactoryTest {
         String lastPadParameter2 = "/test/lastPadParameter2";
         assertEquals(lastPadParameter, factory.invokeAction(lastPadParameter));
         assertEquals("path" + lastPadParameter2, factory.invokeAction(lastPadParameter2, "path"));
+    }
+
+    /**
+     * 测试ActionFactory的actionFilter属性。
+     *
+     * @see jrouter.SimpleAction#actionFilter
+     */
+    @Test
+    public void test_actionFilter() {
+        String actionFilter = "/test/actionFilter";
+        String actionFilter2 = "/actionFilter2";
+        assertEquals("test", factory.invokeAction(actionFilter, "test"));
+        assertEquals(actionFilter2, factory.invokeAction(actionFilter2));
     }
 }

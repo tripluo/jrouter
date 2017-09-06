@@ -35,7 +35,7 @@ public class CollectionUtil {
     /**
      * An empty immutable {@code Class} array.
      */
-    public static final Class<?>[] EMPTY_CLASS_ARRAY = new Class[0];
+    public static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
 
     /**
      * An empty immutable {@code String} array.

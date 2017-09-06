@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 /**
  * SimpleAction。
@@ -283,5 +284,23 @@ public class SimpleAction {
     public void setString(String string) {
         LOG.info("Set string [{}] in {}", string, this);
         this.string = string;
+    }
+
+    /**
+     * 测试ActionFactory的actionFilter属性。
+     */
+    @RequestMapping
+    public String actionFilter(String string) {
+        LOG.info("In actionFilter [{}] in {}", string, this);
+        return string;
+    }
+
+    /**
+     * 测试ActionFactory的actionFilter属性。
+     */
+    @RequestMapping(path = {"/actionFilter2"})
+    public String actionFilter2(ActionInvocation<String> invocation) {
+        LOG.info("In actionFilter [{}] in {}", string, this);
+        return invocation.getActionPath();
     }
 }

@@ -87,7 +87,9 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
         if (action != null) {
             switch (action.scope()) {
                 case SINGLETON:
-                    LOG.debug("Get singleton ActionProxy [{}] at : {}", this, getMethodInfo());
+                    if (LOG.isDebugEnabled()) {
+                        LOG.debug("Get singleton ActionProxy [{}] at : {}", this, getMethodInfo());
+                    }
                     return this;
                 case PROTOTYPE: {
                     if (object != null) {
@@ -97,7 +99,9 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
                             Injector.injectAction(path, invoker);
                             PathActionProxy ap = this.clone();
                             ap.object = invoker;
-                            LOG.debug("Get prototype ActionProxy [{}] at : {}", ap, getMethodInfo());
+                            if (LOG.isDebugEnabled()) {
+                                LOG.debug("Get prototype ActionProxy [{}] at : {}", ap, getMethodInfo());
+                            }
                             return ap;
                         } catch (IllegalAccessException e) {
                             throw new InvocationProxyException(e, this);

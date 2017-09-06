@@ -141,18 +141,18 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      * @throws Exception 如果发生异常。
      */
     protected ActionFactory buildActionFactory() throws Exception {
-        LOG.info("Initiating JRouter ActionFactory at : " + new java.util.Date());
+        LOG.info("Initiating JRouter ActionFactory at : {}", new java.util.Date());
         if (configuration == null) {
             configuration = createDefaultConfiguration();
         }
         //不保证ActionFactory属性的重复加载
         if (configLocation != null) {
-            LOG.debug("Load configuration : " + configLocation.getURL());
+            LOG.debug("Load configuration : {}", configLocation.getURL());
             configuration.load(configLocation.getURL());
         }
 
         if (actionFactoryClass != null) {
-            LOG.debug("Set actionFactoryClass : " + actionFactoryClass);
+            LOG.debug("Set actionFactoryClass : {}", actionFactoryClass);
             configuration.setActionFactoryClass(actionFactoryClass);
         } else {
             setDefaultActionFactoryClass(configuration);
@@ -233,7 +233,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
                     }
                 } catch (BeansException e) {
                     //ignore
-                    LOG.warn("Can't get bean : " + includeName);
+                    LOG.warn("Can't get bean : {}", includeName);
                 }
             }
         }
@@ -343,7 +343,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      */
     @Override
     public void destroy() throws JRouterException {
-        LOG.info("Closing JRouter ActionFactory : " + actionFactory);
+        LOG.info("Closing JRouter ActionFactory : {}", actionFactory);
         try {
             beforeActionFactoryDestruction();
         } finally {
