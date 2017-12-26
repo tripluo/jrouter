@@ -23,6 +23,7 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import jrouter.ActionFactory;
+import jrouter.ActionFilter;
 import jrouter.ConverterFactory;
 import jrouter.JRouterException;
 import jrouter.ObjectFactory;
@@ -57,6 +58,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     /**
      * Location of a single JRouter XML config file. 不保证ActionFactory属性的重复加载。
      */
+    @lombok.Setter
     private Resource configLocation;
 
     /* ActionFactory对象 */
@@ -65,7 +67,8 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     /* ActionFactory的类型 */
     private Class<T> actionFactoryClass = null;
 
-    /** Configuration对象 */
+    /** 指定的Configuration */
+    @lombok.Setter
     private Configuration configuration;
 
     /**
@@ -76,32 +79,58 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     @Deprecated
     private Class<? extends Configuration> configurationClass = Configuration.class;
 
-    /** @see ActionFactory#getObjectFactory() */
+    /**
+     * 设置ActionFactory中创建对象的工厂对象。
+     *
+     * @see ActionFactory#getObjectFactory()
+     */
+    @lombok.Setter
     private ObjectFactory objectFactory;
 
-    /** @see ActionFactory#getConverterFactory() */
+    /**
+     * 设置ActionFactory中创建底层方法转换器的工厂对象。
+     *
+     * @see ActionFactory#getConverterFactory()
+     */
+    @lombok.Setter
     private ConverterFactory converterFactory;
 
     /**
+     * 设置ActionFactory中创建{@link Action}转换器。
+     *
+     * @see AbstractActionFactory#getActionFilter()
+     */
+    @lombok.Setter
+    private ActionFilter actionFilter;
+
+    /**
+     * 添加ActionFactory的属性映射集合。
+     *
      * @see Configuration#actionFactoryProperties
      * @see jrouter.impl.PathActionFactory#setActionFactoryProperties(java.util.Map)
      */
+    @lombok.Setter
     private Properties actionFactoryProperties = new Properties();
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
     /* 拦截器的bean名称和类名称的集合 */
+    @lombok.Setter
     private List<Object> interceptors = null;
 
     /* 拦截栈的bean名称和类名称的集合 */
+    @lombok.Setter
     private List<Object> interceptorStacks = null;
 
     /* 结果类型的bean名称和类名称的集合 */
+    @lombok.Setter
     private List<Object> resultTypes = null;
 
     /* 结果对象的bean名称和类名称的集合 */
+    @lombok.Setter
     private List<Object> results = null;
 
     /* Action的bean名称和类名称的集合 */
+    @lombok.Setter
     private List<Object> actions = null;
 
     /**
@@ -109,13 +138,16 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      *
      * @see Configuration#parsecComponentClassScanner(java.util.Map)
      */
+    @lombok.Setter
     private List<Properties> componentClassScanProperties;
 
     /** actions' aop */
+    @lombok.Setter
     private List<? extends AopAction> aopActions;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /** 根据匹配的name自动加载Bean，依次配置匹配(包含/排除)的beans' name属性。 */
+    @lombok.Setter
     private Properties componentBeanScanProperties;
 
     /** ApplicationContext */
@@ -164,6 +196,9 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
         if (converterFactory != null) {
             actionFactoryProperties.put("converterFactory", converterFactory);
+        }
+        if (actionFilter != null) {
+            actionFactoryProperties.put("actionFilter", actionFilter);
         }
         configuration.addActionFactoryProperties((Map) actionFactoryProperties);
 
@@ -401,17 +436,6 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * Set the location of a single JRouter XML config file.
-     *
-     * @param configLocation Location of a single JRouter XML config file.
-     *
-     * @see jrouter.config.Configuration#load(java.net.URL)
-     */
-    public void setConfigLocation(Resource configLocation) {
-        this.configLocation = configLocation;
-    }
-
-    /**
      * 指定的JRouter Configuration类型。
      *
      * @param configurationClass 指定的Configuration类型。
@@ -428,15 +452,6 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
                     "'configurationClass' must be assignable to [jrouter.config.Configuration]");
         }
         this.configurationClass = (Class<? extends Configuration>) configurationClass;
-    }
-
-    /**
-     * 设置指定的Configuration。
-     *
-     * @param configuration 指定的Configuration。
-     */
-    public void setConfiguration(Configuration configuration) {
-        this.configuration = configuration;
     }
 
     /**
@@ -466,88 +481,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         this.actionFactoryClass = actionFactoryClass;
     }
 
-    /**
-     * 添加ActionFactory的属性映射集合。
-     *
-     * @param actionFactoryProperties ActionFactory的属性映射集合。
-     *
-     * @see Configuration#addActionFactoryProperties(java.util.Map)
-     * @see jrouter.impl.PathActionFactory#setActionFactoryProperties(java.util.Map)
-     */
-    public void setActionFactoryProperties(Properties actionFactoryProperties) {
-        this.actionFactoryProperties = actionFactoryProperties;
-    }
-
-    /**
-     * 设置ActionFactory中创建对象的工厂对象。
-     *
-     * @param objectFactory ActionFactory中创建对象的工厂对象。
-     *
-     * @see Configuration#addActionFactoryProperties(java.util.Map)
-     * @see ActionFactory#getObjectFactory()
-     */
-    public void setObjectFactory(ObjectFactory objectFactory) {
-        this.objectFactory = objectFactory;
-    }
-
-    /**
-     * 设置ActionFactory中创建底层方法转换器的工厂对象。
-     *
-     * @param converterFactory ActionFactory中创建底层方法转换器的工厂对象。
-     *
-     * @see Configuration#addActionFactoryProperties(java.util.Map)
-     * @see ActionFactory#getConverterFactory()
-     */
-    public void setConverterFactory(ConverterFactory converterFactory) {
-        this.converterFactory = converterFactory;
-    }
-
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * 设置Action的bean名称和类名称的集合。
-     *
-     * @param actions Action的bean名称和类名称的集合。
-     */
-    public void setActions(List<Object> actions) {
-        this.actions = actions;
-    }
-
-    /**
-     * 设置拦截栈的bean名称和类名称的集合。
-     *
-     * @param interceptorStacks 拦截栈的bean名称和类名称的集合。
-     */
-    public void setInterceptorStacks(List<Object> interceptorStacks) {
-        this.interceptorStacks = interceptorStacks;
-    }
-
-    /**
-     * 设置拦截器的bean名称和类名称的集合。
-     *
-     * @param interceptors 拦截器的bean名称和类名称的集合。
-     */
-    public void setInterceptors(List<Object> interceptors) {
-        this.interceptors = interceptors;
-    }
-
-    /**
-     * 设置结果类型的bean名称和类名称的集合。
-     *
-     * @param resultTypes 结果类型的bean名称和类名称的集合。
-     */
-    public void setResultTypes(List<Object> resultTypes) {
-        this.resultTypes = resultTypes;
-    }
-
-    /**
-     * 设置结果对象的bean名称和类名称的集合。
-     *
-     * @param results 结果对象的bean名称和类名称的集合。
-     */
-    public void setResults(List<Object> results) {
-        this.results = results;
-    }
-
     /**
      * @see #setComponentClassScanProperties(java.util.List)
      *
@@ -556,36 +490,6 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     @Deprecated
     public void setClassScannerProperties(List<Properties> classScannerProperties) {
         this.setComponentClassScanProperties(classScannerProperties);
-    }
-
-    /**
-     * 设置扫描类工具的顺序配置。
-     *
-     * @param componentClassScanProperties 扫描类工具的顺序配置集合。
-     *
-     * @see Configuration#parsecComponentClassScanner(java.util.Map)
-     */
-    public void setComponentClassScanProperties(List<Properties> componentClassScanProperties) {
-        this.componentClassScanProperties = componentClassScanProperties;
-    }
-
-    /**
-     * 设置Action的aop。
-     *
-     * @param aopActions Actions' Aop。
-     */
-    public void setAopActions(List<? extends AopAction> aopActions) {
-        this.aopActions = aopActions;
-    }
-
-    /**
-     * 设置匹配包含/排除的beans' name属性。
-     *
-     * @param componentBeanScanProperties 匹配包含/排除的beans' name属性。
-     *
-     */
-    public void setComponentBeanScanProperties(Properties componentBeanScanProperties) {
-        this.componentBeanScanProperties = componentBeanScanProperties;
     }
 
     /**

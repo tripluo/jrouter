@@ -25,7 +25,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 /**
- * 测试MultiParameterConverter转换参数。
+ * 测试{@link MultiParameterConverter}转换参数。
  */
 public class MultiParameterConverterTest {
 

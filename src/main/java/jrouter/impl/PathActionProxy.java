@@ -40,23 +40,31 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
     private final ActionFactory actionFactory;
 
     /** 命名空间 */
+    @lombok.Getter
     private final String namespace;
 
     /** 全路径 */
+    @lombok.Getter
     private final String path;
 
     /** Action */
+    @lombok.Getter
     private final Action action;
 
     /**
      * Action初始化参数的键/值映射。
      */
+    @lombok.Setter(lombok.AccessLevel.PACKAGE)
+    @lombok.Getter
     private Map<String, String[]> actionParameters;
 
-    /** 拦截器集合 */
+    /** Action所配置的拦截器集合 */
+    @lombok.Setter(lombok.AccessLevel.PACKAGE)
     private List<InterceptorProxy> interceptors;
 
     /** 结果对象的映射集合 */
+    @lombok.Setter(lombok.AccessLevel.PACKAGE)
+    @lombok.Getter
     private Map<String, Result> results;
 
     /**
@@ -128,21 +136,6 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
     }
 
     @Override
-    public Action getAction() {
-        return action;
-    }
-
-    @Override
-    public String getPath() {
-        return path;
-    }
-
-    @Override
-    public String getNamespace() {
-        return namespace;
-    }
-
-    @Override
     public String getActionParameter(String name) {
         String[] params = getActionParameterValues(name);
         if (params == null || params.length == 0)
@@ -157,20 +150,6 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
     @Override
     public String[] getActionParameterValues(String name) {
         return actionParameters.get(name);
-    }
-
-    @Override
-    public Map<String, String[]> getActionParameters() {
-        return actionParameters;
-    }
-
-    /**
-     * 设置Action初始化参数键/值映射。
-     *
-     * @param actionParameters Action初始化参数键/值映射。
-     */
-    void setActionParameters(Map<String, String[]> actionParameters) {
-        this.actionParameters = actionParameters;
     }
 
     @Override
@@ -192,26 +171,4 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
         return interceptors;
     }
 
-    /**
-     * 设置Action的拦截器集合。
-     *
-     * @param interceptors Action的拦截器集合。
-     */
-    void setInterceptors(List<InterceptorProxy> interceptors) {
-        this.interceptors = interceptors;
-    }
-
-    @Override
-    public Map<String, Result> getResults() {
-        return results;
-    }
-
-    /**
-     * 设置Action的结果对象集合。
-     *
-     * @param results Action的结果对象集合。
-     */
-    void setResults(Map<String, Result> results) {
-        this.results = results;
-    }
 }

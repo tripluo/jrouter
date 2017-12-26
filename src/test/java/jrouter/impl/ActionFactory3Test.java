@@ -39,10 +39,10 @@ public class ActionFactory3Test {
     private PathActionFactory factory2;
 
     //extension for factory1
-    private String extension1 = ".do";
+    private final String extension1 = ".do";
 
     //extension for factory2
-    private String extension2 = ".action";
+    private final String extension2 = ".action";
 
     @Before
     public void init() {

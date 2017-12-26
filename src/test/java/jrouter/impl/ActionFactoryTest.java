@@ -101,11 +101,11 @@ public class ActionFactoryTest {
      *
      * @throws Exception 如果发生异常。
      *
-     * @see PathActionFactory#parseMatch(java.lang.String, java.lang.String[])
+     * @see PathActionFactory.ColonString#parseMatch(java.lang.String, java.lang.String[])
      */
     @Test
     public void test_parseMatch() throws Exception {
-        java.lang.reflect.Method method = PathActionFactory.class.getDeclaredMethod("parseMatch", String.class, String[].class);
+        java.lang.reflect.Method method = PathActionFactory.ColonString.class.getDeclaredMethod("parseMatch", String.class, String[].class);
         method.setAccessible(true);
         String[] emptyDefaults = new String[]{"", ""};
 
@@ -315,7 +315,7 @@ public class ActionFactoryTest {
     public void test_autoRender() {
         Map<String, Object> props = new HashMap<String, Object>();
         //默认结果处理直接返回调用结果
-        props.put("defaultResultType", DefaultResult.EMPTY);
+        props.put("defaultStringResultType", DefaultResult.EMPTY);
 
         String url1 = "/test/autoRender.do";
         //rebuild factory
@@ -331,7 +331,7 @@ public class ActionFactoryTest {
         assertEquals(" :   abcde", factory.invokeAction(url1, " :   abcde"));
 
         //forward
-        props.put("defaultResultType", DefaultResult.FORWARD);
+        props.put("defaultStringResultType", DefaultResult.FORWARD);
         //rebuild factory
         factory = initiateConfiguration().addActionFactoryProperties(props).buildActionFactory();
         assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, ":/test/simple2"));
@@ -431,7 +431,7 @@ public class ActionFactoryTest {
         String included = "test/autoIncluded";
         ActionProxy ap = factory.getActions().get(included);
         assertNotNull(ap);
-        assertEquals(1, factory.invokeAction(included));
+        assertEquals(1L, factory.invokeAction(included));
     }
 
     /**

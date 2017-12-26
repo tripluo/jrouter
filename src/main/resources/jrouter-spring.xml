@@ -29,8 +29,8 @@
                 defaultResultType = empty
                 <!-- optional default -->
                 pathSeparator = /
-                <!-- optional default -->
-                extension = .
+                <!-- optional default:null -->
+                extension =
                 <!-- optional default -->
                 actionCacheNumber = 10000
                 <!-- optional default -->

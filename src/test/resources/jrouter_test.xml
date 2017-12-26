@@ -2,9 +2,10 @@
 <jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../main/resources/jrouter-1.6.xsd">
 
-    <action-factory class="jrouter.impl.PathActionFactory">
+    <action-factory class="jrouter.impl.PathActionFactory$ColonString">
         <property name="defaultInterceptorStack" value="empty"/>
         <property name="defaultResultType" value="empty"/>
+        <property name="defaultStringResultType" value="empty"/>
         <property name="pathSeparator" value="/"/>
         <property name="extension" value="."/>
         <property name="actionCacheNumber" value="100000"/>

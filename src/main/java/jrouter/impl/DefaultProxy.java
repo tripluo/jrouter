@@ -62,7 +62,8 @@ public class DefaultProxy extends AbstractProxy {
             empty = (Object[]) Array.newInstance(varArgClass, 0);
         }
         if (proxyFactory != null) {
-            this.invoker = proxyFactory.newInstance(method);
+            Class<?> targetClass = (object == null ? method.getDeclaringClass() : object.getClass());
+            this.invoker = proxyFactory.newInstance(targetClass, method);
         }
     }
 

@@ -43,6 +43,8 @@ public interface ActionFactory<K> {
     /**
      * 返回创建底层方法转换器的工厂对象。
      *
+     * @param <T> ActionInvocation type.
+     *
      * @return 创建底层方法转换器的工厂对象。
      */
     <T extends ActionInvocation<?>> ConverterFactory<T> getConverterFactory();

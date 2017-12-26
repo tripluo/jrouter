@@ -26,12 +26,14 @@ import java.util.List;
 public final class InterceptorStackProxy {
 
     /** 拦截栈名称 */
+    @lombok.Getter
     private final String name;
 
     /** 拦截栈取名字段 */
     private final Field field;
 
     /** 包含的拦截器集合 */
+    @lombok.Getter
     private final List<InterceptorProxy> interceptors;
 
     /**
@@ -45,24 +47,6 @@ public final class InterceptorStackProxy {
         this.name = name;
         this.field = field;
         this.interceptors = interceptors;
-    }
-
-    /**
-     * 返回拦截栈所包含的拦截器集合，不包含任何拦截器则返回 null。
-     *
-     * @return 包含的拦截器集合。
-     */
-    public List<InterceptorProxy> getInterceptors() {
-        return interceptors;
-    }
-
-    /**
-     * 返回拦截栈名称。
-     *
-     * @return 拦截栈名称。
-     */
-    public String getName() {
-        return name;
     }
 
     /**

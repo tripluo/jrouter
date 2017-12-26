@@ -13,7 +13,7 @@
         <!-- optional default -->
         <property name="pathSeparator" value="/"/>
         <!-- optional default -->
-        <property name="extension" value="."/>
+        <property name="extension" value=""/>
         <!-- optional default -->
         <property name="actionCacheNumber" value="10000"/>
         <!-- optional default -->

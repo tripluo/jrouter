@@ -15,6 +15,6 @@
  *
  */
 /**
- * 提供默认的拦截栈和拦截器。
+ * 提供常用拦截栈和拦截器。
  */
 package jrouter.interceptor;

@@ -38,7 +38,7 @@ public class ActionFactory2Test {
 
     @Before
     public void init() {
-        factory = new PathActionFactory(Collections.EMPTY_MAP);
+        factory = new PathActionFactory.ColonString(Collections.EMPTY_MAP);
 
         //interceptor
         factory.addInterceptors(SampleInterceptor.class);

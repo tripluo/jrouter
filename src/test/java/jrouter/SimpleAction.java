@@ -143,11 +143,10 @@ public class SimpleAction {
      * @return 抛出异常则返回null。
      */
     @Action(name = "exception", interceptorStack = DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK)
-    public String exception() {
+    public void exception() {
 
         //throw exception
         System.out.println(1 / 0);
-        return null;
     }
 
     /**
@@ -233,7 +232,7 @@ public class SimpleAction {
      *
      * @see Namespace#autoIncluded()
      */
-    public int autoIncluded() {
+    public long autoIncluded() {
         return 1;
     }
 

@@ -44,16 +44,19 @@ class ClassScanner implements Serializable {
     /**
      * 包含的包或类。
      */
+    @lombok.Setter
     private Set<String> includePackages = Collections.EMPTY_SET;
 
     /**
      * 包含匹配类的表达式。
      */
+    @lombok.Setter
     private Set<String> includeExpressions;
 
     /**
      * 排除匹配类的表达式。
      */
+    @lombok.Setter
     private Set<String> excludeExpressions;
 
     /**
@@ -127,35 +130,7 @@ class ClassScanner implements Serializable {
                 }
             }
         }
-
         return includes;
-    }
-
-    /**
-     * 设置排除匹配类的表达式。
-     *
-     * @param excludeExpressions 排除匹配类的表达式。
-     */
-    public void setExcludeExpressions(Set<String> excludeExpressions) {
-        this.excludeExpressions = excludeExpressions;
-    }
-
-    /**
-     * 设置包含匹配类的表达式。
-     *
-     * @param includeExpressions 包含匹配类的表达式。
-     */
-    public void setIncludeExpressions(Set<String> includeExpressions) {
-        this.includeExpressions = includeExpressions;
-    }
-
-    /**
-     * 设置包含的包或类。
-     *
-     * @param includePackages 包含的包或类。
-     */
-    public void setIncludePackages(Set<String> includePackages) {
-        this.includePackages = includePackages;
     }
 
     @Override

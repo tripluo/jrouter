@@ -30,94 +30,30 @@ public class AopAction implements Serializable {
     /**
      * Action的路径匹配。
      */
+    @lombok.Getter
+    @lombok.Setter
     private String matches;
 
     /**
      * 依序指定的拦截栈集合。
      */
+    @lombok.Getter
+    @lombok.Setter
     private List<String> interceptorStacks;
 
     /**
      * 依序指定的拦截器集合。
      */
+    @lombok.Getter
+    @lombok.Setter
     private List<String> interceptors;
 
     /**
      * aop的类型。
      */
+    @lombok.Getter
+    @lombok.Setter
     private Type type;
-
-    /**
-     * 获取Action的路径匹配。
-     *
-     * @return Action的路径匹配。
-     */
-    public String getMatches() {
-        return matches;
-    }
-
-    /**
-     * 设置Action的路径匹配。
-     *
-     * @param matches Action的路径匹配。
-     */
-    public void setMatches(String matches) {
-        this.matches = matches;
-    }
-
-    /**
-     * 获取指定的拦截栈集合。
-     *
-     * @return 指定的拦截栈集合。
-     */
-    public List<String> getInterceptorStacks() {
-        return interceptorStacks;
-    }
-
-    /**
-     * 设置指定的拦截栈集合。
-     *
-     * @param interceptorStacks 指定的拦截栈集合。
-     */
-    public void setInterceptorStacks(List<String> interceptorStacks) {
-        this.interceptorStacks = interceptorStacks;
-    }
-
-    /**
-     * 获取指定的拦截器集合。
-     *
-     * @return 指定的拦截器集合。
-     */
-    public List<String> getInterceptors() {
-        return interceptors;
-    }
-
-    /**
-     * 设置指定的拦截器集合。
-     *
-     * @param interceptors 指定的拦截器集合。
-     */
-    public void setInterceptors(List<String> interceptors) {
-        this.interceptors = interceptors;
-    }
-
-    /**
-     * 获取aop的类型。
-     *
-     * @return aop的类型。
-     */
-    public Type getType() {
-        return type;
-    }
-
-    /**
-     * 设置aop的类型。
-     *
-     * @param type aop的类型。
-     */
-    public void setType(Type type) {
-        this.type = type;
-    }
 
     /**
      * 修改Action拦截器集合的aop操作类型。
@@ -138,6 +74,7 @@ public class AopAction implements Serializable {
         OVERRIDE("override");
 
         //aop类型所表征的字符串代码
+        @lombok.Getter
         private final String code;
 
         /**
@@ -147,15 +84,6 @@ public class AopAction implements Serializable {
          */
         private Type(String code) {
             this.code = code;
-        }
-
-        /**
-         * 获取aop的类型代码。
-         *
-         * @return aop的类型代码。
-         */
-        public String getCode() {
-            return code;
         }
 
         /**

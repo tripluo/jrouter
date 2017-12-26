@@ -27,6 +27,7 @@ import jrouter.annotation.ResultType;
 public final class ResultProxy extends DefaultProxy {
 
     /** 结果对象 */
+    @lombok.Getter
     private final Result result;
 
     /** 结果对象相应的结果类型 未完成 */
@@ -43,14 +44,5 @@ public final class ResultProxy extends DefaultProxy {
     public ResultProxy(ActionFactory actionFactory, Result result, Method method, Object object) {
         super(method, object, actionFactory.getMethodInvokerFactory());
         this.result = result;
-    }
-
-    /**
-     * 返回代理的结果对象。
-     *
-     * @return 代理的结果对象。
-     */
-    public Result getResult() {
-        return result;
     }
 }

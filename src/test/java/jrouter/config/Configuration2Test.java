@@ -34,7 +34,7 @@ public class Configuration2Test extends Assert {
 
     private Configuration config = null;
 
-    private PathActionFactory factory;
+    private PathActionFactory.ColonString factory;
 
     @After
     public void tearDown() {
@@ -52,6 +52,7 @@ public class Configuration2Test extends Assert {
         assertNotNull(factory);
         assertEquals("empty", factory.getDefaultInterceptorStack());
         assertEquals("empty", factory.getDefaultResultType());
+        assertEquals("empty", factory.getDefaultStringResultType());
         assertEquals(100000, factory.getActionCacheNumber());
         assertEquals(".", factory.getExtension());
         assertEquals('/', factory.getPathSeparator());

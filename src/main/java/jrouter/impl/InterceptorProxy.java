@@ -29,11 +29,13 @@ public final class InterceptorProxy extends DefaultProxy {
     /**
      * 拦截器的名称。
      */
+    @lombok.Getter
     private final String name;
 
     /**
      * 拦截器。
      */
+    @lombok.Getter
     private final Interceptor interceptor;
 
     /**
@@ -49,23 +51,5 @@ public final class InterceptorProxy extends DefaultProxy {
         super(method, object, actionFactory.getMethodInvokerFactory());
         this.interceptor = interceptor;
         this.name = interceptor.name().trim();
-    }
-
-    /**
-     * 返回拦截器的名称。
-     *
-     * @return 拦截器的名称。
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * 返回所代理的拦截器。
-     *
-     * @return 所代理的拦截器。
-     */
-    public Interceptor getInterceptor() {
-        return interceptor;
     }
 }

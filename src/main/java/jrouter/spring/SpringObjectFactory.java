@@ -34,8 +34,15 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
     protected AutowireCapableBeanFactory autowireCapableBeanFactory;
 
     /**
-     * springframework 属性注入的策略；默认{@code byName}
+     * springframework 属性注入的策略；默认{@code byName}.
+     *
+     * @see AutowireCapableBeanFactory#AUTOWIRE_BY_NAME
+     * @see AutowireCapableBeanFactory#AUTOWIRE_BY_TYPE
+     * @see AutowireCapableBeanFactory#AUTOWIRE_CONSTRUCTOR
+     * @see AutowireCapableBeanFactory#AUTOWIRE_NO
      */
+    @lombok.Getter
+    @lombok.Setter
     private int autowireMode = AutowireCapableBeanFactory.AUTOWIRE_BY_NAME;
 
     /**
@@ -85,29 +92,6 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
             return findAutoWiringBeanFactory(context.getParent());
         }
         return null;
-    }
-
-    /**
-     * 返回注入策略。
-     *
-     * @return 注入策略。
-     */
-    public int getAutowireMode() {
-        return autowireMode;
-    }
-
-    /**
-     * 设置注入策略。
-     *
-     * @param autowireMode 注入策略。
-     *
-     * @see AutowireCapableBeanFactory#AUTOWIRE_BY_NAME
-     * @see AutowireCapableBeanFactory#AUTOWIRE_BY_TYPE
-     * @see AutowireCapableBeanFactory#AUTOWIRE_CONSTRUCTOR
-     * @see AutowireCapableBeanFactory#AUTOWIRE_NO
-     */
-    public void setAutowireMode(int autowireMode) {
-        this.autowireMode = autowireMode;
     }
 
     @Override

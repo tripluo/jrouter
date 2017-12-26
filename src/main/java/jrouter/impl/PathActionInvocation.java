@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import jrouter.ActionFactory;
 import jrouter.ActionInvocation;
-import jrouter.ActionProxy;
 import jrouter.ParameterConverter;
 import jrouter.annotation.Action;
 import jrouter.annotation.Dynamic;
@@ -41,12 +40,16 @@ public class PathActionInvocation implements ActionInvocation<String> {
     private static final Logger LOG = LoggerFactory.getLogger(PathActionInvocation.class);
 
     /** Action是否已调用 */
+    @lombok.Setter(lombok.AccessLevel.PACKAGE)
+    @lombok.Getter
     private boolean executed = false;
 
     /** ActionFactory */
+    @lombok.Getter
     private final ActionFactory actionFactory;
 
     /** PathActionProxy */
+    @lombok.Getter
     private final PathActionProxy actionProxy;
 
     /** interceptors reference */
@@ -56,25 +59,35 @@ public class PathActionInvocation implements ActionInvocation<String> {
     private int _index = 0;
 
     /** Aciton调用的真实路径 */
+    @lombok.Getter
     private final String actionPath;
 
     /** 方法调用的参数 */
     private final Object[] originalParams;
 
     /** 提供给转换器的参数 */
+    @lombok.Getter
+    @lombok.Setter
     private Object[] convertParameters;
 
     /** 方法调用后的结果 */
+    @lombok.Getter
+    @lombok.Setter
     private Object invokeResult;
 
     /** Action结果对象 */
+    @lombok.Getter
+    @lombok.Setter
     private Result result;
 
     /** Action路径的参数匹配映射 */
+    @lombok.Setter(lombok.AccessLevel.PACKAGE)
     private Map<String, String> actionPathParameters;
 
     /** 底层方法参数的转换器 */
     @Dynamic
+    @lombok.Getter
+    @lombok.Setter
     private ParameterConverter parameterConverter;
 
     /**
@@ -133,67 +146,9 @@ public class PathActionInvocation implements ActionInvocation<String> {
         return invokeResult;
     }
 
-    /**
-     * 设置Action是否已调用。
-     *
-     * @param executed Action是否已调用。
-     */
-    void setExecuted(boolean executed) {
-        this.executed = executed;
-    }
-
-    @Override
-    public boolean isExecuted() {
-        return executed;
-    }
-
     @Override
     public Object[] getParameters() {
         return originalParams;
-    }
-
-    @Override
-    public Object getInvokeResult() {
-        return invokeResult;
-    }
-
-    @Override
-    public void setInvokeResult(Object invokeResult) {
-        this.invokeResult = invokeResult;
-    }
-
-    @Override
-    public ActionFactory getActionFactory() {
-        return actionFactory;
-    }
-
-    @Override
-    public ActionProxy getActionProxy() {
-        return actionProxy;
-    }
-
-    @Override
-    public void setResult(Result result) {
-        this.result = result;
-    }
-
-    @Override
-    public Result getResult() {
-        return result;
-    }
-
-    /**
-     * 设置Action路径匹配的键值映射。
-     *
-     * @return 设置Action路径匹配的键值映射。
-     */
-    void setActionPathParameters(Map<String, String> actionPathParameters) {
-        this.actionPathParameters = actionPathParameters;
-    }
-
-    @Override
-    public String getActionPath() {
-        return actionPath;
     }
 
     /**
@@ -205,26 +160,6 @@ public class PathActionInvocation implements ActionInvocation<String> {
      */
     public Map<String, String> getActionPathParameters() {
         return actionPathParameters;
-    }
-
-    @Override
-    public void setParameterConverter(ParameterConverter parameterConverter) {
-        this.parameterConverter = parameterConverter;
-    }
-
-    @Override
-    public ParameterConverter getParameterConverter() {
-        return this.parameterConverter;
-    }
-
-    @Override
-    public Object[] getConvertParameters() {
-        return this.convertParameters;
-    }
-
-    @Override
-    public void setConvertParameters(Object... params) {
-        this.convertParameters = params;
     }
 
     /**

@@ -25,9 +25,11 @@ import jrouter.util.MethodUtil;
 public abstract class AbstractProxy {
 
     /** 方法对象 */
+    @lombok.Getter
     protected Method method;
 
     /** 方法所在的对象 */
+    @lombok.Getter
     protected Object object;
 
     /**
@@ -55,29 +57,11 @@ public abstract class AbstractProxy {
     public abstract Object invoke(Object... params) throws JRouterException;
 
     /**
-     * 返回调用方法。
-     *
-     * @return 调用方法。
-     */
-    public Method getMethod() {
-        return method;
-    }
-
-    /**
      * 返回调用方法的描述信息。
      *
      * @return 调用方法的描述信息。
      */
     public String getMethodInfo() {
         return MethodUtil.getMethod(method);
-    }
-
-    /**
-     * 返回方法所在的对象。
-     *
-     * @return 方法所在的对象。
-     */
-    public Object getObject() {
-        return object;
     }
 }

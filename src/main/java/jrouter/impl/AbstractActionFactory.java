@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import jrouter.ActionFactory;
+import jrouter.ActionFilter;
 import jrouter.ConverterFactory;
 import jrouter.JRouterException;
 import jrouter.MethodInvokerFactory;
@@ -70,58 +71,58 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
     /**
      * 创建对象的工厂对象。
      */
+    @lombok.Getter
     private ObjectFactory objectFactory = null;
 
     /**
      * 创建底层方法代理的工厂对象。
      */
+    @lombok.Getter
     private MethodInvokerFactory methodInvokerFactory = null;
 
     /**
      * 创建底层方法转换器的工厂对象。
      */
+    @lombok.Getter
     private ConverterFactory converterFactory = null;
 
     /**
      * 方法检查器。
      */
+    @lombok.Getter
     private JavassistMethodChecker methodChecker;
 
+    /**
+     * ActionFilter接口。
+     *
+     * @since 1.7.4
+     */
+    @lombok.Getter
+    private ActionFilter actionFilter;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /**
-     * 默认拦截栈名称。作用于初始化Action时的配置。
-     *
-     * @see #createActionProxy(Method, Object)
-     */
-    private String defaultInterceptorStack = null;
-
-    /**
-     * 默认视图类型，主要针对{@code String}类型的结果对象。
-     *
-     * @see #invokeAction(java.lang.String, java.lang.Object...)
-     * @see #invokeColonString
-     * @see #invokeStringResult
-     */
-    private String defaultResultType = null;
 
     /**
      * 拦截器。
      */
+    @lombok.Getter
     private final Map<String, InterceptorProxy> interceptors;
 
     /**
      * 拦截栈。
      */
+    @lombok.Getter
     private final Map<String, InterceptorStackProxy> interceptorStacks;
 
     /**
      * 结果类型。
      */
+    @lombok.Getter
     private final Map<String, ResultTypeProxy> resultTypes;
 
     /**
      * 默认的全局结果对象集合。
      */
+    @lombok.Getter
     private final Map<String, ResultProxy> results;
 
     /**
@@ -145,41 +146,44 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
      */
     private void setActionFactoryProperties(Map<String, Object> properties) {
         boolean setBytecode = false;
-        Class<? extends ConverterFactory> converterFactoryClass = null;
+
+        //load objectFactory first
+        Object value = properties.get("objectFactory");
+        if (value != null) {
+            String strValue = value.toString().trim();
+            if (value instanceof String && StringUtil.isNotBlank(strValue)) {
+                try {
+                    this.objectFactory = (ObjectFactory) (DefaultObjectFactory._newInstance(ClassUtil.loadClass(strValue)));
+                } catch (ClassNotFoundException ex) {
+                    throw new JRouterException(ex);
+                }
+            } else if (value instanceof Class) {
+                this.objectFactory = (ObjectFactory) (DefaultObjectFactory._newInstance((Class) value));
+            } else {
+                //设置创建对象的工厂对象
+                this.objectFactory = (ObjectFactory) value; //throw exception if not matched
+            }
+            LOG.info("Set objectFactory : {}", this.objectFactory);
+        }
+        //create default objectFactory
+        if (objectFactory == null) {
+            objectFactory = createDefaultObjectFactory();
+            LOG.info("No objectFactory setting, use default : {}", objectFactory);
+        }
+
+        //all properties
         for (Map.Entry<String, Object> e : properties.entrySet()) {
             String name = e.getKey();
-            Object value = e.getValue();
-            if (value == null) {
-                LOG.warn("Property [{}] can't be null.", name);
+            Object val = e.getValue();
+            if (val == null) {
+                LOG.warn("Ingore null value Property [{}].", name);
                 continue;
             }
             //string value
-            String strValue = value.toString().trim();
-            if ("defaultInterceptorStack".equalsIgnoreCase(name)) {
-                //设置默认拦截栈名称
-                this.defaultInterceptorStack = strValue;
-                LOG.info("Set defaultInterceptorStack : {}", defaultInterceptorStack);
-            } else if ("defaultResultType".equalsIgnoreCase(name)) {
-                //设置默认结果视图类型
-                this.defaultResultType = strValue;
-                LOG.info("Set defaultResultType : {}", defaultResultType);
-            } else if ("objectFactory".equalsIgnoreCase(name)) {
-                if (value instanceof String && StringUtil.isNotBlank(strValue)) {
-                    try {
-                        this.objectFactory = (ObjectFactory) (DefaultObjectFactory._newInstance(ClassUtil.loadClass(strValue)));
-                    } catch (ClassNotFoundException ex) {
-                        throw new JRouterException(ex);
-                    }
-                } else if (value instanceof Class) {
-                    this.objectFactory = (ObjectFactory) (DefaultObjectFactory._newInstance((Class) value));
-                } else {
-                    //设置创建对象的工厂对象
-                    this.objectFactory = (ObjectFactory) value; //throw exception if not matched
-                }
-                LOG.info("Set objectFactory : {}", this.objectFactory);
-            } else if ("bytecode".equalsIgnoreCase(name)) {
+            String strValue = val.toString().trim();
+            if ("bytecode".equalsIgnoreCase(name)) {
                 setBytecode = true;
-                if (value instanceof String && StringUtil.isNotBlank(strValue)) {
+                if (val instanceof String && StringUtil.isNotBlank(strValue)) {
                     //default to use java reflect directly
                     if ("default".equalsIgnoreCase(strValue)) {
                         methodInvokerFactory = null;
@@ -193,36 +197,27 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
                     }
                 } else {
                     //throw exception if not matched
-                    methodInvokerFactory = (MethodInvokerFactory) value;
+                    methodInvokerFactory = (MethodInvokerFactory) val;
                     LOG.info("Set methodInvokerFactory : {}", this.methodInvokerFactory);
                 }
             } else if ("converterFactory".equalsIgnoreCase(name)) {
-                if (value instanceof String && StringUtil.isNotBlank(strValue)) {
-                    try {
-                        //此时objectFactory未必初始化完成
-                        converterFactoryClass = (Class<ConverterFactory>) ClassUtil.loadClass(strValue);
-                    } catch (ClassNotFoundException ex) {
-                        LOG.error("Can't set ConverterFactory of class : {}", strValue);
-                        throw new JRouterException(ex);
-                    }
-                } else if (value instanceof Class) {
-                    converterFactoryClass = (Class) value;
-                } else {
-                    //throw exception if not matched
-                    converterFactory = (ConverterFactory) value;
-                    LOG.info("Set converterFactory : {}", this.converterFactory);
-                }
+                converterFactory = loadComponent(ConverterFactory.class, val);
+                LOG.info("Set converterFactory : {}", this.converterFactory);
             } else if ("interceptorMethodChecker".equalsIgnoreCase(name)) {
                 //create interceptorMethodChecker
                 if (ClassUtil.isJavassistSupported() && StringUtil.isNotBlank(strValue)) {
                     methodChecker = new JavassistMethodChecker(strValue);
                     LOG.info("Set methodChecker : {}", this.methodChecker);
                 }
+            } else if ("actionFilter".equalsIgnoreCase(name)) {
+                actionFilter = loadComponent(ActionFilter.class, val);
+                LOG.info("Set actionFilter : {}", this.actionFilter);
             }
         }
-        //create default objectFactory
-        if (objectFactory == null) {
-            objectFactory = createDefaultObjectFactory();
+        //create default actionFilter
+        if (actionFilter == null) {
+            actionFilter = createDefaultActionFilter();
+            LOG.info("No actionFilter setting, use default : {}", actionFilter);
         }
         //create default methodInvokerFactory
         if (!setBytecode) {
@@ -230,8 +225,11 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
                 methodInvokerFactory = createDefaultMethodInvokerFactory();
             }
         }
-        //create converterFactory using objectFactory
-        createConverterFactory(converterFactoryClass);
+        //create default converterFactory
+        if (converterFactory == null) {
+            converterFactory = createDefaultConverterFactory();
+            LOG.info("No converterFactory setting, use default : {}", converterFactory);
+        }
     }
 
     /**
@@ -246,12 +244,14 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
      * @see #getObjectFactory()
      */
     protected <T> T loadComponent(Class<T> componentClass, Object value) {
-        if (value instanceof String && StringUtil.isNotBlank((String) value)) {
-            try {
-                return objectFactory.newInstance((Class<T>) ClassUtil.loadClass((String) value));
-            } catch (ClassNotFoundException ex) {
-                LOG.error("Can't set {} of class : {}", componentClass, value);
-                throw new JRouterException(ex);
+        if (value instanceof String) {
+            if (StringUtil.isNotBlank((String) value)) {
+                try {
+                    return objectFactory.newInstance((Class<T>) ClassUtil.loadClass((String) value));
+                } catch (ClassNotFoundException ex) {
+                    LOG.error("Can't set {} of class : {}", componentClass, value);
+                    throw new JRouterException(ex);
+                }
             }
         } else if (value instanceof Class) {
             return objectFactory.newInstance((Class<T>) value);
@@ -259,22 +259,31 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             //throw exception if not matched
             return (T) value;
         }
+        return null;
     }
 
     /**
-     * 未设置objectFactory属性时，提供默认的{@code ObjectFactory}实现。
+     * 未设置 objectFactory 属性时，提供默认的{@code ObjectFactory}实现。
      * 默认提供{@link DefaultObjectFactory}。
      *
      * @return ObjectFactory对象。
      */
     protected ObjectFactory createDefaultObjectFactory() {
-        ObjectFactory defaultObjectFactory = new DefaultObjectFactory();
-        LOG.info("No objectFactory setting, use default : {}", defaultObjectFactory);
-        return defaultObjectFactory;
+        return new DefaultObjectFactory();
     }
 
     /**
-     * 未设置proxyFactory属性时，提供默认的{code MethodInvokerFactory}实现。
+     * 未设置 actionFilter 属性时，提供默认的{@code ActionFilter}实现。
+     * 默认提供{@link DefaultActionFilter}。
+     *
+     * @return ActionFilter对象。
+     */
+    protected ActionFilter createDefaultActionFilter() {
+        return new DefaultActionFilter();
+    }
+
+    /**
+     * 未设置 proxyFactory 属性时，提供默认的{code MethodInvokerFactory}实现。
      * 默认引入javassist时提供{@link JavassistMethodInvokerFactory}；若无javassist引用则采用java反射机制。
      *
      * @see DefaultProxy#invoke
@@ -292,33 +301,13 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
     }
 
     /**
-     * Create converterFactory using objectFactory, use MultiParameterConverterFactory as default
-     * if converterFactory is not set.
-     *
-     * @param converterFactoryClass ConverterFactory.class
-     */
-    private void createConverterFactory(Class<? extends ConverterFactory> converterFactoryClass) {
-        if (converterFactoryClass != null) {
-            converterFactory = objectFactory.newInstance(converterFactoryClass);
-            LOG.info("Set converterFactory : {}", this.converterFactory);
-        }
-        //finally check if converterFactory is still not set
-        if (converterFactory == null) {
-            converterFactory = createDefaultConverterFactory();
-        }
-    }
-
-    /**
-     * 未设置converterFactory属性时提供默认的{@code ConverterFactory}实现。
+     * 未设置 converterFactory 属性时提供默认的{@code ConverterFactory}实现。
      * 默认提供{@link MultiParameterConverterFactory}。
      *
      * @return ConverterFactory object.
      */
     protected ConverterFactory createDefaultConverterFactory() {
-        ConverterFactory multiParameterConverterFactory = new MultiParameterConverterFactory(true);
-        LOG.info("No converterFactory setting, use default : {}", multiParameterConverterFactory);
-        return multiParameterConverterFactory;
-
+        return new MultiParameterConverterFactory(true);
     }
 
     @Override
@@ -656,56 +645,6 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    @Override
-    public String getDefaultInterceptorStack() {
-        return defaultInterceptorStack;
-    }
-
-    @Override
-    public String getDefaultResultType() {
-        return defaultResultType;
-    }
-
-    @Override
-    public ObjectFactory getObjectFactory() {
-        return objectFactory;
-    }
-
-    @Override
-    public MethodInvokerFactory getMethodInvokerFactory() {
-        return methodInvokerFactory;
-    }
-
-    @Override
-    public ConverterFactory getConverterFactory() {
-        return converterFactory;
-    }
-
-    @Override
-    public Map<String, InterceptorProxy> getInterceptors() {
-        return interceptors;
-    }
-
-    @Override
-    public Map<String, InterceptorStackProxy> getInterceptorStacks() {
-        return interceptorStacks;
-    }
-
-    @Override
-    public Map<String, ResultTypeProxy> getResultTypes() {
-        return resultTypes;
-    }
-
-    @Override
-    public Map<String, ResultProxy> getResults() {
-        return results;
-    }
-
-    public JavassistMethodChecker getMethodChecker() {
-        return methodChecker;
-    }
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
     /**
      * 默认创建对象的工厂类。
      */
@@ -730,6 +669,22 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
         @Override
         public Class<?> getClass(Object obj) {
             return obj.getClass();
+        }
+    }
+
+    /**
+     * 默认ActionFilter实现。
+     */
+    protected static class DefaultActionFilter implements ActionFilter {
+
+        @Override
+        public boolean accept(Method method) {
+            return method.isAnnotationPresent(Action.class);
+        }
+
+        @Override
+        public Action getAnnotation(Method method) {
+            return method.getAnnotation(Action.class);
         }
     }
 }

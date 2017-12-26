@@ -52,6 +52,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
      *
      * @see ActionInvocation#getConvertParameters()
      */
+    @lombok.Getter
     private final boolean fixedOrder;
 
     /**
@@ -170,14 +171,5 @@ public class MultiParameterConverterFactory implements ConverterFactory {
             }
             return idx;
         }
-    }
-
-    /**
-     * 参数类型是否固定顺序。
-     *
-     * @return 参数类型是否固定顺序。
-     */
-    public boolean isFixedOrder() {
-        return fixedOrder;
     }
 }

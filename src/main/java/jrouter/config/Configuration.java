@@ -920,7 +920,7 @@ public class Configuration implements Serializable {
             printSeparator(true);
 
             if (factory instanceof PathActionFactory) {
-                PathActionFactory defaultFactory = (PathActionFactory) factory;
+                PathActionFactory pathActionFactory = (PathActionFactory) factory;
 
                 //先加载指定配置的类，再加载自动搜索的类
                 //排除指定配置的类
@@ -934,17 +934,17 @@ public class Configuration implements Serializable {
                         injectProperties(obj, props, true);
                     }
                     //add interceptor
-                    defaultFactory.addInterceptors(obj);
+                    pathActionFactory.addInterceptors(obj);
                     specified.add(obj.getClass());
                 }
                 //auto-scan interceptors
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls))
-                        defaultFactory.addInterceptors(cls);
+                        pathActionFactory.addInterceptors(cls);
                 }
                 //clear
                 specified.clear();
-                printSeparator(!defaultFactory.getInterceptors().isEmpty());
+                printSeparator(!pathActionFactory.getInterceptors().isEmpty());
 
                 //interceptor-stack
                 for (Object obj : interceptorStacks) {
@@ -954,17 +954,17 @@ public class Configuration implements Serializable {
                         injectProperties(obj, props, true);
                     }
                     //add interceptor stacks
-                    defaultFactory.addInterceptorStacks(obj);
+                    pathActionFactory.addInterceptorStacks(obj);
                     specified.add(obj.getClass());
                 }
                 //scan interceptorStacks
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls))
-                        defaultFactory.addInterceptorStacks(cls);
+                        pathActionFactory.addInterceptorStacks(cls);
                 }
                 //clear
                 specified.clear();
-                printSeparator(!defaultFactory.getInterceptorStacks().isEmpty());
+                printSeparator(!pathActionFactory.getInterceptorStacks().isEmpty());
 
                 //result-type
                 for (Object obj : resultTypes) {
@@ -974,17 +974,17 @@ public class Configuration implements Serializable {
                         injectProperties(obj, props, true);
                     }
                     //add result types
-                    defaultFactory.addResultTypes(obj);
+                    pathActionFactory.addResultTypes(obj);
                     specified.add(obj.getClass());
                 }
                 //scan resultTypes
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls))
-                        defaultFactory.addResultTypes(cls);
+                        pathActionFactory.addResultTypes(cls);
                 }
                 //clear
                 specified.clear();
-                printSeparator(!defaultFactory.getResultTypes().isEmpty());
+                printSeparator(!pathActionFactory.getResultTypes().isEmpty());
 
                 //result
                 for (Object obj : results) {
@@ -994,17 +994,17 @@ public class Configuration implements Serializable {
                         injectProperties(obj, props, true);
                     }
                     //add result types
-                    defaultFactory.addResults(obj);
+                    pathActionFactory.addResults(obj);
                     specified.add(obj.getClass());
                 }
                 //scan results
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls))
-                        defaultFactory.addResults(cls);
+                        pathActionFactory.addResults(cls);
                 }
                 //clear
                 specified.clear();
-                printSeparator(!defaultFactory.getResults().isEmpty());
+                printSeparator(!pathActionFactory.getResults().isEmpty());
 
                 //action
                 for (Object obj : actions) {
@@ -1017,18 +1017,18 @@ public class Configuration implements Serializable {
                     }
 
                     //add result types
-                    defaultFactory.addActions(obj);
+                    pathActionFactory.addActions(obj);
                     specified.add(obj.getClass());
                 }
 
                 //scan actions
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls))
-                        defaultFactory.addActions(cls);
+                        pathActionFactory.addActions(cls);
                 }
                 //clear
                 specified.clear();
-                printSeparator(!defaultFactory.getActions().isEmpty());
+                printSeparator(!pathActionFactory.getActions().isEmpty());
 
                 //specified path action
                 for (Map.Entry<String, Map<String, Object>> e : pathProperties.entrySet()) {
@@ -1046,13 +1046,13 @@ public class Configuration implements Serializable {
                 //actions' aop
                 if (!aopActions.isEmpty()) {
                     LOG.info("Starting Aop Action");
-                    AntPathMatcher matcher = new AntPathMatcher(defaultFactory.getPathSeparator() + "");
+                    AntPathMatcher matcher = new AntPathMatcher(pathActionFactory.getPathSeparator() + "");
                     //已经匹配的路径
                     Set<String> existMatchPaths = new HashSet<String>();
                     //倒序，最后匹配的路径优先
                     for (int i = aopActions.size() - 1; i > -1; i--) {
                         in:
-                        for (Map.Entry<String, PathActionProxy> e : defaultFactory.getActions().entrySet()) {
+                        for (Map.Entry<String, PathActionProxy> e : pathActionFactory.getActions().entrySet()) {
                             AopAction aa = aopActions.get(i);
                             String path = e.getKey();
                             if (matcher.match(aa.getMatches(), path)) {
@@ -1065,8 +1065,8 @@ public class Configuration implements Serializable {
                                 //TODO
                                 if (CollectionUtil.isNotEmpty(aa.getInterceptorStacks())) {
                                     for (String stackName : aa.getInterceptorStacks()) {
-                                        if (defaultFactory.getInterceptorStacks().containsKey(stackName)) {
-                                            news.addAll(defaultFactory.getInterceptorStacks().get(stackName).getInterceptors());
+                                        if (pathActionFactory.getInterceptorStacks().containsKey(stackName)) {
+                                            news.addAll(pathActionFactory.getInterceptorStacks().get(stackName).getInterceptors());
                                         } else {
                                             LOG.warn("Can't find InterceptorStack [{}]", stackName);
                                         }
@@ -1074,8 +1074,8 @@ public class Configuration implements Serializable {
                                 }
                                 if (CollectionUtil.isNotEmpty(aa.getInterceptors())) {
                                     for (String interceptorName : aa.getInterceptors()) {
-                                        if (defaultFactory.getInterceptors().containsKey(interceptorName)) {
-                                            news.add(defaultFactory.getInterceptors().get(interceptorName));
+                                        if (pathActionFactory.getInterceptors().containsKey(interceptorName)) {
+                                            news.add(pathActionFactory.getInterceptors().get(interceptorName));
                                         } else {
                                             LOG.warn("Can't find Interceptor [{}]", interceptorName);
                                         }

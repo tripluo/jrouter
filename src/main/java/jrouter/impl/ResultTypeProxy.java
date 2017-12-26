@@ -27,9 +27,11 @@ import jrouter.annotation.ResultType;
 public final class ResultTypeProxy extends DefaultProxy {
 
     /** 结果类型的名称 */
+    @lombok.Getter
     private final String type;
 
     /** 结果类型 */
+    @lombok.Getter
     private final ResultType resultType;
 
     /**
@@ -45,23 +47,5 @@ public final class ResultTypeProxy extends DefaultProxy {
         super(method, object, actionFactory.getMethodInvokerFactory());
         this.resultType = resultType;
         this.type = resultType.type().trim();
-    }
-
-    /**
-     * 返回结果类型的名称。
-     *
-     * @return 结果类型的名称。
-     */
-    public String getType() {
-        return type;
-    }
-
-    /**
-     * 返回结果类型。
-     *
-     * @return 结果类型。
-     */
-    public ResultType getResultType() {
-        return resultType;
     }
 }

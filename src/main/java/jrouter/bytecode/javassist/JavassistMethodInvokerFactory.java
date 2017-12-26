@@ -31,9 +31,10 @@ import jrouter.MethodInvokerFactory;
  * <p>
  * 通常如下使用：
  * <code><blockquote><pre>
+ * Class<?> targetClass = ...
  * Method method = ...
  * JavassistMethodInvokerFactory factory = new JavassistMethodInvokerFactory();
- * JavassistInvoker invoker = factory.createInvokeClass(method);
+ * JavassistInvoker invoker = factory.createInvokeClass(targetClass, method);
  * invoker.invoke(...);
  * </pre></blockquote></code>
  * </p>
@@ -43,8 +44,11 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
     /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(JavassistMethodInvokerFactory.class);
 
-    //** 调用对象的类名称前缀 */
-    private static final String CLASS_PREFIX = "jrouter.bytecode.javassist.Invoker$$";
+    /** 调用对象的类名称前缀 */
+    private static final String PROXY_CLASS_PREFIX = JavassistMethodInvokerFactory.class.getPackage().getName() + ".";
+
+    /** 调用对象的类名称后缀 */
+    private static final String PROXY_CLASS_SUFFIX = "$$JR_Invoker$$";
 
     /** 计数器 */
     private static final AtomicInteger COUNTER = new AtomicInteger(0x10000);
@@ -55,19 +59,18 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
     }
 
     @Override
-    public JavassistInvoker newInstance(Method method) {
+    public JavassistInvoker newInstance(Class<?> targetClass, Method method) {
         //only public method can be proxied
         if (!Modifier.isPublic(method.getModifiers())) {
             LOG.warn("Only public method can be proxied, no proxy at : {}", MethodUtil.getFullMethod(method));
             return null;
         }
-        Class<?> srcClass = method.getDeclaringClass();
         try {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Create JavassistInvoker at : {}", MethodUtil.getMethod(method));
             }
-            JavassistInvoker invoker = (JavassistInvoker) (createInvokeClass(method).
-                    toClass(srcClass.getClassLoader(), srcClass.getProtectionDomain()).newInstance());
+            JavassistInvoker invoker = (JavassistInvoker) (createInvokeClass(targetClass, method).
+                    toClass(targetClass.getClassLoader(), targetClass.getProtectionDomain()).newInstance());
             return invoker;
         } catch (Exception e) {
             throw new JRouterException(e);
@@ -84,23 +87,23 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
      * @throws CannotCompileException when bytecode transformation has failed.
      * @throws NotFoundException when class is not found.
      */
-    private CtClass createInvokeClass(Method method) throws CannotCompileException,
+    private CtClass createInvokeClass(Class<?> targetClass, Method method) throws CannotCompileException,
             NotFoundException {
         ClassPool classPool = ClassPool.getDefault();
-        ClassClassPath classPath = new ClassClassPath(method.getClass());
+        ClassClassPath classPath = new ClassClassPath(targetClass);
         classPool.insertClassPath(classPath);
         //import target class package
-        classPool.importPackage(method.getClass().getPackage().getName());
+        classPool.importPackage(targetClass.getPackage().getName());
 
         //类前缀 + 16进制计数值
-        CtClass clazz = classPool.makeClass(CLASS_PREFIX + Integer.toHexString(COUNTER.getAndIncrement()));
+        CtClass clazz = classPool.makeClass(PROXY_CLASS_PREFIX + targetClass.getSimpleName() + PROXY_CLASS_SUFFIX + Integer.toHexString(COUNTER.getAndIncrement()));
         try {
             //特定接口/抽象类/类的调用
             clazz.setSuperclass(classPool.getCtClass(JavassistInvoker.class.getName()));
             //final
             clazz.setModifiers(Modifier.FINAL);
             //invoke method
-            clazz.addMethod(createInovkeMethod(clazz, method));
+            clazz.addMethod(createInovkeMethod(clazz, targetClass, method));
         } finally {
             classPool.removeClassPath(classPath);
             classPool.clearImportedPackages();
@@ -121,9 +124,9 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
      *
      * @throws CannotCompileException when bytecode transformation has failed.
      */
-    private CtMethod createInovkeMethod(CtClass clazz, Method method) throws CannotCompileException {
+    private CtMethod createInovkeMethod(CtClass clazz, Class<?> targetClass, Method method) throws
+            CannotCompileException {
         StringBuilder body = new StringBuilder("public Object invoke(Object obj, Object[] params){");
-        Class<?> targetClass = method.getDeclaringClass();
         boolean voidMethod = void.class == method.getReturnType();
         if (!voidMethod)
             body.append("return ($w)");

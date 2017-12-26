@@ -179,12 +179,10 @@ public class ClassUtil {
      *
      * @return 具有指定名的类的 Class 对象。
      */
-    private static Class<?> loadClassQuietly(String className) {
+    public static Class<?> loadClassQuietly(String className) {
         try {
             return loadClass(className);
-        } catch (ClassNotFoundException e) {
-            //ignore
-        } catch (NoClassDefFoundError e) {
+        } catch (Throwable thr) {
             //ignore
         }
         return null;

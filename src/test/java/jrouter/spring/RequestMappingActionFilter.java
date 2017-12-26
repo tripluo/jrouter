@@ -34,17 +34,18 @@ public class RequestMappingActionFilter implements ActionFilter {
 
     @Override
     public boolean accept(Method method) {
-        return method.isAnnotationPresent(RequestMapping.class);
+        return method.isAnnotationPresent(Action.class) || method.isAnnotationPresent(RequestMapping.class);
     }
 
     @Override
     public Action getAnnotation(Method method) {
-        Action action = method.getAnnotation(Action.class);
-        if (action != null) {
-            return action;
-        }
+        final Action action = method.getAnnotation(Action.class);
+        final boolean hasAction = (action != null);
         RequestMapping mapping = method.getAnnotation(RequestMapping.class);
-        if (mapping != null) {
+        if (mapping == null) {
+            return action;
+        } else {
+            //use mapping's value/name, ignore action's value/name
             String[] values = mapping.value();
             if (CollectionUtil.isEmpty(values)) {
                 values = mapping.path();
@@ -73,27 +74,27 @@ public class RequestMappingActionFilter implements ActionFilter {
 
                 @Override
                 public String interceptorStack() {
-                    return "";
+                    return hasAction ? action.interceptorStack() : "";
                 }
 
                 @Override
                 public String[] interceptors() {
-                    return CollectionUtil.EMPTY_STRING_ARRAY;
+                    return hasAction ? action.interceptors() : CollectionUtil.EMPTY_STRING_ARRAY;
                 }
 
                 @Override
                 public Result[] results() {
-                    return new Result[0];
+                    return hasAction ? action.results() : new Result[0];
                 }
 
                 @Override
                 public Scope scope() {
-                    return Scope.SINGLETON;
+                    return hasAction ? action.scope() : Scope.SINGLETON;
                 }
 
                 @Override
                 public Parameter[] parameters() {
-                    return new Parameter[0];
+                    return hasAction ? action.parameters() : new Parameter[0];
                 }
 
                 @Override
@@ -102,6 +103,5 @@ public class RequestMappingActionFilter implements ActionFilter {
                 }
             };
         }
-        return null;
     }
 }
