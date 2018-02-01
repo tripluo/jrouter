@@ -98,8 +98,8 @@ public class PathActionInvocation implements ActionInvocation<String> {
      * @param actionProxy Action代理对象。
      * @param originalParams Action代理对象中方法调用的原始参数。
      */
-    public PathActionInvocation(String realPath, ActionFactory actionFactory,
-            PathActionProxy actionProxy, Object... originalParams) {
+    public PathActionInvocation(String realPath, ActionFactory actionFactory, PathActionProxy actionProxy,
+            Object... originalParams) {
         this.actionPath = realPath;
         this.actionFactory = actionFactory;
         this.actionProxy = actionProxy;

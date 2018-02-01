@@ -56,7 +56,7 @@ public class ClassUtil {
      * @return 指定的包名中所有Class的名称集合。
      */
     public static Set<Class<?>> getClasses(String... packageNames) {
-        Set<Class<?>> classes = new LinkedHashSet<Class<?>>();
+        Set<Class<?>> classes = new LinkedHashSet<>();
         getClasses(classes, packageNames);
         return classes;
     }
@@ -140,8 +140,8 @@ public class ClassUtil {
      * @param recursive 是否递归文件目录。
      * @param classes 指定的Class名称集合。
      */
-    private static void getClassesByPackageFile(String packageName, String packagePath,
-            final boolean recursive, Collection<Class<?>> classes) {
+    private static void getClassesByPackageFile(String packageName, String packagePath, final boolean recursive,
+            Collection<Class<?>> classes) {
         //package directory
         File dir = new File(packagePath);
         //not exists or not directory

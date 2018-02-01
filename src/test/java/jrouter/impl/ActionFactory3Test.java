@@ -46,7 +46,7 @@ public class ActionFactory3Test {
 
     @Before
     public void init() {
-        Map<String, Object> props1 = new HashMap<String, Object>();
+        Map<String, Object> props1 = new HashMap<>();
         //set extension
         props1.put("extension", ".");
 
@@ -65,7 +65,7 @@ public class ActionFactory3Test {
         factory1.addActions(jrouter.URLTestAction.class);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-        Map<String, Object> props2 = new HashMap<String, Object>();
+        Map<String, Object> props2 = new HashMap<>();
         //set extension
         props2.put("extension", extension2);
 

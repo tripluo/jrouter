@@ -28,9 +28,9 @@ import org.junit.Test;
  */
 public class ConfigurationAopTest extends Assert {
 
-    private Configuration config = new Configuration().load("/jrouter_aop.xml");
+    private final Configuration config = new Configuration().load("/jrouter_aop.xml");
 
-    private PathActionFactory factory = config.buildActionFactory();
+    private final PathActionFactory factory = config.buildActionFactory();
 
     @After
     public void tearDown() {

@@ -73,7 +73,7 @@ public class ActionFactoryTest {
      */
     @Test
     public void test_createActionFactory() {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         //set extension
         props.put("extension", ".do");
         factory = new PathActionFactory(props);
@@ -313,7 +313,7 @@ public class ActionFactoryTest {
      */
     @Test
     public void test_autoRender() {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         //默认结果处理直接返回调用结果
         props.put("defaultStringResultType", DefaultResult.EMPTY);
 

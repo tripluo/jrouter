@@ -78,8 +78,7 @@ public class JavassistMethodCheckerTest {
     }
 
     //invoke JavassistMethodChecker#toClassNames
-    private static String[] toClassNames(Method m, String descriptor) throws
-            Exception {
+    private static String[] toClassNames(Method m, String descriptor) throws Exception {
         return ((List<String>) m.invoke(null, descriptor)).toArray(new String[0]);
     }
 }

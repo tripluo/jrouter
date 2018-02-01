@@ -146,8 +146,7 @@ public class AntPathMatcher {
      * {@code path} matched,
      * {@code false} if it didn't
      */
-    protected boolean doMatch(String pattern, String path, boolean fullMatch,
-            Map<String, String> uriTemplateVariables) {
+    protected boolean doMatch(String pattern, String path, boolean fullMatch, Map<String, String> uriTemplateVariables) {
 
         if (path.startsWith(this.pathSeparator) != pattern.startsWith(this.pathSeparator)) {
             return false;
@@ -279,8 +278,7 @@ public class AntPathMatcher {
      *
      * @return {@code true} if the string matches against the pattern, or {@code false} otherwise
      */
-    private boolean matchStrings(String pattern, String str,
-            Map<String, String> uriTemplateVariables) {
+    private boolean matchStrings(String pattern, String str, Map<String, String> uriTemplateVariables) {
         AntPathStringMatcher matcher = new AntPathStringMatcher(pattern);;
         return matcher.matchStrings(str, uriTemplateVariables);
     }
@@ -324,7 +322,7 @@ public class AntPathMatcher {
     }
 
     public Map<String, String> extractUriTemplateVariables(String pattern, String path) {
-        Map<String, String> variables = new LinkedHashMap<String, String>();
+        Map<String, String> variables = new LinkedHashMap<>();
         boolean result = doMatch(pattern, path, true, variables);
         if (!result) {
             throw new IllegalStateException("Pattern \"" + pattern + "\" is not a match for \"" + path + "\"");
@@ -616,7 +614,7 @@ public class AntPathMatcher {
 
         private final Pattern pattern;
 
-        private final List<String> variableNames = new LinkedList<String>();
+        private final List<String> variableNames = new LinkedList<>();
 
         public AntPathStringMatcher(String pattern) {
             this(pattern, true);

@@ -37,7 +37,7 @@ public class AopActionBean extends AopAction {
      * @param interceptorNames 拦截栈集合的字符串名称，支持','或';'分隔。
      */
     public void setInterceptorNames(String interceptorNames) {
-        List<String> list = new ArrayList<String>(4);
+        List<String> list = new ArrayList<>(4);
         CollectionUtil.stringToCollection(interceptorNames, list, sep);
         setInterceptors(list);
     }
@@ -48,7 +48,7 @@ public class AopActionBean extends AopAction {
      * @param interceptorStackNames 拦截栈集合，支持','或';'分隔。
      */
     public void setInterceptorStackNames(String interceptorStackNames) {
-        List<String> list = new ArrayList<String>(4);
+        List<String> list = new ArrayList<>(4);
         CollectionUtil.stringToCollection(interceptorStackNames, list, sep);
         setInterceptorStacks(list);
     }

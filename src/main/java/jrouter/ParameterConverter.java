@@ -40,6 +40,5 @@ public interface ParameterConverter {
      *
      * @see ActionFactory#invokeAction(java.lang.Object, java.lang.Object...)
      */
-    Object[] convert(Method method, Object obj, Object[] invokeParams, Object[] convertParams)
-            throws JRouterException;
+    Object[] convert(Method method, Object obj, Object[] invokeParams, Object[] convertParams) throws JRouterException;
 }

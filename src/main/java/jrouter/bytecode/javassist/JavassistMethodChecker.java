@@ -68,8 +68,8 @@ public class JavassistMethodChecker {
      * @param pattern 匹配字符串，包含 & 或 | 运算符。
      */
     public JavassistMethodChecker(String pattern) {
-        this.allMatch = new ArrayList<MethodInfo>();
-        this.anyMatch = new ArrayList<MethodInfo>();
+        this.allMatch = new ArrayList<>();
+        this.anyMatch = new ArrayList<>();
         this.sourcePattern = pattern;
         this.prasePattern(pattern);
     }
@@ -82,7 +82,7 @@ public class JavassistMethodChecker {
      * @return 是否匹配指定的模式。
      */
     public boolean check(Method method) {
-        List<MethodInfo> bodyMethods = new ArrayList<MethodInfo>();
+        List<MethodInfo> bodyMethods = new ArrayList<>();
         try {
             CtMethod ctMethod = toMethod(method);
             javassist.bytecode.MethodInfo info = ctMethod.getMethodInfo2();
@@ -110,9 +110,7 @@ public class JavassistMethodChecker {
                         ;
                 }
             }
-        } catch (javassist.NotFoundException ex) {
-            LOG.warn("Check method error : " + ex.getMessage());
-        } catch (BadBytecode ex) {
+        } catch (javassist.NotFoundException | BadBytecode ex) {
             LOG.warn("Check method error : " + ex.getMessage());
         }
 
@@ -247,8 +245,8 @@ public class JavassistMethodChecker {
     //parse &| as separator, no group
     private void prasePattern(String pattern) {
         pattern = StringUtil.trim(pattern, '&', '|');
-        List<String> all = new ArrayList<String>(4);
-        List<String> any = new ArrayList<String>(4);
+        List<String> all = new ArrayList<>(4);
+        List<String> any = new ArrayList<>(4);
         //default & as first if no last
         char before = Character.MIN_VALUE;
         int p = 0;
@@ -324,7 +322,7 @@ public class JavassistMethodChecker {
      * @see javassist.bytecode.Descriptor#toClassName(java.lang.String)
      */
     private static List<String> toClassNames(String descriptor) {
-        List<String> params = new ArrayList<String>(3);
+        List<String> params = new ArrayList<>(3);
         out:
         for (int i = 0; i < descriptor.length(); i++) {
             char c = descriptor.charAt(i);

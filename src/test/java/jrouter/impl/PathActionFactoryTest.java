@@ -36,7 +36,7 @@ public class PathActionFactoryTest {
 
     @Before
     public void init() {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         //set extension
         props.put("extension", "");
 
@@ -110,7 +110,7 @@ public class PathActionFactoryTest {
      */
     @Test
     public void test_getActionPathParameters() {
-        Map<String, String> excepted = new HashMap<String, String>();
+        Map<String, String> excepted = new HashMap<>();
 
         factory.invokeAction("/xx/yy/zz");
         assertNotNull(getActionPathParameters());

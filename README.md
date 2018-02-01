@@ -30,7 +30,7 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.7.4</version>
+    <version>1.7.5</version>
 </dependency>
 ```
 
@@ -57,8 +57,8 @@
             defaultResultType = empty
             <!-- optional default -->
             pathSeparator = /
-            <!-- optional default -->
-            extension = .
+            <!-- optional default:null -->
+            extension =
             <!-- optional default -->
             actionCacheNumber = 10000
             <!-- optional default -->

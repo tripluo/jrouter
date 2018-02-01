@@ -46,8 +46,8 @@ class PathTreeMap<V> extends AbstractMap<String, V> implements Serializable {
      * @param separator 指定的路径分割符。
      */
     public PathTreeMap(char separator) {
-        tree = new PathTree<V>(separator);
-        entrySet = new HashSet<Entry<String, V>>();
+        tree = new PathTree<>(separator);
+        entrySet = new HashSet<>();
     }
 
     /**
@@ -57,7 +57,7 @@ class PathTreeMap<V> extends AbstractMap<String, V> implements Serializable {
      * @param value 与路径相关联的值。
      */
     private void addEntrySet(String fullpath, V value) {
-        entrySet.add(new SimpleImmutableEntry<String, V>(fullpath, value));
+        entrySet.add(new SimpleImmutableEntry<>(fullpath, value));
     }
 
     @Override
@@ -142,7 +142,7 @@ class PathTree<V> implements Serializable {
      */
     PathTree(char pathSeparator) {
         this.pathSeparator = pathSeparator;
-        root = new TreeNode<V>(Character.toString(pathSeparator), null);
+        root = new TreeNode<>(Character.toString(pathSeparator), null);
         root.code = 1;
     }
 
@@ -227,9 +227,9 @@ class PathTree<V> implements Serializable {
             return null;
 
         //the current nodes as parents
-        List<TreeNode<V>> current = new ArrayList<TreeNode<V>>(1);
+        List<TreeNode<V>> current = new ArrayList<>(1);
         //the next all children nodes
-        List<TreeNode<V>> next = new ArrayList<TreeNode<V>>(5);
+        List<TreeNode<V>> next = new ArrayList<>(5);
 
         //初始化当前的节点集合指向根节点
         current.add(root);
@@ -284,7 +284,6 @@ class PathTree<V> implements Serializable {
         current = next;
 
 //        System.out.println("Final Match Nodes List : " + current);
-
         //最终匹配的路径节点
         TreeNode<V> finalMatcher = null;
 
@@ -319,21 +318,20 @@ class PathTree<V> implements Serializable {
     /*
      * 将路径数组按照指定的路径码（二进制标识）填充进链表。
      */
-    private void fillMatchParameters(TreeNode<V> matcher, String[] paths,
-            Map<String, String> matchParameters) {
+    private void fillMatchParameters(TreeNode<V> matcher, String[] paths, Map<String, String> matchParameters) {
         if (matchParameters != null) {
             /**
-            //parse the * parameters
-            String fullCode = Integer.toBinaryString(matcher.code);
-            //0 is the root '/'
-            for (int i = 1; i < fullCode.length(); i++) {
-            //if 0 means '*'
-            if (fullCode.charAt(i) == '0') {
-            matchParameters.put(i - 1 + "", paths[i - 1]);
-            }
-            }
-            *
-            */
+             * //parse the * parameters
+             * String fullCode = Integer.toBinaryString(matcher.code);
+             * //0 is the root '/'
+             * for (int i = 1; i < fullCode.length(); i++) {
+             * //if 0 means '*'
+             * if (fullCode.charAt(i) == '0') {
+             * matchParameters.put(i - 1 + "", paths[i - 1]);
+             * }
+             * }
+             *
+             */
 
             IndexKey[] iks = matcher.indexKeys;
             if (iks != null) {
@@ -357,7 +355,7 @@ class PathTree<V> implements Serializable {
      * @return 解析后的事字符串数组。
      */
     private String[] parsePath(String fullpath) {
-        List<String> list = new ArrayList<String>(5);
+        List<String> list = new ArrayList<>(5);
         //fullpath is trimmed
         int last = -1;
         int cur = -1;
@@ -514,8 +512,8 @@ class PathTree<V> implements Serializable {
         private TreeNode<V> addBranch(final String[] paths, String child) {
             //未创建子路径节点集合
             if (children == null) {
-                children = new HashMap<String, TreeNode<V>>();
-                TreeNode<V> newNode = new TreeNode<V>(child, null);
+                children = new HashMap<>();
+                TreeNode<V> newNode = new TreeNode<>(child, null);
                 //set the new child node and put it in the children nodes
                 setChildNode(newNode, paths);
                 children.put(newNode.path, newNode);
@@ -527,7 +525,7 @@ class PathTree<V> implements Serializable {
             TreeNode<V> old = children.get(isMatchKay(child) ? SINGLE_MATCH : child);
             //子节点集合未包含此节点
             if (old == null) {
-                TreeNode<V> newNode = new TreeNode<V>(child, null);
+                TreeNode<V> newNode = new TreeNode<>(child, null);
                 //set the new child node and put it in the children nodes
                 setChildNode(newNode, paths);
                 children.put(newNode.path, newNode);
@@ -552,8 +550,8 @@ class PathTree<V> implements Serializable {
         private V addLeaf(final String[] paths, String child, V value) {
             //未创建子路径节点集合
             if (children == null) {
-                children = new HashMap<String, TreeNode<V>>();
-                TreeNode<V> newNode = new TreeNode<V>(child, value);
+                children = new HashMap<>();
+                TreeNode<V> newNode = new TreeNode<>(child, value);
                 //set the new child node and put it in the children nodes
                 setChildNode(newNode, paths);
                 children.put(newNode.path, newNode);
@@ -565,7 +563,7 @@ class PathTree<V> implements Serializable {
             TreeNode<V> old = children.get(isMatchKay(child) ? SINGLE_MATCH : child);
             //子节点集合未包含此节点
             if (old == null) {
-                TreeNode<V> newNode = new TreeNode<V>(child, value);
+                TreeNode<V> newNode = new TreeNode<>(child, value);
                 //set the new child node and put it in the children nodes
                 setChildNode(newNode, paths);
                 children.put(newNode.path, newNode);
@@ -624,7 +622,7 @@ class PathTree<V> implements Serializable {
         private void setLeafIndexKeys(TreeNode<V> leaf, String paths[]) {
             //仅叶子节点有相关联的值才添加索引/值数组
             if (leaf.value != null) {
-                List<IndexKey> keys = new ArrayList<IndexKey>(paths.length);
+                List<IndexKey> keys = new ArrayList<>(paths.length);
                 byte matchIndex = 1;
                 for (byte i = 0; i < paths.length; i++) {
                     if (SINGLE_MATCH.equals(paths[i])) {

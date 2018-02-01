@@ -139,7 +139,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             }
         }
 
-        pathActions = new PathTreeMap<PathActionProxy>(pathSeparator);
+        pathActions = new PathTreeMap<>(pathSeparator);
         actionCache = new ActionCache(new java.util.concurrent.ConcurrentHashMap<String, ActionCacheEntry>(),
                 Collections.synchronizedMap(new jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber)));
     }
@@ -228,7 +228,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             matchParameters = ace.matchParameters;
         } else {
             //initiate matchParameters
-            matchParameters = new HashMap<String, String>(2);
+            matchParameters = new HashMap<>(2);
             //get Action and fill matchParameters
             ap = pathActions.get(path, matchParameters);
 
@@ -586,9 +586,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                         //the same object
                         addAction(createActionProxy(m, invoker));
                     }
-                } catch (IllegalAccessException e) {
-                    throw new JRouterException(e);
-                } catch (InvocationTargetException e) {
+                } catch (IllegalAccessException | InvocationTargetException e) {
                     throw new JRouterException(e);
                 }
             }
@@ -604,8 +602,8 @@ public class PathActionFactory extends AbstractActionFactory<String> {
      *
      * @return Action代理对象。
      */
-    private PathActionProxy[] createActionProxy(final Method method, final Object obj) throws
-            IllegalAccessException, InvocationTargetException {
+    private PathActionProxy[] createActionProxy(final Method method, final Object obj) throws IllegalAccessException,
+            InvocationTargetException {
         Namespace ns = getNamespace(method.getDeclaringClass());
         //trim empty and '/'
         String namespace = ns == null ? Character.toString(pathSeparator) : pathSeparator + StringUtil.trim(ns.name(), pathSeparator);
@@ -638,7 +636,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             names = new String[]{""};
         }
         //去重复的path
-        Collection<String> paths = new LinkedHashSet<String>(1);
+        Collection<String> paths = new LinkedHashSet<>(1);
         for (String name : names) {
             if (name != null) {
                 //Action名称可为空字符串
@@ -650,7 +648,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         for (String path : paths) {
             //包含指定path的属性注入，其Action需重新生成对象
             Object _obj = obj;
-            if (_obj != null && Injector.actionInjection.containsKey(path)) {
+            if (_obj != null && Injector.ACTION_INJECTION.containsKey(path)) {
                 _obj = getObjectFactory().newInstance(getObjectFactory().getClass(_obj));
                 Injector.injectAction(path, _obj);
             }
@@ -669,7 +667,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             //not not nullable action's interceptors
             String[] interceptorNames = action.interceptors();
 
-            List<InterceptorProxy> inters = new ArrayList<InterceptorProxy>(5);
+            List<InterceptorProxy> inters = new ArrayList<>(5);
             //action interceptors
             if (interceptorNames.length != 0) {
                 //action interceptorStack
@@ -728,14 +726,14 @@ public class PathActionFactory extends AbstractActionFactory<String> {
 
             //set action parameters
             Parameter[] ps = action.parameters();
-            Map<String, String[]> params = new HashMap<String, String[]>(ps.length);
+            Map<String, String[]> params = new HashMap<>(ps.length);
             for (Parameter p : ps) {
                 params.put(p.name(), p.value());
             }
             ap.setActionParameters(Collections.unmodifiableMap(params));
             //set results
             Result[] rs = action.results();
-            Map<String, Result> res = new HashMap<String, Result>(rs.length);
+            Map<String, Result> res = new HashMap<>(rs.length);
             for (Result r : rs) {
                 res.put(r.name(), r);
             }
@@ -902,7 +900,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
          * @return 缓存的Map视图。
          */
         Map<String, ActionCacheEntry> toMap() {
-            Map<String, ActionCacheEntry> cache = new LinkedHashMap<String, ActionCacheEntry>(matchedPathActionCache);
+            Map<String, ActionCacheEntry> cache = new LinkedHashMap<>(matchedPathActionCache);
             cache.putAll(fullPathActionCache);
             return cache;
         }

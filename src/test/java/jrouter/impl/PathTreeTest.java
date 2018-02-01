@@ -70,7 +70,7 @@ public class PathTreeTest {
      */
     @Before
     public void testBefore() {
-        tree = new PathTree<String>();
+        tree = new PathTree<>();
         for (String p : PATHS) {
             //返回 null 表示添加新节点的原节点无相关联的值
             assertNull(tree.put(p, p));
@@ -157,8 +157,8 @@ public class PathTreeTest {
      */
     @Test
     public void testTreePathParameters() {
-        Map<String, String> excepted = new HashMap<String, String>();
-        Map<String, String> actual = new HashMap<String, String>();
+        Map<String, String> excepted = new HashMap<>();
+        Map<String, String> actual = new HashMap<>();
 
         tree.get("/xx/yy/zz", actual);
         tree.get("/aa/b1/c1/d0", actual);
@@ -205,7 +205,7 @@ public class PathTreeTest {
      * @param path Action路径。
      */
     private void assertTreePathParameters(Map<String, String> excepted, String path) {
-        Map<String, String> actual = new HashMap<String, String>();
+        Map<String, String> actual = new HashMap<>();
         tree.get(path, actual);
         assertEquals(excepted, actual);
         //clear the excepted map at last

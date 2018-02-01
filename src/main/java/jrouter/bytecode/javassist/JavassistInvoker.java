@@ -21,7 +21,7 @@ import jrouter.Invoker;
 /**
  * Invoker接口的封装，本质未实现方法。
  *
- * @see JavassistMethodInvokerFactory#newInstance(Method)
+ * @see JavassistMethodInvokerFactory#newInstance(java.lang.Class, java.lang.reflect.Method)
  */
 public class JavassistInvoker implements Invoker {
 

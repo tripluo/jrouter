@@ -52,7 +52,7 @@ public class PathActionFactory1Test {
 
     @Before
     public void init() {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         //set extension
         props.put("extension", "");
 

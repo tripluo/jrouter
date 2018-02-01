@@ -31,9 +31,9 @@ import org.junit.Test;
  */
 public class ConfigurationScanComponentTest extends Assert {
 
-    private Configuration config = new Configuration().load("/jrouter_autoscan.xml");
+    private final Configuration config = new Configuration().load("/jrouter_autoscan.xml");
 
-    private ActionFactory factory = config.buildActionFactory();
+    private final ActionFactory factory = config.buildActionFactory();
 
     @Before
     public void setUp() {

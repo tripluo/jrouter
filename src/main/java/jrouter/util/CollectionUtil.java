@@ -255,10 +255,10 @@ public class CollectionUtil {
      *
      * @return 解析后的字符串集合。
      */
-    public static <T extends Collection<String>> T stringToCollection(final String source,
-            Collection<String> collection, char... sep) {
+    public static <T extends Collection<String>> T stringToCollection(final String source, Collection<String> collection,
+            char... sep) {
         if (collection == null)
-            collection = new ArrayList<String>();
+            collection = new ArrayList<>();
         if (source == null) {
             return (T) collection;
         }
@@ -308,14 +308,14 @@ public class CollectionUtil {
      *
      * @return 解析后的字符串键值映射。
      */
-    public static <T extends Map<String, String>> T stringToMap(final String source,
-            Map<String, String> map, char... sep) {
+    public static <T extends Map<String, String>> T stringToMap(final String source, Map<String, String> map,
+            char... sep) {
         if (contains('=', sep) || contains(':', sep)) {
             throw new IllegalArgumentException("Separate array " + Arrays.toString(sep)
                     + " can't contain " + Arrays.toString(new char[]{'=', ':'}));
         }
         if (map == null)
-            map = new LinkedHashMap<String, String>();
+            map = new LinkedHashMap<>();
         if (StringUtil.isEmpty(source)) {
             return (T) map;
         }

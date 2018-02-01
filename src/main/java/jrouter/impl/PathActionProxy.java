@@ -77,8 +77,8 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public PathActionProxy(ActionFactory actionFactory, String namespace, String path,
-            Action action, Method method, Object object) {
+    public PathActionProxy(ActionFactory actionFactory, String namespace, String path, Action action, Method method,
+            Object object) {
         super(method, object, actionFactory.getMethodInvokerFactory());
         this.actionFactory = actionFactory;
         this.namespace = namespace;
@@ -154,7 +154,7 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
 
     @Override
     public List<Interceptor> getInterceptors() {
-        List<Interceptor> is = new java.util.ArrayList<Interceptor>(interceptors.size());
+        List<Interceptor> is = new java.util.ArrayList<>(interceptors.size());
         for (InterceptorProxy ip : interceptors) {
             is.add(ip.getInterceptor());
         }

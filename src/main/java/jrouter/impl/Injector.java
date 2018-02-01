@@ -40,10 +40,10 @@ public class Injector {
     private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
 
     /** 对象类型与其注入属性的映射 */
-    static final Map<Class, Injection[]> classInjection = new HashMap<Class, Injection[]>();
+    static final Map<Class, Injection[]> CLASS_INJECTION = new HashMap<>();
 
     /** action对象与其注入属性的映射 */
-    static final Map<String, Injection[]> actionInjection = new HashMap<String, Injection[]>();
+    static final Map<String, Injection[]> ACTION_INJECTION = new HashMap<>();
 
     /**
      * private constructor
@@ -61,9 +61,9 @@ public class Injector {
      *
      * @throws IntrospectionException 如果在内省期间发生异常。
      */
-    public static Injection[] putClassProperties(Class<?> cls, Map<String, Object> properties)
-            throws IntrospectionException {
-        return classInjection.put(cls, convertToInjections(cls, properties));
+    public static Injection[] putClassProperties(Class<?> cls, Map<String, Object> properties) throws
+            IntrospectionException {
+        return CLASS_INJECTION.put(cls, convertToInjections(cls, properties));
     }
 
     /**
@@ -77,9 +77,9 @@ public class Injector {
      *
      * @throws IntrospectionException 如果在内省期间发生异常。
      */
-    public static Injection[] putActionProperties(Class<?> cls, String actionPath,
-            Map<String, Object> properties) throws IntrospectionException {
-        return actionInjection.put(actionPath, convertToInjections(cls, properties));
+    public static Injection[] putActionProperties(Class<?> cls, String actionPath, Map<String, Object> properties)
+            throws IntrospectionException {
+        return ACTION_INJECTION.put(actionPath, convertToInjections(cls, properties));
     }
 
     /**
@@ -94,11 +94,11 @@ public class Injector {
      *
      * @see Injection
      */
-    private static Injection[] convertToInjections(Class<?> cls, Map<String, Object> properties)
-            throws IntrospectionException {
+    private static Injection[] convertToInjections(Class<?> cls, Map<String, Object> properties) throws
+            IntrospectionException {
         //common class properties
         Map<String, PropertyDescriptor> supports = Injector.getSupportedProperties(cls);
-        List<Injection> injections = new ArrayList<Injection>(properties.size());
+        List<Injection> injections = new ArrayList<>(properties.size());
         for (Map.Entry<String, Object> prop : properties.entrySet()) {
             String pName = prop.getKey();
             PropertyDescriptor pd = supports.get(pName);
@@ -130,9 +130,8 @@ public class Injector {
      * @throws IllegalAccessException 如果属性注入的方法不可访问。
      * @throws InvocationTargetException 如果属性注入的方法发生异常。
      */
-    static void injectAction(String actionPath, Object invoker) throws IllegalAccessException,
-            InvocationTargetException {
-        Injection[] injects = actionInjection.get(actionPath);
+    static void injectAction(String actionPath, Object invoker) throws IllegalAccessException, InvocationTargetException {
+        Injection[] injects = ACTION_INJECTION.get(actionPath);
         //如果指定的Action中无注入属性，则查找其对象类型的注入属性
 //        if (injects == null) {
 //            injects = classInjection.get(invoker.getClass());
@@ -152,9 +151,8 @@ public class Injector {
      * @throws IllegalAccessException 如果属性注入的方法不可访问。
      * @throws InvocationTargetException 如果属性注入的方法发生异常。
      */
-    public static void injectObject(Object obj) throws IllegalAccessException,
-            InvocationTargetException {
-        Injection[] injects = classInjection.get(obj.getClass());
+    public static void injectObject(Object obj) throws IllegalAccessException, InvocationTargetException {
+        Injection[] injects = CLASS_INJECTION.get(obj.getClass());
         if (injects != null && injects.length > 0) {
             for (Injection ij : injects) {
                 ij.setter.invoke(obj, ij.value);
@@ -166,8 +164,8 @@ public class Injector {
      * 清除类型与注入属性的映射。
      */
     static void clear() {
-        classInjection.clear();
-        actionInjection.clear();
+        CLASS_INJECTION.clear();
+        ACTION_INJECTION.clear();
     }
 
     /**
@@ -179,13 +177,12 @@ public class Injector {
      *
      * @throws IntrospectionException 如果在内省期间发生异常。
      */
-    public static Map<String, PropertyDescriptor> getSupportedProperties(Class<?> cls) throws
-            IntrospectionException {
+    public static Map<String, PropertyDescriptor> getSupportedProperties(Class<?> cls) throws IntrospectionException {
         PropertyDescriptor[] propds = Introspector.getBeanInfo(cls).getPropertyDescriptors();
-        Map<String, PropertyDescriptor> support = new HashMap<String, PropertyDescriptor>(propds.length);
+        Map<String, PropertyDescriptor> support = new HashMap<>(propds.length);
         //getPropertyDescriptors返回的PropertyDescriptor[]已经过滤了重复的属性名。
         for (PropertyDescriptor p : propds) {
-            if (supportTypes.contains(p.getPropertyType()))
+            if (SUPPORT_TYPES.contains(p.getPropertyType()))
                 support.put(p.getName(), p);
         }
         return support;
@@ -221,29 +218,29 @@ public class Injector {
     /**
      * 所支持的属性转换对象类型
      */
-    private static final Set<Class<?>> supportTypes = new HashSet<Class<?>>(18);
+    private static final Set<Class<?>> SUPPORT_TYPES = new HashSet<>(18);
 
     //初始化所支持的对象类型。
     static {
         //String to Class
-        supportTypes.add(Class.class);
-        supportTypes.add(String.class);
-        supportTypes.add(boolean.class);
-        supportTypes.add(Boolean.class);
-        supportTypes.add(byte.class);
-        supportTypes.add(Byte.class);
-        supportTypes.add(char.class);
-        supportTypes.add(Character.class);
-        supportTypes.add(double.class);
-        supportTypes.add(Double.class);
-        supportTypes.add(float.class);
-        supportTypes.add(Float.class);
-        supportTypes.add(int.class);
-        supportTypes.add(Integer.class);
-        supportTypes.add(long.class);
-        supportTypes.add(Long.class);
-        supportTypes.add(short.class);
-        supportTypes.add(Short.class);
+        SUPPORT_TYPES.add(Class.class);
+        SUPPORT_TYPES.add(String.class);
+        SUPPORT_TYPES.add(boolean.class);
+        SUPPORT_TYPES.add(Boolean.class);
+        SUPPORT_TYPES.add(byte.class);
+        SUPPORT_TYPES.add(Byte.class);
+        SUPPORT_TYPES.add(char.class);
+        SUPPORT_TYPES.add(Character.class);
+        SUPPORT_TYPES.add(double.class);
+        SUPPORT_TYPES.add(Double.class);
+        SUPPORT_TYPES.add(float.class);
+        SUPPORT_TYPES.add(Float.class);
+        SUPPORT_TYPES.add(int.class);
+        SUPPORT_TYPES.add(Integer.class);
+        SUPPORT_TYPES.add(long.class);
+        SUPPORT_TYPES.add(Long.class);
+        SUPPORT_TYPES.add(short.class);
+        SUPPORT_TYPES.add(Short.class);
     }
 
     /**

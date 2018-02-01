@@ -133,10 +133,10 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
     public AbstractActionFactory(Map<String, Object> properties) {
         //initiate properties
         setActionFactoryProperties(properties);
-        interceptors = new HashMap<String, InterceptorProxy>();
-        interceptorStacks = new HashMap<String, InterceptorStackProxy>();
-        resultTypes = new HashMap<String, ResultTypeProxy>();
-        results = new HashMap<String, ResultProxy>();
+        interceptors = new HashMap<>();
+        interceptorStacks = new HashMap<>();
+        resultTypes = new HashMap<>();
+        results = new HashMap<>();
     }
 
     /**
@@ -583,8 +583,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
      *
      * @throws IllegalAccessException 如果调用的对象无法访问指定字段。
      */
-    private InterceptorStackProxy createInterceptorStackProxy(Field field, Object obj) throws
-            IllegalAccessException {
+    private InterceptorStackProxy createInterceptorStackProxy(Field field, Object obj) throws IllegalAccessException {
         InterceptorStack interceptorStack = field.getAnnotation(InterceptorStack.class);
         String name = interceptorStack.name().trim();
 
@@ -602,7 +601,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
 
         List<InterceptorProxy> list = null;
         if (names != null) {
-            list = new ArrayList<InterceptorProxy>(names.length);
+            list = new ArrayList<>(names.length);
             //add interceptorStack
             //for (int i = names.length - 1; i >= 0; i--) {
             for (int i = 0; i < names.length; i++) {
@@ -659,9 +658,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
         private static <T> T _newInstance(Class<T> clazz) {
             try {
                 return clazz.newInstance();
-            } catch (IllegalAccessException e) {
-                throw new JRouterException(e);
-            } catch (InstantiationException e) {
+            } catch (IllegalAccessException | InstantiationException e) {
                 throw new JRouterException(e);
             }
         }

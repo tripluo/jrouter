@@ -75,7 +75,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
     public MultiParameterConverterFactory(boolean fixedOrder) {
         this.fixedOrder = fixedOrder;
         if (fixedOrder) {
-            methodParametersCache = new ConcurrentHashMap<Method, int[]>();
+            methodParametersCache = new ConcurrentHashMap<>();
         }
         parameterConverter = new MultiParameterConverter();
     }
@@ -98,8 +98,8 @@ public class MultiParameterConverterFactory implements ConverterFactory {
     public class MultiParameterConverter implements ParameterConverter {
 
         @Override
-        public Object[] convert(Method method, Object obj, Object[] invokeParams,
-                Object[] convertParams) throws JRouterException {
+        public Object[] convert(Method method, Object obj, Object[] invokeParams, Object[] convertParams) throws
+                JRouterException {
             if (convertParams == null || convertParams.length == 0)
                 return invokeParams;
             Class<?>[] parameterTypes = method.getParameterTypes();
@@ -136,8 +136,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
          *
          * @see #methodParametersCache
          */
-        private int[] match(Method method, int matchStart, Class<?>[] parameterTypes,
-                Object[] convertParams) {
+        private int[] match(Method method, int matchStart, Class<?>[] parameterTypes, Object[] convertParams) {
             int[] idx = null;
             if (fixedOrder) {
                 //get from cache

@@ -35,7 +35,7 @@ public class ActionFactory4Test {
 
     @Before
     public void init() {
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("defaultInterceptorStack", DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK);
 
         factory = new PathActionFactory(props);

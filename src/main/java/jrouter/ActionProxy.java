@@ -24,6 +24,8 @@ import jrouter.annotation.Result;
 
 /**
  * {@link Action}代理类接口。
+ *
+ * @param <K> Path type.
  */
 public interface ActionProxy<K> {
 

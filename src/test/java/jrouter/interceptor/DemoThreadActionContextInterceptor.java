@@ -30,7 +30,7 @@ public class DemoThreadActionContextInterceptor {
     public static final String DEMO_THREAD = "demoThread";
 
     /** ThreadLocal */
-    private static final ThreadLocal<ActionInvocation> threadLocal = new ThreadLocal<ActionInvocation>();
+    private static final ThreadLocal<ActionInvocation> threadLocal = new ThreadLocal<>();
 
     /** Action调用结束后是否清除线程变量中的ActionInvocation对象，默认清除 */
     private boolean removeActionInvocation = true;

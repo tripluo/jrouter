@@ -118,7 +118,7 @@ public class MultiParameterConverterTest {
     private static class TestAction {
 
         //test methods
-        static final Map<String, Method> TEST_METHODS = new HashMap<String, Method>(8);
+        static final Map<String, Method> TEST_METHODS = new HashMap<>(8);
 
         static {
             Method[] methods = TestAction.class.getDeclaredMethods();

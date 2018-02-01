@@ -49,8 +49,8 @@ import org.springframework.core.io.Resource;
  *
  * @param <T> ActionFactory特定类型。
  */
-public class DefaultActionFactoryBean<T extends ActionFactory> implements FactoryBean<T>,
-        InitializingBean, DisposableBean, ApplicationContextAware {
+public class DefaultActionFactoryBean<T extends ActionFactory> implements FactoryBean<T>, InitializingBean,
+        DisposableBean, ApplicationContextAware {
 
     /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(DefaultActionFactoryBean.class);
@@ -212,23 +212,23 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         if (CollectionUtil.isNotEmpty(componentBeanScanProperties)) {
             char[] sep = {',', ';'};
             //匹配包含bean名称的表达式
-            List<String> includeComponentBeanExpressions = new ArrayList<String>(2);
+            List<String> includeComponentBeanExpressions = new ArrayList<>(2);
             CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentBeanExpression"), includeComponentBeanExpressions, sep);
             //匹配排除bean名称的表达式
-            List<String> excludeComponentBeanExpressions = new ArrayList<String>(2);
+            List<String> excludeComponentBeanExpressions = new ArrayList<>(2);
             CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentBeanExpression"), excludeComponentBeanExpressions, sep);
 
             //匹配包含class的表达式
-            List<String> includeComponentClassExpressions = new ArrayList<String>(2);
+            List<String> includeComponentClassExpressions = new ArrayList<>(2);
             CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentClassExpression"), includeComponentClassExpressions, sep);
 
             //匹配排除class名称的表达式
-            List<String> excludeComponentClassExpressions = new ArrayList<String>(2);
+            List<String> excludeComponentClassExpressions = new ArrayList<>(2);
             CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentClassExpression"), excludeComponentClassExpressions, sep);
 
             AntPathMatcher matcher = new AntPathMatcher(".");
             String[] beanNames = applicationContext.getBeanDefinitionNames();
-            Set<String> includes = new LinkedHashSet<String>();
+            Set<String> includes = new LinkedHashSet<>();
             out:
             for (String name : beanNames) {
                 for (String excludeComponentBeanExpression : excludeComponentBeanExpressions) {

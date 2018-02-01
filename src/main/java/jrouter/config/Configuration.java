@@ -228,21 +228,21 @@ public class Configuration implements Serializable {
      * initiate or reset the collections.
      */
     protected void reset() {
-        actionFactoryProperties = new LinkedHashMap<String, Object>();
-        interceptors = new LinkedHashSet<Object>();
-        interceptorProperties = new LinkedHashMap<Class<?>, Map<String, Object>>();
-        interceptorStacks = new LinkedHashSet<Object>();
-        interceptorStackProperties = new LinkedHashMap<Class<?>, Map<String, Object>>();
-        resultTypes = new LinkedHashSet<Object>();
-        resultTypeProperties = new LinkedHashMap<Class<?>, Map<String, Object>>();
-        results = new LinkedHashSet<Object>();
-        resultProperties = new LinkedHashMap<Class<?>, Map<String, Object>>();
-        actions = new LinkedHashSet<Object>();
-        actionProperties = new LinkedHashMap<Class<?>, Map<String, Object>>();
-        pathActions = new LinkedHashMap<String, Class<?>>();
-        pathProperties = new LinkedHashMap<String, Map<String, Object>>();
-        classScanners = new ArrayList<ClassScanner>();
-        aopActions = new ArrayList<AopAction>();
+        actionFactoryProperties = new LinkedHashMap<>();
+        interceptors = new LinkedHashSet<>();
+        interceptorProperties = new LinkedHashMap<>();
+        interceptorStacks = new LinkedHashSet<>();
+        interceptorStackProperties = new LinkedHashMap<>();
+        resultTypes = new LinkedHashSet<>();
+        resultTypeProperties = new LinkedHashMap<>();
+        results = new LinkedHashSet<>();
+        resultProperties = new LinkedHashMap<>();
+        actions = new LinkedHashSet<>();
+        actionProperties = new LinkedHashMap<>();
+        pathActions = new LinkedHashMap<>();
+        pathProperties = new LinkedHashMap<>();
+        classScanners = new ArrayList<>();
+        aopActions = new ArrayList<>();
     }
 
     /**
@@ -390,8 +390,8 @@ public class Configuration implements Serializable {
          *
          * @return {@code Document} 对象。
          */
-        private static Document loadDocument(InputStream stream) throws ParserConfigurationException,
-                SAXException, IOException {
+        private static Document loadDocument(InputStream stream) throws ParserConfigurationException, SAXException,
+                IOException {
             DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
             factory.setNamespaceAware(true);
             factory.setValidating(true);
@@ -421,8 +421,7 @@ public class Configuration implements Serializable {
      *
      * @throws ConfigurationException 如果发生配置错误。
      */
-    protected Configuration load(InputStream stream, String resourceName) throws
-            ConfigurationException {
+    protected Configuration load(InputStream stream, String resourceName) throws ConfigurationException {
         try {
             Document doc = DocumentLoader.loadDocument(stream);
             //root node : <jrouter>
@@ -458,7 +457,7 @@ public class Configuration implements Serializable {
             //include
             list = getChildNodesByTagName(root, INCLUDE);
             //length = list.size();
-            Map<String, String> record = new HashMap<String, String>();
+            Map<String, String> record = new HashMap<>();
             for (Element e : list) {
                 //add included files, use a hash set to avoid circular reference
                 parseInclude(resourceName, e.getAttribute(FILE), record);
@@ -563,9 +562,8 @@ public class Configuration implements Serializable {
      * @throws IntrospectionException 如果在内省期间发生异常。
      * @throws InstantiationException 如果实例化失败。
      */
-    private void parseActionFactoryElements(Element root) throws ClassNotFoundException,
-            IllegalAccessException, IntrospectionException, InvocationTargetException {
-
+    private void parseActionFactoryElements(Element root) throws ClassNotFoundException, IllegalAccessException,
+            IntrospectionException, InvocationTargetException {
         List<Element> list = null;
         //interceptor
         list = getChildNodesByTagName(root, INTERCEPTOR);
@@ -663,7 +661,7 @@ public class Configuration implements Serializable {
                 LOG.debug("Load path properties : {}", pathName);
                 //path <property> nodes
                 List<Element> pathpropnodes = getChildNodesByTagName(path, PROPERTY);
-                Map<String, Object> pathProps = new LinkedHashMap<String, Object>();
+                Map<String, Object> pathProps = new LinkedHashMap<>();
                 for (Element p : pathpropnodes) {
                     pathProps.put(p.getAttribute(NAME), p.getAttribute(VALUE));
                 }
@@ -696,7 +694,7 @@ public class Configuration implements Serializable {
             String exclude = e.getAttribute(EXCLUDE_EXPRESSION);
             LOG.info("Parse <component-scan> : [package = {}, includeExpression = {}, excludeExpression = {}]",
                     pkg, include, exclude);
-            Map<String, String> props = new HashMap<String, String>(4);
+            Map<String, String> props = new HashMap<>(4);
             if (StringUtil.isNotBlank(pkg)) {
                 props.put(PACKAGE, pkg);
                 if (StringUtil.isNotBlank(include)) {
@@ -730,7 +728,7 @@ public class Configuration implements Serializable {
                 LOG.warn("Property [{}] can't be empty.", name);
                 continue;
             }
-            Set<String> set = new LinkedHashSet<String>();
+            Set<String> set = new LinkedHashSet<>();
             if (PACKAGE.equalsIgnoreCase(name)) {
                 CollectionUtil.stringToCollection(value, set, sep);
                 //packages
@@ -772,12 +770,12 @@ public class Configuration implements Serializable {
                 aopAction.setMatches(matches);
                 aopAction.setType(Type.parseCode(type));
                 if (StringUtil.isNotBlank(stacks)) {
-                    List<String> list = new ArrayList<String>(4);
+                    List<String> list = new ArrayList<>(4);
                     CollectionUtil.stringToCollection(stacks, list, sep);
                     aopAction.setInterceptorStacks(list);
                 }
                 if (StringUtil.isNotBlank(interceptors)) {
-                    List<String> list = new ArrayList<String>(4);
+                    List<String> list = new ArrayList<>(4);
                     CollectionUtil.stringToCollection(interceptors, list, sep);
                     aopAction.setInterceptors(list);
                 }
@@ -795,7 +793,7 @@ public class Configuration implements Serializable {
      * @return 子节点集合。
      */
     private static List<Element> getChildNodesByTagName(Element parent, String name) {
-        List<Element> eles = new ArrayList<Element>();
+        List<Element> eles = new ArrayList<>();
         for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
             //System.out.println(child.getNodeName() + "," + child.getNodeType());
             if (Node.ELEMENT_NODE == child.getNodeType() && name.equals(child.getNodeName())) {
@@ -834,9 +832,8 @@ public class Configuration implements Serializable {
      * @throws IllegalAccessException 如果底层方法不可访问。
      * @throws InvocationTargetException 如果底层方法抛出异常。
      */
-    private static void injectProperties(Object obj, Map<String, Object> properties,
-            boolean removeUnsupported) throws IntrospectionException, IllegalAccessException,
-            InvocationTargetException {
+    private static void injectProperties(Object obj, Map<String, Object> properties, boolean removeUnsupported) throws
+            IntrospectionException, IllegalAccessException, InvocationTargetException {
         String cls = obj.getClass().getName();
         Map<String, PropertyDescriptor> supports = Injector.getSupportedProperties(obj.getClass());
         Iterator<Map.Entry<String, Object>> it = properties.entrySet().iterator();
@@ -869,8 +866,7 @@ public class Configuration implements Serializable {
      *
      * @throws ClassNotFoundException 如果没有找到具有指定名称的类。
      */
-    private static Object newInstance(ActionFactory factory, Object obj) throws
-            ClassNotFoundException {
+    private static Object newInstance(ActionFactory factory, Object obj) throws ClassNotFoundException {
         if (obj instanceof Class) {
             obj = factory.getObjectFactory().newInstance((Class<?>) obj);
         } else if (obj instanceof String) {
@@ -895,7 +891,7 @@ public class Configuration implements Serializable {
         printSeparator(!actionFactoryProperties.isEmpty());
         try {
             //扫描类集合
-            Set<Class<?>> scanComponents = new LinkedHashSet<Class<?>>();
+            Set<Class<?>> scanComponents = new LinkedHashSet<>();
             //计算扫描类集合
             if (!classScanners.isEmpty()) {
                 for (ClassScanner scanner : classScanners) {
@@ -924,7 +920,7 @@ public class Configuration implements Serializable {
 
                 //先加载指定配置的类，再加载自动搜索的类
                 //排除指定配置的类
-                Set<Class<?>> specified = new HashSet<Class<?>>();
+                Set<Class<?>> specified = new HashSet<>();
 
                 //interceptor
                 for (Object obj : interceptors) {
@@ -1034,7 +1030,7 @@ public class Configuration implements Serializable {
                 for (Map.Entry<String, Map<String, Object>> e : pathProperties.entrySet()) {
                     String pathName = e.getKey();
                     Class<?> pathActionClass = pathActions.get(pathName);
-                    Map<String, Object> allProps = new LinkedHashMap<String, Object>();
+                    Map<String, Object> allProps = new LinkedHashMap<>();
                     //class properties
                     allProps.putAll(actionProperties.get(pathActionClass));
                     //path properties
@@ -1061,7 +1057,7 @@ public class Configuration implements Serializable {
                                 existMatchPaths.add(path);
                                 //exist can't be null by PathActionFactory
                                 List<InterceptorProxy> exist = e.getValue().getInterceptorProxies();
-                                List<InterceptorProxy> news = new ArrayList<InterceptorProxy>();
+                                List<InterceptorProxy> news = new ArrayList<>();
                                 //TODO
                                 if (CollectionUtil.isNotEmpty(aa.getInterceptorStacks())) {
                                     for (String stackName : aa.getInterceptorStacks()) {
@@ -1128,8 +1124,7 @@ public class Configuration implements Serializable {
      *
      * @throws ConfigurationException 如果发生任何构造异常。
      */
-    protected <T extends ActionFactory> T createActionFactory(
-            Class<? extends ActionFactory> actionFactoryClass,
+    protected <T extends ActionFactory> T createActionFactory(Class<? extends ActionFactory> actionFactoryClass,
             Map<String, Object> actionFactoryProperties) throws ConfigurationException {
         ActionFactory factory = null;
         Constructor<? extends ActionFactory> con = null;

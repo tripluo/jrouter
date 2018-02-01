@@ -46,8 +46,7 @@ public final class InterceptorProxy extends DefaultProxy {
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public InterceptorProxy(ActionFactory actionFactory, Interceptor interceptor, Method method,
-            Object object) {
+    public InterceptorProxy(ActionFactory actionFactory, Interceptor interceptor, Method method, Object object) {
         super(method, object, actionFactory.getMethodInvokerFactory());
         this.interceptor = interceptor;
         this.name = interceptor.name().trim();

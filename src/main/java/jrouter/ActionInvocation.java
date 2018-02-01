@@ -22,6 +22,8 @@ import jrouter.annotation.Result;
 
 /**
  * {@link Action}运行时上下文的代理接口。在{@link Action}调用时记录并返回其状态、调用参数、结果对象、ActionFactory等信息。
+ *
+ * @param <K> Action Path type.
  */
 @Dynamic
 public interface ActionInvocation<K> {

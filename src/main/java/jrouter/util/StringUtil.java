@@ -215,13 +215,12 @@ public class StringUtil {
      * @see java.util.StringTokenizer
      * @see java.lang.String#trim()
      */
-    static String[] tokenizeToStringArray(String str, String delimiters, boolean trimTokens,
-            boolean ignoreEmptyTokens) {
+    static String[] tokenizeToStringArray(String str, String delimiters, boolean trimTokens, boolean ignoreEmptyTokens) {
         if (str == null) {
             return null;
         }
         StringTokenizer st = new StringTokenizer(str, delimiters);
-        List<String> tokens = new ArrayList<String>();
+        List<String> tokens = new ArrayList<>();
         while (st.hasMoreTokens()) {
             String token = st.nextToken();
             if (trimTokens) {

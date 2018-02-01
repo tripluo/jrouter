@@ -50,7 +50,7 @@ public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
         //SpringObjectFactory
         objectFactory = new SpringObjectFactory(applicationContext);
 
-        Map<String, Object> props = new HashMap<String, Object>();
+        Map<String, Object> props = new HashMap<>();
         props.put("objectFactory", objectFactory);
         //create ActionFactory not by springframework
         factory = new PathActionFactory(props);

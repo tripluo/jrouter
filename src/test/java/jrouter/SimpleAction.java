@@ -139,8 +139,6 @@ public class SimpleAction {
 
     /**
      * 测试调用时抛出异常。
-     *
-     * @return 抛出异常则返回null。
      */
     @Action(name = "exception", interceptorStack = DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK)
     public void exception() {
