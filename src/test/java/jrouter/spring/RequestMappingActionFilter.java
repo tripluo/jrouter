@@ -20,6 +20,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import jrouter.ActionFilter;
 import jrouter.annotation.Action;
+import jrouter.annotation.Namespace;
 import jrouter.annotation.Parameter;
 import jrouter.annotation.Result;
 import jrouter.annotation.Scope;
@@ -33,12 +34,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class RequestMappingActionFilter implements ActionFilter {
 
     @Override
-    public boolean accept(Method method) {
+    public boolean accept(Object obj, Method method) {
         return method.isAnnotationPresent(Action.class) || method.isAnnotationPresent(RequestMapping.class);
     }
 
     @Override
-    public Action getAnnotation(Method method) {
+    public Action getAction(Object obj, Method method) {
         final Action action = method.getAnnotation(Action.class);
         final boolean hasAction = (action != null);
         RequestMapping mapping = method.getAnnotation(RequestMapping.class);
@@ -103,5 +104,10 @@ public class RequestMappingActionFilter implements ActionFilter {
                 }
             };
         }
+    }
+
+    @Override
+    public Namespace getNamespace(Object obj, Method method) {
+        return method.getDeclaringClass().getAnnotation(Namespace.class);
     }
 }

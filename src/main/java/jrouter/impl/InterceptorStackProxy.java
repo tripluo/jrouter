@@ -66,8 +66,9 @@ public final class InterceptorStackProxy {
             Iterator<InterceptorProxy> it = interceptors.iterator();
             while (it.hasNext()) {
                 msg.append(it.next().getName());
-                if (it.hasNext())
+                if (it.hasNext()) {
                     msg.append(", ");
+                }
             }
         }
         msg.append(']');

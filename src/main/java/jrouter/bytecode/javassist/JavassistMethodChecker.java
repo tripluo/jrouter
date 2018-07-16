@@ -77,7 +77,7 @@ public class JavassistMethodChecker {
     /**
      * 分析指定的{@code Method}对象体，检查是否匹配指定的模式。
      *
-     * @param method 待检查的Method对象。
+     * @param method 待检查的{@code Metohd}对象。
      *
      * @return 是否匹配指定的模式。
      */
@@ -88,15 +88,16 @@ public class JavassistMethodChecker {
             javassist.bytecode.MethodInfo info = ctMethod.getMethodInfo2();
             ConstPool pool = info.getConstPool();
             CodeAttribute code = info.getCodeAttribute();
-            if (code == null)
+            if (code == null) {
                 return false;
+            }
             CodeIterator iter = code.iterator();
             while (iter.hasNext()) {
                 int pos = iter.next();
                 int opcode = iter.byteAt(pos);
-                if (opcode > OPCODES.length || opcode < 0)
+                if (opcode > OPCODES.length || opcode < 0) {
                     throw new BadBytecode("Invalid opcode, opcode: " + opcode + " pos: " + pos);
-
+                }
                 switch (opcode) {
                     case INVOKEVIRTUAL:
                     case INVOKESPECIAL:
@@ -107,7 +108,7 @@ public class JavassistMethodChecker {
                         bodyMethods.add(interfaceMethodInfo(pool, iter.u16bitAt(pos + 1)));
                         break;
                     default:
-                        ;
+                        break;
                 }
             }
         } catch (javassist.NotFoundException | BadBytecode ex) {
@@ -127,8 +128,9 @@ public class JavassistMethodChecker {
             if (!matchedAny) {
                 for (MethodInfo any : anyMatch) {
                     matchedAny = matchMethod(bodyMethod, any);
-                    if (matchedAny)
+                    if (matchedAny) {
                         break;
+                    }
                 }
             }
         }
@@ -165,17 +167,21 @@ public class JavassistMethodChecker {
      * 判断方法是否匹配指定的模式（方法名称/参数）。
      */
     private boolean matchMethod(MethodInfo method, MethodInfo pattern) {
-        if (method == null)
+        if (method == null) {
             return false;
-        if (pattern == null || pattern.methodName == null)
+        }
+        if (pattern == null || pattern.methodName == null) {
             return true;
+        }
         return this.methodMatcher.match(pattern.methodName, method.methodName)
                 && (pattern.parametersDescription == null
                         ? true
                         : this.parameterMatcher.match(pattern.parametersDescription, method.parametersDescription));
     }
 
-    /** Method object */
+    /**
+     * Method object
+     */
     private static final class MethodInfo {
 
         //simplify name
@@ -206,30 +212,34 @@ public class JavassistMethodChecker {
 
         //parse parameters to String
         static String toParametersDescription(Collection<String> params) {
-            if (params == null || params.isEmpty())
+            if (params == null || params.isEmpty()) {
                 return "";
+            }
             StringBuilder sb = new StringBuilder();
             Iterator<String> i = params.iterator();
             for (;;) {
                 String e = i.next();
                 sb.append(e);
-                if (!i.hasNext())
+                if (!i.hasNext()) {
                     return sb.toString();
-                sb.append(",");
+                }
+                sb.append(',');
             }
         }
 
         //set method name
         public void setMethodName(String methodName) {
-            if (methodName.startsWith(JAVA_LANG))
+            if (methodName.startsWith(JAVA_LANG)) {
                 methodName = methodName.substring(JAVA_LANG.length());
+            }
             this.methodName = methodName;
         }
 
         //set parameters description, ',' as separator
         public void setParametersDescription(String parametersDescription) {
-            if (parametersDescription.startsWith(JAVA_LANG))
+            if (parametersDescription.startsWith(JAVA_LANG)) {
                 parametersDescription = parametersDescription.substring(JAVA_LANG.length());
+            }
             //remove "java.lang."
             parametersDescription = parametersDescription.replaceAll("\\s*,\\s*(?:java.lang.)?", ",");
             this.parametersDescription = parametersDescription;
@@ -263,9 +273,9 @@ public class JavassistMethodChecker {
                         if (before == Character.MIN_VALUE) {
                             before = c;
                         }
-                        if (before == '&') {
+                        if (before == '&') {//NOPMD
                             all.add(name);
-                        } else if (before == '|') {
+                        } else if (before == '|') {//NOPMD
                             any.add(name);
                         }
                     }
@@ -280,9 +290,9 @@ public class JavassistMethodChecker {
             name = StringUtil.trim(pattern.substring(p, i));
             if (StringUtil.isNotEmpty(name)) {
                 //if no separator
-                if (before == Character.MIN_VALUE || before == '&') {
+                if (before == Character.MIN_VALUE || before == '&') {//NOPMD
                     all.add(name);
-                } else if (before == '|') {
+                } else if (before == '|') {//NOPMD
                     any.add(name);
                 }
             }
@@ -386,6 +396,7 @@ public class JavassistMethodChecker {
                 default: {
                     //ignore
                     //throw new RuntimeException("bad descriptor: " + descriptor);
+                    break;
                 }
             }
             if (!name.isEmpty()) {

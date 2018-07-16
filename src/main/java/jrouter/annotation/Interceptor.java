@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 拦截器，定义于方法上的注解。
+ * 拦截器。
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

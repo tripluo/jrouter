@@ -16,20 +16,15 @@
  */
 package jrouter.impl;
 
-import java.util.Map;
-import jrouter.ActionFactory;
 import jrouter.ActionInvocation;
-import jrouter.ActionProxy;
-import jrouter.JRouterException;
-import jrouter.ParameterConverter;
-import jrouter.annotation.Result;
+import jrouter.support.ActionInvocationDelegate;
 
 /**
  * 测试ActionFactory的ConverterFactory传递参数的扩展性。
  */
 public class ConverterParameterActionFactory extends PathActionFactory {
 
-    public ConverterParameterActionFactory(Map<String, Object> properties) {
+    public ConverterParameterActionFactory(Properties properties) {
         super(properties);
     }
 
@@ -55,97 +50,21 @@ public class ConverterParameterActionFactory extends PathActionFactory {
     /**
      * 代理ActionInvocation，并添加自定义的属性和实现接口。
      */
-    public static class DefaultDemoActionInvocation implements DemoActionInvocation {
+    public static class DefaultDemoActionInvocation extends ActionInvocationDelegate<String> implements
+            DemoActionInvocation {
 
         /* name */
         private final String name;
 
-        /* 代理的ActionInvocation */
-        private final ActionInvocation<String> invocation;
-
         public DefaultDemoActionInvocation(String name, ActionInvocation<String> invocation) {
+            super();
             this.name = name;
-            this.invocation = invocation;
+            this.delegate = invocation;
         }
 
         @Override
         public String getName() {
             return name;
-        }
-
-        @Override
-        public ActionFactory getActionFactory() {
-            return invocation.getActionFactory();
-        }
-
-        @Override
-        public ActionProxy getActionProxy() {
-            return invocation.getActionProxy();
-        }
-
-        @Override
-        public boolean isExecuted() {
-            return invocation.isExecuted();
-        }
-
-        @Override
-        public Object[] getParameters() {
-            return invocation.getParameters();
-        }
-
-        @Override
-        public Object invoke(Object... params) throws JRouterException {
-            return invocation.invoke(params);
-        }
-
-        @Override
-        public Object invokeActionOnly(Object... params) throws JRouterException {
-            return invocation.invokeActionOnly(params);
-        }
-
-        @Override
-        public String getActionPath() {
-            return invocation.getActionPath();
-        }
-
-        @Override
-        public Object getInvokeResult() {
-            return invocation.getInvokeResult();
-        }
-
-        @Override
-        public void setInvokeResult(Object result) {
-            invocation.setInvokeResult(result);
-        }
-
-        @Override
-        public void setResult(Result result) {
-            invocation.setResult(result);
-        }
-
-        @Override
-        public Result getResult() {
-            return invocation.getResult();
-        }
-
-        @Override
-        public void setParameterConverter(ParameterConverter parameterConverter) {
-            invocation.setParameterConverter(parameterConverter);
-        }
-
-        @Override
-        public ParameterConverter getParameterConverter() {
-            return invocation.getParameterConverter();
-        }
-
-        @Override
-        public void setConvertParameters(Object... params) {
-            invocation.setConvertParameters(params);
-        }
-
-        @Override
-        public Object[] getConvertParameters() {
-            return invocation.getConvertParameters();
         }
 
     }

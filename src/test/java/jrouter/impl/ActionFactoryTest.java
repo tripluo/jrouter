@@ -73,10 +73,9 @@ public class ActionFactoryTest {
      */
     @Test
     public void test_createActionFactory() {
-        Map<String, Object> props = new HashMap<>();
-        //set extension
-        props.put("extension", ".do");
-        factory = new PathActionFactory(props);
+        PathActionFactory.Properties prop = new PathActionFactory.Properties();
+        prop.setExtension(".do");
+        factory = new PathActionFactory(prop);
 
         //interceptor
         factory.addInterceptors(SampleInterceptor.class);

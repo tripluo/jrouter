@@ -16,10 +16,9 @@
  */
 package jrouter.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import jrouter.ActionInvocation;
 import jrouter.annotation.ResultType;
+import jrouter.impl.PathActionFactory.ColonString;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
 import org.junit.Before;
@@ -52,13 +51,10 @@ public class PathActionFactory1Test {
 
     @Before
     public void init() {
-        Map<String, Object> props = new HashMap<>();
-        //set extension
-        props.put("extension", "");
-
-        //default result
-        props.put("defaultResultType", TestResult.DEMO);
-        factory = new PathActionFactory.ColonString(props);
+        ColonString.Properties properties = new ColonString.Properties();
+        properties.setExtension("");
+        properties.setDefaultResultType(TestResult.DEMO);
+        factory = new ColonString(properties);
 
         //path aciotn
         factory.addActions(jrouter.URLTestAction.class);

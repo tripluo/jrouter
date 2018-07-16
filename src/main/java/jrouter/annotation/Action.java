@@ -88,7 +88,10 @@ public @interface Action {
      * 结果对象集合。
      *
      * @return 结果对象集合。
+     *
+     * @deprecated
      */
+    @Deprecated
     Result[] results() default {};
 
     /**

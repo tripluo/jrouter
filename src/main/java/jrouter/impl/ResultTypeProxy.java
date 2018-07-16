@@ -43,7 +43,7 @@ public final class ResultTypeProxy extends DefaultProxy {
      * @param object 代理的方法的对象。
      */
     public ResultTypeProxy(ActionFactory<?> actionFactory, ResultType resultType, Method method, Object object) {
-        super(method, object, actionFactory.getMethodInvokerFactory());
+        super(method, object, actionFactory);
         this.resultType = resultType;
         this.type = resultType.type().trim();
     }

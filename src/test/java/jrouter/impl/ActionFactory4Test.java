@@ -16,8 +16,6 @@
  */
 package jrouter.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import jrouter.InterceptorTestAction;
 import jrouter.interceptor.DefaultInterceptorStack;
 import jrouter.interceptor.SampleInterceptor;
@@ -35,10 +33,9 @@ public class ActionFactory4Test {
 
     @Before
     public void init() {
-        Map<String, Object> props = new HashMap<>();
-        props.put("defaultInterceptorStack", DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK);
-
-        factory = new PathActionFactory(props);
+        PathActionFactory.Properties prop = new PathActionFactory.Properties();
+        prop.setDefaultInterceptorStack(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK);
+        factory = new PathActionFactory(prop);
 
         assertEquals(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK, factory.getDefaultInterceptorStack());
 
@@ -79,7 +76,6 @@ public class ActionFactory4Test {
         assertEquals(ap22.getInterceptorProxies(), factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
         assertEquals(1, ap23.getInterceptorProxies().size());
         assertEquals(ap23.getInterceptorProxies().get(0).getName(), SampleInterceptor.TIMER);
-
 
         PathActionProxy ap31 = factory.getActions().get("/test3/1");
         PathActionProxy ap32 = factory.getActions().get("/test3/2");

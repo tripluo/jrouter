@@ -14,24 +14,18 @@
  * limitations under the License.
  *
  */
-package jrouter;
+package jrouter.support;
+
+import jrouter.ActionInvocation;
 
 /**
- * 调用底层方法的接口。
+ * ActionInvocation's Delegate.
+ *
+ * @param <P> Action Path type.
  */
-public interface Invoker {
+public class ActionInvocationDelegate<P> implements ActionInvocation<P> {
 
-    /**
-     * 由指定对象和参数调用方法。
-     *
-     * @param <T> 方法调用结果的类型。
-     *
-     * @param obj 调用方法的对象。
-     * @param params 用于方法调用的参数。
-     *
-     * @return 方法调用后的结果。
-     *
-     * @throws JRouterException 如果发生调用异常。
-     */
-    <T> T invoke(Object obj, Object... params) throws JRouterException;
+    @lombok.experimental.Delegate
+    protected ActionInvocation<P> delegate = null;
+
 }

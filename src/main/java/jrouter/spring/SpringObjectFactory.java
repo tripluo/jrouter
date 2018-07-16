@@ -49,6 +49,7 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
      * 构造一个空对象。
      */
     public SpringObjectFactory() {
+        super();
     }
 
     /**
@@ -62,8 +63,9 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
 
     @Override
     public <T> T newInstance(Class<T> clazz) {
-        if (AutowireCapableBeanFactory.AUTOWIRE_NO == autowireMode)
+        if (AutowireCapableBeanFactory.AUTOWIRE_NO == autowireMode) {
             return autowireCapableBeanFactory.createBean(clazz);
+        }
         return (T) autowireCapableBeanFactory.createBean(clazz, autowireMode, false);
     }
 

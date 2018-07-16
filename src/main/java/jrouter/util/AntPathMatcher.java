@@ -279,7 +279,7 @@ public class AntPathMatcher {
      * @return {@code true} if the string matches against the pattern, or {@code false} otherwise
      */
     private boolean matchStrings(String pattern, String str, Map<String, String> uriTemplateVariables) {
-        AntPathStringMatcher matcher = new AntPathStringMatcher(pattern);;
+        AntPathStringMatcher matcher = new AntPathStringMatcher(pattern);
         return matcher.matchStrings(str, uriTemplateVariables);
     }
 

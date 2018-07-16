@@ -71,8 +71,9 @@ public class ClassUtil {
         //recursive
         boolean recursive = true;
         for (String packageName : packageNames) {
-            if (StringUtil.isEmpty(packageName))
+            if (StringUtil.isEmpty(packageName)) {
                 continue;
+            }
             String packageDirName = packageName.replace('.', '/');
             Enumeration<URL> dirs = null;
             try {
@@ -96,17 +97,18 @@ public class ClassUtil {
                                 //获取jar里的一个实体 可以是目录 和一些jar包里的其他文件 如META-INF等文件
                                 JarEntry entry = entries.nextElement();
                                 String name = entry.getName();
+                                char slash = '/';
                                 //如果是以/开头的
-                                if (name.charAt(0) == '/') {
+                                if (name.charAt(0) == slash) {
                                     name = name.substring(1);
                                 }
                                 //如果前半部分和定义的包名相同
                                 if (name.startsWith(packageDirName)) {
-                                    int idx = name.lastIndexOf('/');
+                                    int idx = name.lastIndexOf(slash);
                                     //如果以"/"结尾，是一个包
                                     if (idx != -1) {
                                         //获取包名，把"/"替换成"."
-                                        packageName = name.substring(0, idx).replace('/', '.');
+                                        packageName = name.substring(0, idx).replace(slash, '.');
                                     }
                                     //如果可以迭代下去 并且是一个包
                                     if ((idx != -1) || recursive) {
@@ -115,8 +117,9 @@ public class ClassUtil {
                                             //去掉后面的".class" 获取真正的类名
                                             String className = name.substring(packageName.length() + 1, name.length() - 6);
                                             Class<?> cls = loadClassQuietly(packageName + '.' + className);
-                                            if (cls != null)
+                                            if (cls != null) { //NOPMD AvoidDeeplyNestedIfStmts
                                                 classes.add(cls);
+                                            }
                                         }
                                     }
                                 }
@@ -166,8 +169,9 @@ public class ClassUtil {
                 //remove .class suffix
                 String className = file.getName().substring(0, file.getName().length() - 6);
                 Class<?> cls = loadClassQuietly(packageName + '.' + className);
-                if (cls != null)
+                if (cls != null) {
                     classes.add(cls);
+                }
             }
         }
     }
@@ -182,7 +186,7 @@ public class ClassUtil {
     public static Class<?> loadClassQuietly(String className) {
         try {
             return loadClass(className);
-        } catch (Throwable thr) {
+        } catch (Throwable thr) { //NOPMD AvoidCatchingThrowable
             //ignore
         }
         return null;
@@ -199,7 +203,7 @@ public class ClassUtil {
      */
     public static Class<?> loadClass(String className) throws ClassNotFoundException {
         ClassLoader contextCL = Thread.currentThread().getContextClassLoader();
-        ClassLoader loader = contextCL == null ? ClassUtil.class.getClassLoader() : contextCL;
+        ClassLoader loader = contextCL == null ? ClassUtil.class.getClassLoader() : contextCL; //NOPMD UseProperClassLoader
         return loader.loadClass(className);
     }
 

@@ -22,6 +22,7 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
+import java.nio.file.Files;
 import java.util.*;
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -221,13 +222,6 @@ public class Configuration implements Serializable {
      * Constructor with initialization.
      */
     public Configuration() {
-        reset();
-    }
-
-    /**
-     * initiate or reset the collections.
-     */
-    protected void reset() {
         actionFactoryProperties = new LinkedHashMap<>();
         interceptors = new LinkedHashSet<>();
         interceptorProperties = new LinkedHashMap<>();
@@ -299,10 +293,10 @@ public class Configuration implements Serializable {
      */
     public Configuration load(File configFile) throws ConfigurationException {
         LOG.info("Configuring from file : {}", configFile.getName());
-        try {
-            return load(new FileInputStream(configFile), configFile.toString());
-        } catch (FileNotFoundException fnfe) {
-            throw new ConfigurationException("Could not find file : " + configFile, fnfe);
+        try (InputStream is = Files.newInputStream(configFile.toPath())) {
+            return load(is, configFile.toString());
+        } catch (IOException ex) {
+            throw new ConfigurationException("Could not load file : " + configFile, ex);
         }
     }
 
@@ -314,7 +308,7 @@ public class Configuration implements Serializable {
      * @return URL。
      */
     private static URL getResource(String resource) {
-        String name = resource.startsWith("/") ? resource.substring(1) : resource;
+        String name = (resource.charAt(0) == '/' ? resource.substring(1) : resource);
         URL url = null;
         ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
         if (classLoader != null) {
@@ -324,7 +318,7 @@ public class Configuration implements Serializable {
             url = Configuration.class.getResource(resource);
         }
         if (url == null) {
-            url = Configuration.class.getClassLoader().getResource(name);
+            url = Configuration.class.getClassLoader().getResource(name); //NOPMD UseProperClassLoader
         }
         if (url == null) {
             throw new IllegalArgumentException(resource + " not found");
@@ -339,8 +333,9 @@ public class Configuration implements Serializable {
      */
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private static void printSeparator(boolean bool) {
-        if (bool)
-            System.out.println("--------------------------------------------------------------------------------");
+        if (bool) {
+            System.out.println("--------------------------------------------------------------------------------");//NOPMD
+        }
     }
 
     /**
@@ -349,7 +344,7 @@ public class Configuration implements Serializable {
     private static class DocumentLoader {
 
         /* SAX 错误处理对象 */
-        static ErrorHandler ERROR_HANDLER = new ErrorHandler() {
+        static final ErrorHandler ERROR_HANDLER = new ErrorHandler() {
 
             @Override
             public void warning(SAXParseException ex) throws SAXException {
@@ -368,7 +363,7 @@ public class Configuration implements Serializable {
         };
 
         /* 用于解析实体的对象 */
-        static EntityResolver ENTITY_RESOLVER = new EntityResolver() {
+        static final EntityResolver ENTITY_RESOLVER = new EntityResolver() {
 
             @Override
             public InputSource resolveEntity(String publicId, String systemId) throws
@@ -435,8 +430,9 @@ public class Configuration implements Serializable {
             if ((length = list.size()) == 1) {
                 Element e = list.get(0);
                 String cls = e.getAttribute(CLASS);
-                if (StringUtil.isNotBlank(cls))
+                if (StringUtil.isNotBlank(cls)) {
                     actionFactoryClass = (Class<? extends ActionFactory>) ClassUtil.loadClass(cls);
+                }
                 LOG.info("Configured SessionFactory : {}", cls);
                 //ActionFactory's properties
                 list = getChildNodesByTagName(e, PROPERTY);
@@ -508,9 +504,6 @@ public class Configuration implements Serializable {
         printSeparator(true);
 
         URL include = getResource(includeFile);
-        if (include == null) {
-            throw new ConfigurationException("Could not included file : " + include, null);
-        }
         InputStream stream = null;
         try {
             stream = include.openStream();
@@ -543,12 +536,13 @@ public class Configuration implements Serializable {
         } catch (Exception e) {
             throw new ConfigurationException("Could not load or parse properties from included file : " + include, e);
         } finally {
-            if (stream != null)
+            if (stream != null) {
                 try {
                     stream.close();
                 } catch (IOException e) {
                     LOG.error("Fail to close input stream : " + include, e);
                 }
+            }
         }
     }
 
@@ -576,8 +570,9 @@ public class Configuration implements Serializable {
             }
             //set property nodes
             Map<String, Object> props = parseProperties(cls, getChildNodesByTagName(e, PROPERTY));
-            if (!props.isEmpty())
+            if (!props.isEmpty()) {
                 interceptorProperties.put(cls, props);
+            }
         }
 
         printSeparator(!list.isEmpty());
@@ -594,8 +589,9 @@ public class Configuration implements Serializable {
 
             //set property nodes
             Map<String, Object> props = parseProperties(cls, getChildNodesByTagName(e, PROPERTY));
-            if (!props.isEmpty())
+            if (!props.isEmpty()) {
                 interceptorStackProperties.put(cls, props);
+            }
         }
 
         printSeparator(!list.isEmpty());
@@ -611,8 +607,9 @@ public class Configuration implements Serializable {
             }
             //set property nodes
             Map<String, Object> props = parseProperties(cls, getChildNodesByTagName(e, PROPERTY));
-            if (!props.isEmpty())
+            if (!props.isEmpty()) {
                 resultTypeProperties.put(cls, props);
+            }
         }
 
         printSeparator(!list.isEmpty());
@@ -628,8 +625,9 @@ public class Configuration implements Serializable {
             }
             //set property nodes
             Map<String, Object> props = parseProperties(cls, getChildNodesByTagName(e, PROPERTY));
-            if (!props.isEmpty())
+            if (!props.isEmpty()) {
                 resultProperties.put(cls, props);
+            }
         }
 
         printSeparator(!list.isEmpty());
@@ -649,9 +647,9 @@ public class Configuration implements Serializable {
 
             //set property nodes
             Map<String, Object> props = parseProperties(cls, propnodes);
-            if (!props.isEmpty())
+            if (!props.isEmpty()) {
                 actionProperties.put(cls, props);
-
+            }
             //<path> nodes
             List<Element> pathnodes = getChildNodesByTagName(e, PATH);
             for (Element path : pathnodes) {
@@ -813,10 +811,12 @@ public class Configuration implements Serializable {
      */
     private String getTrimmedToNullString(Element element, String attribute) {
         String str = element.getAttribute(attribute);
-        if (str != null)
+        if (str != null) {
             str = str.trim();
-        if (str != null && str.length() == 0)
+        }
+        if (str != null && str.length() == 0) {
             str = null;
+        }
         return str;
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -843,8 +843,9 @@ public class Configuration implements Serializable {
             PropertyDescriptor pd = supports.get(pName);
             if (pd == null) {
                 LOG.error("Not supported property [{}] in [{}]", pName, cls);
-                if (removeUnsupported)
+                if (removeUnsupported) {
                     it.remove();
+                }
             } else {
                 Object value = e.getValue();
                 //convert string to specific object
@@ -935,8 +936,9 @@ public class Configuration implements Serializable {
                 }
                 //auto-scan interceptors
                 for (Class<?> cls : scanComponents) {
-                    if (!specified.contains(cls))
+                    if (!specified.contains(cls)) {
                         pathActionFactory.addInterceptors(cls);
+                    }
                 }
                 //clear
                 specified.clear();
@@ -955,8 +957,9 @@ public class Configuration implements Serializable {
                 }
                 //scan interceptorStacks
                 for (Class<?> cls : scanComponents) {
-                    if (!specified.contains(cls))
+                    if (!specified.contains(cls)) {
                         pathActionFactory.addInterceptorStacks(cls);
+                    }
                 }
                 //clear
                 specified.clear();
@@ -975,8 +978,9 @@ public class Configuration implements Serializable {
                 }
                 //scan resultTypes
                 for (Class<?> cls : scanComponents) {
-                    if (!specified.contains(cls))
+                    if (!specified.contains(cls)) {
                         pathActionFactory.addResultTypes(cls);
+                    }
                 }
                 //clear
                 specified.clear();
@@ -995,8 +999,9 @@ public class Configuration implements Serializable {
                 }
                 //scan results
                 for (Class<?> cls : scanComponents) {
-                    if (!specified.contains(cls))
+                    if (!specified.contains(cls)) {
                         pathActionFactory.addResults(cls);
+                    }
                 }
                 //clear
                 specified.clear();
@@ -1019,8 +1024,9 @@ public class Configuration implements Serializable {
 
                 //scan actions
                 for (Class<?> cls : scanComponents) {
-                    if (!specified.contains(cls))
+                    if (!specified.contains(cls)) {
                         pathActionFactory.addActions(cls);
+                    }
                 }
                 //clear
                 specified.clear();
@@ -1042,9 +1048,9 @@ public class Configuration implements Serializable {
                 //actions' aop
                 if (!aopActions.isEmpty()) {
                     LOG.info("Starting Aop Action");
-                    AntPathMatcher matcher = new AntPathMatcher(pathActionFactory.getPathSeparator() + "");
+                    AntPathMatcher matcher = new AntPathMatcher(String.valueOf(pathActionFactory.getPathSeparator()));
                     //已经匹配的路径
-                    Set<String> existMatchPaths = new HashSet<String>();
+                    Set<String> existMatchPaths = new HashSet<>();
                     //倒序，最后匹配的路径优先
                     for (int i = aopActions.size() - 1; i > -1; i--) {
                         in:
@@ -1052,8 +1058,9 @@ public class Configuration implements Serializable {
                             AopAction aa = aopActions.get(i);
                             String path = e.getKey();
                             if (matcher.match(aa.getMatches(), path)) {
-                                if (existMatchPaths.contains(path))
+                                if (existMatchPaths.contains(path)) {
                                     continue in;
+                                }
                                 existMatchPaths.add(path);
                                 //exist can't be null by PathActionFactory
                                 List<InterceptorProxy> exist = e.getValue().getInterceptorProxies();
@@ -1090,6 +1097,10 @@ public class Configuration implements Serializable {
                                     case OVERRIDE: {
                                         exist.clear();
                                         exist.addAll(news);
+                                        break;
+                                    }
+                                    default: {
+                                        LOG.error("Unknown {} : [{}]", Type.class, aa.getType());
                                         break;
                                     }
                                 }
@@ -1190,17 +1201,20 @@ public class Configuration implements Serializable {
      * @return 显示名称。
      */
     private String interceptorsToString(List<InterceptorProxy> interceptors) {
-        if (interceptors == null)
+        if (interceptors == null) {
             return "null";
+        }
         int iMax = interceptors.size() - 1;
-        if (iMax == -1)
+        if (iMax == -1) {
             return "[]";
+        }
         StringBuilder msg = new StringBuilder();
         msg.append('[');
         for (int i = 0;; i++) {
             msg.append(interceptors.get(i).getName());
-            if (i == iMax)
+            if (i == iMax) {
                 return msg.append(']').toString();
+            }
             msg.append(", ");
         }
     }

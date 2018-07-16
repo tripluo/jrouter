@@ -23,7 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * ResultType，定义于方法上的注解。
+ * 定义于方法上，表明同一类型结果处理。
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

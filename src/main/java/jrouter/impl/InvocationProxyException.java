@@ -61,7 +61,7 @@ public class InvocationProxyException extends JRouterException {
      */
     public Throwable getSource() {
         Throwable cur = this.getCause();
-        while (cur instanceof InvocationProxyException && (cur = cur.getCause()) != null) {
+        while (cur instanceof InvocationProxyException && (cur = cur.getCause()) != null) {//NOPMD for EmptyWhileStmt
         }
         return cur;
     }

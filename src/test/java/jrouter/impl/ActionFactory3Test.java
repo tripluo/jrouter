@@ -16,8 +16,6 @@
  */
 package jrouter.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.After;
 import jrouter.JRouterException;
 import jrouter.interceptor.DefaultInterceptorStack;
@@ -46,11 +44,9 @@ public class ActionFactory3Test {
 
     @Before
     public void init() {
-        Map<String, Object> props1 = new HashMap<>();
-        //set extension
-        props1.put("extension", ".");
-
-        factory1 = new PathActionFactory(props1);
+        PathActionFactory.Properties prop = new PathActionFactory.Properties();
+        prop.setExtension(".");
+        factory1 = new PathActionFactory(prop);
 
         //interceptor
         factory1.addInterceptors(SampleInterceptor.class);
@@ -65,11 +61,9 @@ public class ActionFactory3Test {
         factory1.addActions(jrouter.URLTestAction.class);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
-        Map<String, Object> props2 = new HashMap<>();
-        //set extension
-        props2.put("extension", extension2);
-
-        factory2 = new PathActionFactory(props2);
+        PathActionFactory.Properties prop2 = new PathActionFactory.Properties();
+        prop2.setExtension(extension2);
+        factory2 = new PathActionFactory(prop2);
 
         //interceptor
         factory2.addInterceptors(SampleInterceptor.class);

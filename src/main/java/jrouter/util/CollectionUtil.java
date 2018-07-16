@@ -147,7 +147,6 @@ public class CollectionUtil {
     }
 
     /**
-     *
      * 判断Collection是否为空。
      *
      * @param collection 待检测的Collection。
@@ -159,7 +158,6 @@ public class CollectionUtil {
     }
 
     /**
-     *
      * 判断Collection是否不为空。
      *
      * @param collection 待检测的Collection。
@@ -171,7 +169,6 @@ public class CollectionUtil {
     }
 
     /**
-     *
      * 判断Map是否不为空。
      *
      * @param map 待检测的Map。
@@ -183,7 +180,6 @@ public class CollectionUtil {
     }
 
     /**
-     *
      * 判断Map是否不为空。
      *
      * @param map 待检测的Map。
@@ -204,8 +200,9 @@ public class CollectionUtil {
      */
     public static boolean contains(int element, int... array) {
         for (int t : array) {
-            if (element == t)
+            if (element == t) {
                 return true;
+            }
         }
         return false;
     }
@@ -220,8 +217,9 @@ public class CollectionUtil {
      */
     public static boolean contains(char element, char... array) {
         for (char t : array) {
-            if (element == t)
+            if (element == t) {
                 return true;
+            }
         }
         return false;
     }
@@ -236,8 +234,9 @@ public class CollectionUtil {
      */
     public static boolean contains(boolean element, boolean... array) {
         for (boolean t : array) {
-            if (element == t)
+            if (element == t) {
                 return true;
+            }
         }
         return false;
     }
@@ -257,8 +256,9 @@ public class CollectionUtil {
      */
     public static <T extends Collection<String>> T stringToCollection(final String source, Collection<String> collection,
             char... sep) {
-        if (collection == null)
+        if (collection == null) {
             collection = new ArrayList<>();
+        }
         if (source == null) {
             return (T) collection;
         }
@@ -274,24 +274,30 @@ public class CollectionUtil {
             if (contains(source.charAt(i), sep)) {
                 //blank
                 end = i - 1;
-                while (Character.isWhitespace(source.charAt(point)))
+                while (Character.isWhitespace(source.charAt(point))) {
                     point++;
-                while (end > point && Character.isWhitespace(source.charAt(end)))
+                }
+                while (end > point && Character.isWhitespace(source.charAt(end))) {
                     end--;
-                if (point <= end)
+                }
+                if (point <= end) {
                     collection.add(source.substring(point, end + 1));
+                }
                 point = i + 1;
             }
         }
         //尾串
         if (i != point) {
             end = i - 1;
-            while (point < i && Character.isWhitespace(source.charAt(point)))
+            while (point < i && Character.isWhitespace(source.charAt(point))) {
                 point++;
-            while (end > point && Character.isWhitespace(source.charAt(end)))
+            }
+            while (end > point && Character.isWhitespace(source.charAt(end))) {
                 end--;
-            if (point <= end)
+            }
+            if (point <= end) {
                 collection.add(source.substring(point, end + 1));
+            }
         }
         return (T) collection;
     }
@@ -314,8 +320,9 @@ public class CollectionUtil {
             throw new IllegalArgumentException("Separate array " + Arrays.toString(sep)
                     + " can't contain " + Arrays.toString(new char[]{'=', ':'}));
         }
-        if (map == null)
+        if (map == null) {
             map = new LinkedHashMap<>();
+        }
         if (StringUtil.isEmpty(source)) {
             return (T) map;
         }
@@ -327,10 +334,12 @@ public class CollectionUtil {
             //if separate
             if (contains(source.charAt(i), sep)) {
                 end = i - 1;
-                while (Character.isWhitespace(source.charAt(point)))
+                while (Character.isWhitespace(source.charAt(point))) {
                     point++;
-                while (end > point && Character.isWhitespace(source.charAt(end)))
+                }
+                while (end > point && Character.isWhitespace(source.charAt(end))) {
                     end--;
+                }
                 if (point < end || (point == end && !contains(source.charAt(point), sep))) {
                     String[] kv = parseKeyValue(source, point, end);
                     map.put(kv[0], kv[1]);
@@ -341,10 +350,12 @@ public class CollectionUtil {
         //尾串
         if (i != point) {
             end = i - 1;
-            while (point < i && Character.isWhitespace(source.charAt(point)))
+            while (point < i && Character.isWhitespace(source.charAt(point))) {
                 point++;
-            while (end > point && Character.isWhitespace(source.charAt(end)))
+            }
+            while (end > point && Character.isWhitespace(source.charAt(end))) {
                 end--;
+            }
             if (point < end || (point == end && !contains(source.charAt(point), sep))) {
                 String[] kv = parseKeyValue(source, point, end);
                 map.put(kv[0], kv[1]);
@@ -378,10 +389,12 @@ public class CollectionUtil {
         }
         int lp = point - 1;
         int rp = point + 1;
-        while (lp > beginIndex && Character.isWhitespace(source.charAt(lp)))
+        while (lp > beginIndex && Character.isWhitespace(source.charAt(lp))) {
             lp--;
-        while (rp < endIndex && Character.isWhitespace(source.charAt(rp)))
+        }
+        while (rp < endIndex && Character.isWhitespace(source.charAt(rp))) {
             rp++;
+        }
         return new String[]{point == beginIndex ? "" : source.substring(beginIndex, lp + 1),
             point == endIndex ? "" : source.substring(rp, endIndex + 1)};
     }

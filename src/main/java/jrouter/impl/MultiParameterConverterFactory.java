@@ -44,7 +44,9 @@ public class MultiParameterConverterFactory implements ConverterFactory {
 
     }
 
-    /** 缓存转换参数匹配的位置 */
+    /**
+     * 缓存转换参数匹配的位置
+     */
     private Map<Method, int[]> methodParametersCache;
 
     /**
@@ -83,7 +85,6 @@ public class MultiParameterConverterFactory implements ConverterFactory {
     /**
      * 返回线程安全的多参数自动映射转换器。
      * 此参数转换器可能需要ActionFactory支持，在创建ActionInvocation时区分处理原始参数和转换参数。
-     *
      */
     @Override
     public ParameterConverter getParameterConverter(ActionInvocation actionInvocation) {
@@ -100,8 +101,9 @@ public class MultiParameterConverterFactory implements ConverterFactory {
         @Override
         public Object[] convert(Method method, Object obj, Object[] invokeParams, Object[] convertParams) throws
                 JRouterException {
-            if (convertParams == null || convertParams.length == 0)
+            if (convertParams == null || convertParams.length == 0) {
                 return invokeParams;
+            }
             Class<?>[] parameterTypes = method.getParameterTypes();
             int paramSize = parameterTypes.length;
             //变长或原本无参数的方法
@@ -112,8 +114,9 @@ public class MultiParameterConverterFactory implements ConverterFactory {
             //保留原参数，追加支持的绑定参数
             if (paramSize > invokeSize) {
                 Object[] newArgs = new Object[paramSize];
-                if (invokeSize > 0)
+                if (invokeSize > 0) {
                     System.arraycopy(invokeParams, 0, newArgs, 0, invokeSize);
+                }
                 int[] idx = match(method, invokeSize, parameterTypes, convertParams);
                 for (int i = invokeSize; i < paramSize; i++) {
                     newArgs[i] = (idx[i] == -1 ? null : convertParams[idx[i]]);
@@ -141,8 +144,9 @@ public class MultiParameterConverterFactory implements ConverterFactory {
             if (fixedOrder) {
                 //get from cache
                 idx = methodParametersCache.get(method);
-                if (idx != null)
+                if (idx != null) {
                     return idx;
+                }
             }
             idx = new int[parameterTypes.length];
             boolean[] convertMatched = null;

@@ -128,8 +128,9 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
             CannotCompileException {
         StringBuilder body = new StringBuilder("public Object invoke(Object obj, Object[] params){");
         boolean voidMethod = void.class == method.getReturnType();
-        if (!voidMethod)
+        if (!voidMethod) {
             body.append("return ($w)");
+        }
         //static method needs to import class package to invoke by simple class name
         if (Modifier.isStatic(method.getModifiers())) {
             body.append(targetClass.getName());
@@ -137,22 +138,23 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
             body.append("((").append(targetClass.getName()).append(")obj)");
         }
         //invoke begin
-        body.append(".");
+        body.append('.');
         Class<?>[] parameterTypes = method.getParameterTypes();
         //no parameters method
         if (parameterTypes.length == 0) {
             body.append(method.getName()).append("()");
         } else {
-            body.append(method.getName()).append("(");
+            //can't use ($$) here because of "Object[] params"
+            body.append(method.getName()).append('(');
             for (int i = 0; i < parameterTypes.length - 1; i++) {
                 body.append(getClassName(parameterTypes[i], "params[" + i + "]"));
-                body.append(",");
+                body.append(',');
             }
             body.append(getClassName(parameterTypes[parameterTypes.length - 1], "params[" + (parameterTypes.length - 1) + "]"));
-            body.append(")");
+            body.append(')');
         }
-        body.append(";");
-        body.append(voidMethod ? "return null;}" : "}");
+        body.append(';');
+        body.append(voidMethod ? "return null;}" : '}');
         return CtNewMethod.make(body.toString(), clazz);
     }
 

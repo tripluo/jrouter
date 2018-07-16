@@ -48,14 +48,15 @@ public class MethodUtil {
      */
     public static String getSimpleMethod(Method method) {
         StringBuilder sb = new StringBuilder();
-        sb.append(method.getName()).append("(");
+        sb.append(method.getName()).append('(');
         Class[] params = method.getParameterTypes(); // avoid clone
         for (int j = 0; j < params.length; j++) {
             sb.append(getTypeName(params[j]));
-            if (j < (params.length - 1))
-                sb.append(",");
+            if (j < (params.length - 1)) {
+                sb.append(',');
+            }
         }
-        sb.append(")");
+        sb.append(')');
         return sb.toString();
     }
 
@@ -70,15 +71,16 @@ public class MethodUtil {
      */
     public static String getMethod(Method method) {
         StringBuilder sb = new StringBuilder();
-        sb.append(getTypeName(method.getDeclaringClass())).append(".");
-        sb.append(method.getName()).append("(");
+        sb.append(getTypeName(method.getDeclaringClass())).append('.');
+        sb.append(method.getName()).append('(');
         Class[] params = method.getParameterTypes(); // avoid clone
         for (int j = 0; j < params.length; j++) {
             sb.append(getTypeName(params[j]));
-            if (j < (params.length - 1))
-                sb.append(",");
+            if (j < (params.length - 1)) {
+                sb.append(',');
+            }
         }
-        sb.append(")");
+        sb.append(')');
         return sb.toString();
     }
 
@@ -106,8 +108,9 @@ public class MethodUtil {
                     sb.append("[]");
                 }
                 return sb.toString();
-            } catch (Throwable e) {
-                /*FALLTHRU*/ }
+            } catch (Throwable e) { //NOPMD AvoidCatchingThrowable
+                /*FALLTHRU*/
+            }
         }
         String name = type.getName();
         int i = 0;
@@ -131,15 +134,16 @@ public class MethodUtil {
             StringBuilder sb = new StringBuilder();
             int mod = method.getModifiers() & LANGUAGE_MODIFIERS;
             if (mod != 0) {
-                sb.append(Modifier.toString(mod)).append(" ");
+                sb.append(Modifier.toString(mod)).append(' ');
             }
             Type[] typeparams = method.getTypeParameters();
             if (typeparams.length > 0) {
                 boolean first = true;
-                sb.append("<");
+                sb.append('<');
                 for (Type typeparam : typeparams) {
-                    if (!first)
-                        sb.append(",");
+                    if (!first) {
+                        sb.append(',');
+                    }
                     if (typeparam instanceof Class) {
                         sb.append(((Class) typeparam).getName());
                     } else {
@@ -152,21 +156,22 @@ public class MethodUtil {
 
             Type genRetType = method.getGenericReturnType();
 
-            sb.append(((genRetType instanceof Class)
-                    ? getTypeName((Class) genRetType) : genRetType.toString()) + " ");
+            sb.append((genRetType instanceof Class)
+                    ? getTypeName((Class) genRetType) : genRetType.toString()).append(' ');
 
-            sb.append(getTypeName(method.getDeclaringClass())).append(".");
+            sb.append(getTypeName(method.getDeclaringClass())).append('.');
 
-            sb.append(method.getName()).append("(");
+            sb.append(method.getName()).append('(');
             Type[] params = method.getGenericParameterTypes();
             for (int j = 0; j < params.length; j++) {
                 sb.append((params[j] instanceof Class)
                         ? getTypeName((Class) params[j])
                         : (params[j].toString()));
-                if (j < (params.length - 1))
-                    sb.append(",");
+                if (j < (params.length - 1)) {
+                    sb.append(',');
+                }
             }
-            sb.append(")");
+            sb.append(')');
             Type[] exceptions = method.getGenericExceptionTypes();
             if (exceptions.length > 0) {
                 sb.append(" throws ");
@@ -174,8 +179,9 @@ public class MethodUtil {
                     sb.append((exceptions[k] instanceof Class)
                             ? ((Class) exceptions[k]).getName()
                             : exceptions[k].toString());
-                    if (k < (exceptions.length - 1))
-                        sb.append(",");
+                    if (k < (exceptions.length - 1)) {
+                        sb.append(',');
+                    }
                 }
             }
             return sb.toString();

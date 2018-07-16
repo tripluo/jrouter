@@ -27,6 +27,13 @@ import jrouter.annotation.Action;
 public interface ActionFactory<K> {
 
     /**
+     * 返回Action过滤器。
+     *
+     * @return Action过滤器。
+     */
+    ActionFilter getActionFilter();
+
+    /**
      * 返回创建对象的工厂对象。
      *
      * @return 创建对象的工厂对象。
@@ -41,11 +48,11 @@ public interface ActionFactory<K> {
     MethodInvokerFactory getMethodInvokerFactory();
 
     /**
-     * 返回创建底层方法转换器的工厂对象。
+     * 返回创建方法转换器的工厂对象。
      *
      * @param <T> ActionInvocation type.
      *
-     * @return 创建底层方法转换器的工厂对象。
+     * @return 创建方法转换器的工厂对象。
      */
     <T extends ActionInvocation<?>> ConverterFactory<T> getConverterFactory();
 

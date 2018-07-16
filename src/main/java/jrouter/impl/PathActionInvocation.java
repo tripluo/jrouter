@@ -56,7 +56,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
     private final List<InterceptorProxy> interceptors;
 
     /** recursion invoke index */
-    private int _index = 0;
+    private int interceptorIndex = 0;
 
     /** Aciton调用的真实路径 */
     @lombok.Getter
@@ -84,7 +84,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
     @lombok.Setter(lombok.AccessLevel.PACKAGE)
     private Map<String, String> actionPathParameters;
 
-    /** 底层方法参数的转换器 */
+    /** 方法参数转换器 */
     @Dynamic
     @lombok.Getter
     @lombok.Setter
@@ -111,8 +111,9 @@ public class PathActionInvocation implements ActionInvocation<String> {
     @Override
     public Object invokeActionOnly(Object... params) throws InvocationProxyException {
         //params is null only if explicitly set it null
-        if (params == null || params.length == 0)
+        if (params == null || params.length == 0) {
             params = this.originalParams; //TODO
+        }
         setExecuted(true);
         if (LOG.isDebugEnabled()) {
             LOG.debug("Invoke Action [{}]; Parameters {} at : {}",
@@ -132,17 +133,17 @@ public class PathActionInvocation implements ActionInvocation<String> {
             parameterConverter = actionFactory.getConverterFactory().getParameterConverter(this);
         }
         //recursive invoke
-        if (interceptors != null && _index < interceptors.size()) {
-            final InterceptorProxy interceptor = interceptors.get(_index++);
+        if (interceptors != null && interceptorIndex < interceptors.size()) {
+            final InterceptorProxy interceptor = interceptors.get(interceptorIndex++);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
             }
             //pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
             invokeResult = MethodUtil.invoke(interceptor, parameterConverter, null, getConvertParameters());
         } else //action invoke
-            if (!executed) {
-                invokeActionOnly(params);
-            }
+        if (!executed) {
+            invokeActionOnly(params);
+        }
         return invokeResult;
     }
 

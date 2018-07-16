@@ -17,13 +17,14 @@
 package jrouter.result;
 
 import jrouter.ActionInvocation;
+import jrouter.NotFoundException;
 import jrouter.annotation.Result;
 import jrouter.annotation.ResultType;
 
 /**
  * 内置结果类型。
  */
-public class DefaultResult {
+public class DefaultResult { //NOPMD ClassNamingConventions
 
     /** 默认结果类型名称，不作任何处理 */
     public static final String EMPTY = "empty";
@@ -65,9 +66,12 @@ public class DefaultResult {
      * @param invocation Action运行时上下文。
      *
      * @return 抛出NullPointerException。
+     *
+     * @deprecated
      */
+    @Deprecated
     @Result(name = RESULT_NOT_FOUND)
     public static Object resultNotFound(ActionInvocation invocation) {
-        throw new NullPointerException("Result not found : " + invocation.getResult().location());
+        throw new NotFoundException("Result not found : " + invocation.getResult().location());
     }
 }

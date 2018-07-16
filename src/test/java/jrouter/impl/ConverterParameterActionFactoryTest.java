@@ -37,7 +37,7 @@ public class ConverterParameterActionFactoryTest {
         //manually set converterFactory
         props.put("converterFactory", jrouter.impl.MultiParameterConverterFactory.class);
 //        props.put("bytecode", "default");
-        factory = new ConverterParameterActionFactory(props);
+        factory = new ConverterParameterActionFactory(new PathActionFactory.Properties().properties(props));
         //add test Action
         factory.addActions(ConverterParameterAction.class);
     }

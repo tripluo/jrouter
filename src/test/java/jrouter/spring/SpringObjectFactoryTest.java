@@ -16,8 +16,6 @@
  */
 package jrouter.spring;
 
-import java.util.HashMap;
-import java.util.Map;
 import jrouter.ObjectFactory;
 import jrouter.SimpleAction;
 import jrouter.URLTestAction2;
@@ -50,10 +48,10 @@ public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
         //SpringObjectFactory
         objectFactory = new SpringObjectFactory(applicationContext);
 
-        Map<String, Object> props = new HashMap<>();
-        props.put("objectFactory", objectFactory);
+        PathActionFactory.Properties prop = new PathActionFactory.Properties();
+        prop.setObjectFactory(objectFactory);
         //create ActionFactory not by springframework
-        factory = new PathActionFactory(props);
+        factory = new PathActionFactory(prop);
 
         factory.addInterceptors(DemoInterceptor.class);
         factory.addInterceptorStacks(DemoInterceptor.class);

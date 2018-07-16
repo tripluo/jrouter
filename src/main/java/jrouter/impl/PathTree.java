@@ -46,6 +46,7 @@ class PathTreeMap<V> extends AbstractMap<String, V> implements Serializable {
      * @param separator 指定的路径分割符。
      */
     public PathTreeMap(char separator) {
+        super();
         tree = new PathTree<>(separator);
         entrySet = new HashSet<>();
     }
@@ -123,7 +124,7 @@ class PathTree<V> implements Serializable {
      * @deprecated
      */
     @Deprecated
-    private static final String Last_Match = "**";
+    private static final String LAST_MATCH = "**";
 
     /** 树路径的根节点 */
     private TreeNode<V> root;
@@ -169,9 +170,9 @@ class PathTree<V> implements Serializable {
      * @throws NullPointerException 如果路径相关联的值为 null。
      */
     public V put(String fullpath, V value) {
-        if (value == null)
-            throw new NullPointerException();
-
+        if (value == null) {
+            throw new NullPointerException();//NOPMD
+        }
         //root path
         if (isRoot(fullpath)) {
             V oldRoot = root.value;
@@ -181,9 +182,9 @@ class PathTree<V> implements Serializable {
 
         final String[] paths = parsePath(fullpath);
         int len = paths.length;
-        if (len == 0)
+        if (len == 0) {
             throw new IllegalArgumentException("Null path : " + fullpath);
-
+        }
         TreeNode<V> cur = root;
         for (int i = 0; i < len - 1; i++) {
             //add tree branches
@@ -207,7 +208,6 @@ class PathTree<V> implements Serializable {
     }
 
     /**
-     *
      * 获取指定路径相关联的值；如果不包含该路径的关联关系，则返回 null。
      *
      * @param fullpath 指定路径的名称。
@@ -217,15 +217,15 @@ class PathTree<V> implements Serializable {
      */
     public V get(String fullpath, Map<String, String> matchParameters) {
         //root path
-        if (isRoot(fullpath))
+        if (isRoot(fullpath)) {
             return root.value;
-
+        }
         String[] paths = parsePath(fullpath);
 
         int len = paths.length;
-        if (len == 0)
+        if (len == 0) {
             return null;
-
+        }
         //the current nodes as parents
         List<TreeNode<V>> current = new ArrayList<>(1);
         //the next all children nodes
@@ -237,16 +237,17 @@ class PathTree<V> implements Serializable {
         //遍历树
         for (int i = 0; i < len - 1; i++) {
             for (TreeNode<V> tn : current) {
-                if (tn.children == null || tn.children.isEmpty())
+                if (tn.children == null || tn.children.isEmpty()) {
                     continue;
-
+                }
                 TreeNode<V> match = tn.children.get(paths[i]);
-                if (match != null)
+                if (match != null) {
                     next.add(match);
-
+                }
                 match = tn.children.get(SINGLE_MATCH);
-                if (match != null)
+                if (match != null) {
                     next.add(match);
+                }
             }
 //            System.out.println("Next : " + next + ", Current : " + current);
             if (next.isEmpty()) {
@@ -264,16 +265,17 @@ class PathTree<V> implements Serializable {
 
         //找寻最终路径有值的节点
         for (TreeNode<V> tn : current) {
-            if (tn.children == null || tn.children.isEmpty())
+            if (tn.children == null || tn.children.isEmpty()) {
                 continue;
-
+            }
             TreeNode<V> match = tn.children.get(paths[len - 1]);
-            if (match != null && match.value != null)
+            if (match != null && match.value != null) {
                 next.add(match);
-
+            }
             match = tn.children.get(SINGLE_MATCH);
-            if (match != null && match.value != null)
+            if (match != null && match.value != null) {
                 next.add(match);
+            }
         }
         if (next.isEmpty()) {
 //            System.out.println("Not Found For [" + fullpath + "]");
@@ -297,7 +299,8 @@ class PathTree<V> implements Serializable {
         //compare the paths to find the most matched one which has the maximum code.
         int max = current.get(0).code;
         int index = 0;
-        for (int i = 1, size = current.size(); i < size; i++) {
+        int size = current.size();
+        for (int i = 1; i < size; i++) {
             TreeNode<V> tr = current.get(i);
             if (tr.code > max) {
                 max = tr.code;
@@ -365,9 +368,9 @@ class PathTree<V> implements Serializable {
                 cur = i;
                 if (cur > last) {
                     //avoid ...///...
-                    if (cur - last > 1)
+                    if (cur - last > 1) {
                         list.add(fullpath.substring(last + 1, cur));
-
+                    }
                     last = cur;
                 }
             }
@@ -388,7 +391,7 @@ class PathTree<V> implements Serializable {
 
     /**
      * 获取添加路径的非完全匹配名称，完全字符串则返回 null。
-     *
+     * <p>
      * --> null
      * * --> null
      * abc --> null
@@ -408,9 +411,9 @@ class PathTree<V> implements Serializable {
         int len = path.length();
 
         //at least 2 chars
-        if (len <= 2)
+        if (len <= 2) {
             return null;
-
+        }
         int begin = -1;
         int end = -1;
         for (int i = 0; i < len; i++) {
@@ -437,9 +440,9 @@ class PathTree<V> implements Serializable {
     private static boolean isMatchKay(String path) {
         int len = path.length();
         //at least 2 chars
-        if (len <= 2)
+        if (len <= 2) {
             return false;
-
+        }
         int begin = -1;
         int end = -1;
         for (int i = 0; i < len; i++) {
@@ -591,9 +594,9 @@ class PathTree<V> implements Serializable {
             String childPath = child.path;
             //if child path is '*'
             child.code = (code << 1);
-            if (child.code < 0)
+            if (child.code < 0) {
                 throw new IllegalArgumentException("Depth of the tree is too large, no more than 32 layers.");
-
+            }
             //not equals '*'
             if (!SINGLE_MATCH.equals(childPath)) {
                 //结果代表是否完全匹配的
@@ -632,13 +635,15 @@ class PathTree<V> implements Serializable {
                     } else {
                         //路径的非完全匹配名称
                         String key = getMatchKey(paths[i]);
-                        if (key != null)
+                        if (key != null) {
                             keys.add(new IndexKey(i, key));
+                        }
                     }
                 }
 //                System.out.println("IndexKey : " + keys);
-                if (!keys.isEmpty())
+                if (!keys.isEmpty()) {
                     leaf.indexKeys = keys.toArray(new IndexKey[keys.size()]);
+                }
 //                System.out.println("setChildNode : " + child);
             }
         }

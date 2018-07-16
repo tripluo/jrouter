@@ -31,7 +31,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Action代理类，包含了Action的命名空间、全路径、所对应的拦截器集合、结果对象集合等信息。
  */
-public final class PathActionProxy extends DefaultProxy implements ActionProxy<String> {
+public final class PathActionProxy extends DefaultProxy implements ActionProxy<String>, Cloneable {
 
     /** 日志 */
     private static final Logger LOG = LoggerFactory.getLogger(PathActionProxy.class);
@@ -77,9 +77,9 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public PathActionProxy(ActionFactory actionFactory, String namespace, String path, Action action, Method method,
+    public PathActionProxy(ActionFactory actionFactory, String namespace, String path, Action action, Method method, //NOPMD ExcessiveParameterList
             Object object) {
-        super(method, object, actionFactory.getMethodInvokerFactory());
+        super(method, object, actionFactory);
         this.actionFactory = actionFactory;
         this.namespace = namespace;
         this.path = path;
@@ -111,10 +111,10 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
                                 LOG.debug("Get prototype ActionProxy [{}] at : {}", ap, getMethodInfo());
                             }
                             return ap;
-                        } catch (IllegalAccessException e) {
-                            throw new InvocationProxyException(e, this);
-                        } catch (InvocationTargetException e) {
-                            throw new InvocationProxyException(e.getTargetException(), this);
+                        } catch (IllegalAccessException | CloneNotSupportedException ex) {
+                            throw new InvocationProxyException(ex, this);
+                        } catch (InvocationTargetException ex) {
+                            throw new InvocationProxyException(ex.getTargetException(), this);//NOPMD PreserveStackTrace
                         }
                     }
                     break;
@@ -127,19 +127,16 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
     }
 
     @Override
-    protected PathActionProxy clone() {
-        PathActionProxy ap = new PathActionProxy(actionFactory, namespace, path, action, method, object);
-        ap.actionParameters = this.actionParameters;
-        ap.interceptors = this.interceptors;
-        ap.results = this.results;
-        return ap;
+    public PathActionProxy clone() throws CloneNotSupportedException {
+        return (PathActionProxy) super.clone();
     }
 
     @Override
     public String getActionParameter(String name) {
         String[] params = getActionParameterValues(name);
-        if (params == null || params.length == 0)
+        if (params == null || params.length == 0) {
             return null;
+        }
         if (params.length > 1) {
             LOG.warn("ActionParameter '{}' is [Ljava.lang.String[{}]; return the first value; use method \"getActionParameterValues\" instead", name, params.length);
             //throw new ClassCastException("ActionParameter '" + name + "' is [Ljava.lang.String[" + params.length + "]; cannot be cast to java.lang.String");
@@ -162,7 +159,6 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
     }
 
     /**
-     *
      * 返回Action所配置的拦截器集合，不包含任何拦截器则返回长度为 0 的集合。
      *
      * @return Action所配置的拦截器集合。

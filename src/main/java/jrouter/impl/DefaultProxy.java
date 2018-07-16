@@ -20,8 +20,8 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import jrouter.AbstractProxy;
+import jrouter.ActionFactory;
 import jrouter.Invoker;
-import jrouter.MethodInvokerFactory;
 
 /**
  * 默认方法代理类实现，封装了调用代理方法时及异常的处理。
@@ -50,9 +50,9 @@ public class DefaultProxy extends AbstractProxy {
      *
      * @param method 指定的方法。
      * @param object 指定的对象。
-     * @param proxyFactory 生成底层方法代理的工厂对象。
+     * @param actionFactory 指定的ActionFactory。
      */
-    public DefaultProxy(Method method, Object object, MethodInvokerFactory proxyFactory) {
+    public DefaultProxy(Method method, Object object, ActionFactory actionFactory) {
         super(method, object);
         this.varArgs = method.isVarArgs();
         if (varArgs) {
@@ -61,9 +61,10 @@ public class DefaultProxy extends AbstractProxy {
             varArgClass = parameterTypes[varArgIndex].getComponentType();
             empty = (Object[]) Array.newInstance(varArgClass, 0);
         }
-        if (proxyFactory != null) {
-            Class<?> targetClass = (object == null ? method.getDeclaringClass() : object.getClass());
-            this.invoker = proxyFactory.newInstance(targetClass, method);
+        if (actionFactory != null && actionFactory.getMethodInvokerFactory() != null) {
+            Class<?> targetClass = ((object == null || actionFactory.getObjectFactory() == null)
+                    ? method.getDeclaringClass() : actionFactory.getObjectFactory().getClass(object));
+            this.invoker = actionFactory.getMethodInvokerFactory().newInstance(targetClass, method);
         }
     }
 
@@ -85,21 +86,22 @@ public class DefaultProxy extends AbstractProxy {
                     return invoke(method, object, new Object[]{empty});
                 } //have both normal arguments and varArgs
                 else {
-                    Object[] _varArgs = new Object[params.length + 1];
-                    System.arraycopy(params, 0, _varArgs, 0, params.length);
-                    _varArgs[params.length] = empty;
-                    return invoke(method, object, _varArgs);
+                    Object[] tmpArgs = new Object[params.length + 1];
+                    System.arraycopy(params, 0, tmpArgs, 0, params.length);
+                    tmpArgs[params.length] = empty;
+                    return invoke(method, object, tmpArgs);
                 }
             } //pass varArgs not as array
             else if (params.length > varArgIndex) {
                 if (params[varArgIndex] == null || !params[varArgIndex].getClass().isArray()) {
-                    Object[] _params = new Object[varArgIndex + 1];
-                    if (varArgIndex > 0)
-                        System.arraycopy(params, 0, _params, 0, varArgIndex);
-                    Object[] _varArgs = (Object[]) Array.newInstance(varArgClass, params.length - varArgIndex);
-                    System.arraycopy(params, varArgIndex, _varArgs, 0, params.length - varArgIndex);
-                    _params[varArgIndex] = _varArgs;
-                    return invoke(method, object, _params);
+                    Object[] tmpParams = new Object[varArgIndex + 1];
+                    if (varArgIndex > 0) {
+                        System.arraycopy(params, 0, tmpParams, 0, varArgIndex);
+                    }
+                    Object[] tmpArgs = (Object[]) Array.newInstance(varArgClass, params.length - varArgIndex);
+                    System.arraycopy(params, varArgIndex, tmpArgs, 0, params.length - varArgIndex);
+                    tmpParams[varArgIndex] = tmpArgs;
+                    return invoke(method, object, tmpParams);
                 }
             }
         }
@@ -110,9 +112,8 @@ public class DefaultProxy extends AbstractProxy {
      * 使用Java反射或调用对象调用底层方法。
      *
      * @param <T> 方法调用后结果的类型。
-     *
      * @param method 底层方法。
-     * @param obj 从中调用底层方法的对象。
+     * @param obj 调用底层方法的对象。
      * @param params 用于方法调用的参数。
      *
      * @return 方法调用后的结果。
@@ -123,7 +124,7 @@ public class DefaultProxy extends AbstractProxy {
         } catch (IllegalAccessException e) {
             throw new InvocationProxyException(e, this);
         } catch (InvocationTargetException e) {
-            throw new InvocationProxyException(e.getTargetException(), this);
+            throw new InvocationProxyException(e.getTargetException(), this);//NOPMD PreserveStackTrace
         } //convert Exception to InvocationProxyException
         catch (Exception e) {
             throw new InvocationProxyException(e, this);

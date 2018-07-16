@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <appender name="stdout" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>|%date{yyyy-MM-dd HH:mm:ss}|%p|%thread|%logger %line%n%m%n</pattern>
+        </encoder>
+    </appender>
+    <root level="DEBUG">
+        <appender-ref ref="stdout"/>
+    </root>
+    <logger name="jrouter" level="DEBUG"/>
+    <logger name="org.springframework" level="INFO"/>
+</configuration>

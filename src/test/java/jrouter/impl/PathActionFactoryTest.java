@@ -36,16 +36,11 @@ public class PathActionFactoryTest {
 
     @Before
     public void init() {
-        Map<String, Object> props = new HashMap<>();
-        //set extension
-        props.put("extension", "");
-
-        //default InterceptorStack
-        props.put("defaultInterceptorStack", DemoThreadActionContextInterceptor.DEMO_THREAD);
-
-        //default result
-        props.put("defaultResultType", DefaultResult.EMPTY);
-        factory = new PathActionFactory(props);
+        PathActionFactory.Properties prop = new PathActionFactory.Properties();
+        prop.setExtension("");
+        prop.setDefaultInterceptorStack(DemoThreadActionContextInterceptor.DEMO_THREAD);
+        prop.setDefaultResultType(DefaultResult.EMPTY);
+        factory = new PathActionFactory(prop);
 
         //interceptor
         factory.addInterceptors(new DemoThreadActionContextInterceptor(false));
@@ -90,7 +85,6 @@ public class PathActionFactoryTest {
         assertEquals("/aa/*/c1/d1", factory.invokeAction("/aa/b2/c1/d1"));
         assertEquals("/aa/*/c1/d1/e1", factory.invokeAction("/aa/b1/c1/d1/e1"));
         assertEquals("/aa/*/c1/d1/e1", factory.invokeAction("/aa/b2/c1/d1/e1"));
-
 
         assertEquals("/aa/b4/{k1}/d1", factory.invokeAction("/aa/b4/c1/d1"));
         assertEquals("/aa/b4/{k1}/d2", factory.invokeAction("/aa/b4/c1/d2"));

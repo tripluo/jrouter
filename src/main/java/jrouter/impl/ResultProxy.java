@@ -23,7 +23,10 @@ import jrouter.annotation.ResultType;
 
 /**
  * 结果对象的代理类，包括了结果对象及调用参数的状态。
+ *
+ * @deprecated
  */
+@Deprecated
 public final class ResultProxy extends DefaultProxy {
 
     /** 结果对象 */
@@ -42,7 +45,7 @@ public final class ResultProxy extends DefaultProxy {
      * @param object 代理的方法的对象。
      */
     public ResultProxy(ActionFactory actionFactory, Result result, Method method, Object object) {
-        super(method, object, actionFactory.getMethodInvokerFactory());
+        super(method, object, actionFactory);
         this.result = result;
     }
 }

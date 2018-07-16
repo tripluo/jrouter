@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import jrouter.util.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,7 +35,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Bean注入工具类。
  */
-public class Injector {
+public class Injector { //NOPMD ClassNamingConventions
 
     /* 日志记录 */
     private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
@@ -182,8 +183,9 @@ public class Injector {
         Map<String, PropertyDescriptor> support = new HashMap<>(propds.length);
         //getPropertyDescriptors返回的PropertyDescriptor[]已经过滤了重复的属性名。
         for (PropertyDescriptor p : propds) {
-            if (SUPPORT_TYPES.contains(p.getPropertyType()))
+            if (SUPPORT_TYPES.contains(p.getPropertyType())) {
                 support.put(p.getName(), p);
+            }
         }
         return support;
     }
@@ -252,30 +254,31 @@ public class Injector {
      * @return 转换后的对象。
      */
     public static Object stringToObject(String str, Class<?> type) {
-        if (type == String.class)
+        if (type == String.class) {
             return str;
-        else if (type == Class.class)
+        } else if (type == Class.class) {
             try {
                 return ClassUtil.loadClass(str);
             } catch (ClassNotFoundException ex) {
                 throw new IllegalArgumentException(ex);
             }
-        else if (type == int.class || type == Integer.class)
+        } else if (type == int.class || type == Integer.class) {
             return Integer.parseInt(str);
-        else if (type == boolean.class || type == Boolean.class)
+        } else if (type == boolean.class || type == Boolean.class) {
             return Boolean.parseBoolean(str);
-        else if (type == double.class || type == Double.class)
+        } else if (type == double.class || type == Double.class) {
             return Double.parseDouble(str);
-        else if (type == long.class || type == Long.class)
+        } else if (type == long.class || type == Long.class) {
             return Long.parseLong(str);
-        else if (type == float.class || type == Float.class)
+        } else if (type == float.class || type == Float.class) {
             return Float.parseFloat(str);
-        else if (type == byte.class || type == Byte.class)
+        } else if (type == byte.class || type == Byte.class) {
             return Byte.parseByte(str);
-        else if (type == char.class || type == Character.class)
+        } else if (type == char.class || type == Character.class) {
             return str.charAt(0);
-        else if (type == short.class || type == Short.class)
+        } else if (type == short.class || type == Short.class) {
             return Short.parseShort(str);
+        }
         return null;
     }
 
@@ -287,12 +290,12 @@ public class Injector {
         /**
          * 属性的setter方法
          */
-        private Method setter;
+        private final Method setter;
 
         /**
          * 注入属性的值
          */
-        private Object value;
+        private final Object value;
 
         /**
          * 构造一个指定setter方法和属性值的对象。

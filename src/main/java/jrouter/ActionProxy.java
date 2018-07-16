@@ -104,7 +104,10 @@ public interface ActionProxy<K> {
      * @return Action的结果对象集合。
      *
      * @see Action#results()
+     *
+     * @deprecated
      */
+    @Deprecated
     Map<String, Result> getResults();
 
     /**

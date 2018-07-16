@@ -23,10 +23,10 @@ import jrouter.annotation.Result;
 /**
  * {@link Action}运行时上下文的代理接口。在{@link Action}调用时记录并返回其状态、调用参数、结果对象、ActionFactory等信息。
  *
- * @param <K> Action Path type.
+ * @param <P> Action Path type.
  */
 @Dynamic
-public interface ActionInvocation<K> {
+public interface ActionInvocation<P> {
 
     /**
      * 返回ActionFactory。
@@ -47,7 +47,7 @@ public interface ActionInvocation<K> {
      *
      * @return Aciton调用的真实路径参数。
      */
-    K getActionPath();
+    P getActionPath();
 
     /**
      * 返回Action是否已调用。
@@ -116,16 +116,16 @@ public interface ActionInvocation<K> {
     Result getResult();
 
     /**
-     * 设置Action运行时上下文中的底层方法参数的转换器。
+     * 设置Action运行时上下文中的方法参数转换器。
      *
-     * @param parameterConverter 底层方法参数的转换器。
+     * @param parameterConverter 方法参数转换器。
      */
     void setParameterConverter(ParameterConverter parameterConverter);
 
     /**
-     * 返回当前Action运行时上下文中的底层方法参数的转换器。
+     * 返回当前Action运行时上下文中的方法参数转换器。
      *
-     * @return 底层方法参数的转换器。
+     * @return 方法参数转换器。
      */
     ParameterConverter getParameterConverter();
 

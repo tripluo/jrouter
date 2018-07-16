@@ -26,7 +26,6 @@ import java.util.StringTokenizer;
 public class StringUtil {
 
     /**
-     *
      * 判断CharSequence是否为空。
      *
      * @param cs 待检测的CharSequence。
@@ -38,7 +37,6 @@ public class StringUtil {
     }
 
     /**
-     *
      * 判断CharSequence是否不为空。
      *
      * @param cs 待检测的CharSequence。
@@ -81,7 +79,6 @@ public class StringUtil {
     }
 
     /**
-     *
      * 去除字符串首尾的空格和特定字符。
      *
      * @param src 原字符串。
@@ -90,8 +87,9 @@ public class StringUtil {
      * @return 去除首尾空白和指定字符后的字符串。
      */
     public static String trim(String src, char ch) {
-        if (isEmpty(src))
+        if (isEmpty(src)) {
             return src;
+        }
         int begin = 0;
         int end = src.length() - 1;
         while (begin < end) {
@@ -114,7 +112,6 @@ public class StringUtil {
     }
 
     /**
-     *
      * 去除字符串首尾的空格和特定字符数组。
      *
      * @param src 原字符串。
@@ -123,8 +120,9 @@ public class StringUtil {
      * @return 去除首尾空白和指定字符后的字符串。
      */
     public static String trim(String src, char... chs) {
-        if (isEmpty(src))
+        if (isEmpty(src)) {
             return src;
+        }
         int begin = 0;
         int end = src.length() - 1;
         while (begin < end) {

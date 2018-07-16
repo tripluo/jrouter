@@ -38,8 +38,9 @@ public class Configuration2Test extends Assert {
 
     @After
     public void tearDown() {
-        if (factory != null)
+        if (factory != null) {
             factory.clear();
+        }
     }
 
     /**

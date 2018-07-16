@@ -32,7 +32,7 @@ import jrouter.util.CollectionUtil;
  *
  * @see #calculateScanComponents()
  */
-class ClassScanner implements Serializable {
+public class ClassScanner implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

@@ -67,7 +67,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     /* ActionFactory的类型 */
     private Class<T> actionFactoryClass = null;
 
-    /** 指定的Configuration */
+    /* 指定的Configuration */
     @lombok.Setter
     private Configuration configuration;
 
@@ -88,7 +88,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     private ObjectFactory objectFactory;
 
     /**
-     * 设置ActionFactory中创建底层方法转换器的工厂对象。
+     * 设置ActionFactory中创建方法参数转换器的工厂对象。
      *
      * @see ActionFactory#getConverterFactory()
      */
@@ -112,7 +112,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     @lombok.Setter
     private Properties actionFactoryProperties = new Properties();
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
     /* 拦截器的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> interceptors = null;
@@ -172,7 +172,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      *
      * @throws Exception 如果发生异常。
      */
-    protected ActionFactory buildActionFactory() throws Exception {
+    protected ActionFactory buildActionFactory() throws Exception { //NOPMD SignatureDeclareThrowsException
         LOG.info("Initiating JRouter ActionFactory at : {}", new java.util.Date());
         if (configuration == null) {
             configuration = createDefaultConfiguration();
@@ -203,9 +203,9 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         configuration.addActionFactoryProperties((Map) actionFactoryProperties);
 
         //添加扫描工具属性
-        if (componentClassScanProperties != null)
+        if (componentClassScanProperties != null) {
             configuration.addComponentClassScanProperties(componentClassScanProperties.toArray(new Map[componentClassScanProperties.size()]));
-
+        }
         //convert string to class
         convertList(interceptors, interceptorStacks, resultTypes, results, actions);
 
@@ -274,17 +274,21 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         }
 
         //set configuration
-        if (CollectionUtil.isNotEmpty(interceptors))
+        if (CollectionUtil.isNotEmpty(interceptors)) {
             configuration.addInterceptors(interceptors);
-        if (CollectionUtil.isNotEmpty(interceptorStacks))
+        }
+        if (CollectionUtil.isNotEmpty(interceptorStacks)) {
             configuration.addInterceptorStacks(interceptorStacks);
-        if (CollectionUtil.isNotEmpty(resultTypes))
+        }
+        if (CollectionUtil.isNotEmpty(resultTypes)) {
             configuration.addResultTypes(resultTypes);
-        if (CollectionUtil.isNotEmpty(results))
+        }
+        if (CollectionUtil.isNotEmpty(results)) {
             configuration.addResults(results);
-        if (CollectionUtil.isNotEmpty(actions))
+        }
+        if (CollectionUtil.isNotEmpty(actions)) {
             configuration.addActions(actions);
-
+        }
         //TODO
         //configuration.setPathProperties(null);
         //actions' aop
@@ -343,8 +347,9 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         for (List<Object> componentList : listArray) {
             if (CollectionUtil.isNotEmpty(componentList)) {
                 for (Object exist : componentList) {
-                    if (bean.getClass() == (exist instanceof Class ? exist : exist.getClass()))
+                    if (bean.getClass() == (exist instanceof Class ? exist : exist.getClass())) {
                         continue out;
+                    }
                 }
                 componentList.add(bean);
             }
@@ -382,8 +387,9 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         try {
             beforeActionFactoryDestruction();
         } finally {
-            if (actionFactory != null)
+            if (actionFactory != null) {
                 this.actionFactory.clear();
+            }
         }
     }
 
@@ -506,6 +512,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
          * @param applicationContext ApplicationContext对象。
          */
         public SpringConfiguration(ApplicationContext applicationContext) {
+            super();
             this.applicationContext = applicationContext;
         }
 

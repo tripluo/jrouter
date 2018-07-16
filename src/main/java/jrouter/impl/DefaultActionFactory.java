@@ -25,6 +25,7 @@ import java.util.*;
  *
  * @deprecated
  */
+@Deprecated
 public class DefaultActionFactory extends PathActionFactory {
 
     public DefaultActionFactory(Map<String, Object> properties) {

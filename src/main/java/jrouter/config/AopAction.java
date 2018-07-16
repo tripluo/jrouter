@@ -58,7 +58,7 @@ public class AopAction implements Serializable {
     /**
      * 修改Action拦截器集合的aop操作类型。
      */
-    public static enum Type {
+    public enum Type {
 
         /**
          * 添加于已有拦截器集合之前。
@@ -82,7 +82,7 @@ public class AopAction implements Serializable {
          *
          * @param code 指定代码。
          */
-        private Type(String code) {
+        Type(String code) {
             this.code = code;
         }
 
