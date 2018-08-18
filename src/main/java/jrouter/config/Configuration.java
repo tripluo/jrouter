@@ -35,6 +35,7 @@ import jrouter.impl.PathActionProxy;
 import jrouter.impl.Injector;
 import jrouter.impl.InterceptorProxy;
 import jrouter.util.AntPathMatcher;
+import jrouter.util.ClassScanner;
 import jrouter.util.ClassUtil;
 import jrouter.util.CollectionUtil;
 import jrouter.util.StringUtil;
@@ -897,7 +898,7 @@ public class Configuration implements Serializable {
             if (!classScanners.isEmpty()) {
                 for (ClassScanner scanner : classScanners) {
                     LOG.info("Add classes scanner : {}", scanner);
-                    scanComponents.addAll(scanner.calculateScanComponents());
+                    scanComponents.addAll(scanner.getClasses());
                 }
                 //just for debug log
                 if (LOG.isDebugEnabled()) {

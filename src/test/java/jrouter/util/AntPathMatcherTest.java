@@ -26,14 +26,25 @@ import org.junit.Test;
 public class AntPathMatcherTest {
 
     @Test
+    public void tesMatch_trimTokens() {
+        AntPathMatcher matcher = new AntPathMatcher();
+        matcher.setTrimTokens(true);
+        assertFalse(matcher.match("?", ""));
+        assertFalse(matcher.match("?", " "));
+        assertFalse(matcher.match("*", ""));
+        assertFalse(matcher.match("*", "   "));
+    }
+
+    @Test
     public void tesMatch() {
         AntPathMatcher matcher = new AntPathMatcher();
-
+        matcher.setTrimTokens(false);
         assertTrue(matcher.match("a", "a"));
         assertTrue(matcher.match("abb", "abb"));
 
         assertFalse(matcher.match("?", ""));
-        assertFalse(matcher.match("?", " "));
+        assertTrue(matcher.match("?", " "));
+
         assertTrue(matcher.match("?", "a"));
         assertFalse(matcher.match("?", "aa"));
 
@@ -47,9 +58,8 @@ public class AntPathMatcherTest {
         assertTrue(matcher.match("a?c", "abc"));
         assertTrue(matcher.match("a?cd?", "abcde"));
 
-
         assertFalse(matcher.match("*", ""));
-        assertFalse(matcher.match("*", "   "));
+        assertTrue(matcher.match("*", "   "));
         assertTrue(matcher.match("*", "a"));
         assertTrue(matcher.match("*", "aa"));
         assertTrue(matcher.match("**", "a"));
@@ -140,7 +150,7 @@ public class AntPathMatcherTest {
     @Test
     public void tesMatchStart() {
         AntPathMatcher matcher = new AntPathMatcher();
-
+        matcher.setTrimTokens(false);
         assertTrue(matcher.matchStart("a", "a"));
         assertTrue(matcher.matchStart("abb", "abb"));
 
@@ -158,7 +168,6 @@ public class AntPathMatcherTest {
         assertFalse(matcher.matchStart("?b", "ba"));
         assertTrue(matcher.matchStart("a?c", "abc"));
         assertTrue(matcher.matchStart("a?cd?", "abcde"));
-
 
         assertTrue(matcher.matchStart("*", ""));
         assertTrue(matcher.matchStart("*", "   "));
@@ -180,11 +189,9 @@ public class AntPathMatcherTest {
         assertTrue(matcher.matchStart("a*cd*", "abcd"));
         assertTrue(matcher.matchStart("a*cd*", "abbbcdeee"));
 
-
         assertFalse(matcher.matchStart("?", "/"));
         assertFalse(matcher.matchStart("*", "/"));
         assertFalse(matcher.matchStart("*", "abc/123"));
-
 
         assertTrue(matcher.matchStart("/*", "/"));
         assertTrue(matcher.matchStart("/???", "/abc"));

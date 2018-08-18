@@ -5,7 +5,7 @@
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.7.6-SNAPSHOT</version>
+    <version>1.7.6</version>
     <name>JRouter</name>
     <inceptionYear>2010</inceptionYear>
     <url>http://www.jrouter.net/</url>
@@ -56,7 +56,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.0</version>
+            <version>1.18.2</version>
             <scope>provided</scope>
         </dependency>
         <!-- junit -->
@@ -86,7 +86,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.7.0</version>
+                <version>3.8.0</version>
                 <configuration>
                     <source>1.7</source>
                     <target>1.7</target>
@@ -102,15 +102,14 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-            <!-- jar插件 -->
+            <!-- jar -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.1.0</version>
                 <configuration>
                     <excludes>
-                        <!--  排除logback.xml -->
-                        <exclude>logback.xml</exclude>
+                        <exclude>changelog.txt</exclude>
                     </excludes>
                 </configuration>
             </plugin>
@@ -172,7 +171,7 @@
             </activation>
             <build>
                 <plugins>
-                    <!-- source插件 -->
+                    <!-- source -->
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
@@ -189,8 +188,7 @@
                         <configuration>
                             <attach>true</attach>
                             <excludes>
-                                <!--  排除logback.xml -->
-                                <exclude>logback.xml</exclude>
+                                <exclude>changelog.txt</exclude>
                             </excludes>
                         </configuration>
                     </plugin>
@@ -207,6 +205,9 @@
                                 </goals>
                             </execution>
                         </executions>
+                        <configuration>
+                            <failOnError>false</failOnError>
+                        </configuration>
                     </plugin>
                     <!-- gpg -->
                     <plugin>

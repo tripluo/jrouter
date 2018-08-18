@@ -3,6 +3,16 @@ JROUTER CHANGELOG
 ==========================
 http://jrouter.net/
 
+Changes in version 1.7.6 (2018-08-18)
+* 修正ActionFilter接口参数。
+* ActionFactory接口新增getActionFilter方法获取ActionFilter。
+* 新增ActionInvocationDelegate代理类方便继承扩展。
+* 修正AbstractActionFactory/PathActionFactory/ColonString构造方法，提炼Properties对象。
+* 废弃@Action上的的results方法，不建议配置Action的特定结果。
+* 根据PMD规范代码。
+* 更新可选依赖包springframework至 4.3.18.
+
+
 Changes in version 1.7.5 (2018-02-01)
 * 调整代码，要求Java 1.7+.
 * 调整PathActionFactory/AbstractActionFactory属性；修改路径后缀属性(extension)的默认值为null。

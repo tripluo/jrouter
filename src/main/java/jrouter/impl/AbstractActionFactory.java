@@ -531,6 +531,9 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
 
         /**
          * <p>
+         * 提供默认的{@code ActionFilter}实现{@link DefaultActionFilter}。
+         * </p>
+         * <p>
          * 提供默认的{@code ConverterFactory}实现{@link MultiParameterConverterFactory}。
          * </p>
          * <p>
@@ -538,9 +541,6 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
          * </p>
          * <p>
          * 提供默认的{@code ObjectFactory}实现{@link DefaultObjectFactory}。
-         * </p>
-         * <p>
-         * 提供默认的方法检查器{@link JavassistMethodChecker}。
          * </p>
          */
         public Properties() {
@@ -645,13 +645,13 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
                         throw new JRouterException(ex);
                     }
                 }
+                return null;
             } else if (value instanceof Class) {
                 return objectFactory.newInstance((Class<T>) value);
             } else {
                 //throw exception if not matched
                 return (T) value;
             }
-            return null;
         }
     }
 

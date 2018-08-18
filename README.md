@@ -1,7 +1,7 @@
 
 **jrouter** is an open source lightweight method router processing container implemented entirely in Java. It focuses on methods' mapping, invoking, intercepting and result processing. You can use it to search and collect your application objects' methods for HTTP controller, Web services, RPC, a variety of applications, etc.
 
-**jrouter** 是一个基于对象方法架构的开源轻量级Java容器。它专注于方法的映射、调用、拦截和结果处理，采用基于配置和注解的方式来抽取和收集程序中对象的方法（method）以用于HTTP控制器，Web服务，RPC，各种应用等。
+**jrouter** 是一个围绕对象方法基于责任链（拦截器）模式设计的开源轻量级Java容器。专注于方法的映射、调用、拦截和结果处理，采用基于配置和注解的方式来抽取和收集程序中对象的方法（method）以用于路由映射， HTTP控制器，RPC，各种应用等。
 
 针对方法，提供基于注解(@Annotation)的配置：
 
@@ -19,7 +19,7 @@
 
 ![outline](https://raw.githubusercontent.com/innjj/jrouter/master/outline.png)
 
-● require [jdk 1.6+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+● require [jdk 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 ● require [slf4j](http://www.slf4j.org/download.html)
 
@@ -30,8 +30,64 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.7.5</version>
+    <version>1.7.6</version>
 </dependency>
+```
+
+###  JavaConfig: ###
+```
+import jrouter.ActionFactory;
+import jrouter.bytecode.javassist.JavassistMethodChecker;
+import jrouter.impl.PathActionFactory;
+import jrouter.spring.SpringObjectFactory;
+import jrouter.util.ClassScanner;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+...
+    @Bean
+    ActionFactory<String> actionFactory(ApplicationContext applicationContext) {
+        PathActionFactory.Properties properties = new PathActionFactory.Properties();
+        //default:10000
+        properties.setActionCacheNumber(10000);
+        //default:null
+        properties.setDefaultResultType("empty");
+        //default:null
+        properties.setDefaultInterceptorStack("empty");
+        //default:null
+        properties.setExtension(".");
+        //default:/
+        properties.setPathSeparator('/');
+        //default:PathActionFactory.DefaultActionFilter
+        properties.setActionFilter(...);
+        //default:MultiParameterConverterFactory
+        properties.setConverterFactory(...);
+        //default:JavassistMethodInvokerFactory
+        properties.setMethodInvokerFactory(...);
+        //default:PathActionFactory.DefaultObjectFactory
+        properties.setObjectFactory(new SpringObjectFactory(applicationContext));
+        //default:null
+        properties.setMethodChecker(new JavassistMethodChecker("jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)"));
+
+        PathActionFactory actionFactory = new PathActionFactory(properties);
+        //add interceptors
+        actionFactory.addInterceptors(jrouter.interceptor.SampleInterceptor.class);
+        //add interceptorStacks
+        actionFactory.addInterceptorStacks(jrouter.interceptor.DefaultInterceptorStack.class);
+        //add resultTypes
+        actionFactory.addResultTypes(jrouter.result.DefaultResult.class);
+        //add results
+        actionFactory.addResults(jrouter.result.DefaultResult.class);
+
+        ClassScanner scanner = new ClassScanner();
+        scanner.setIncludePackages(new HashSet<>(Arrays.asList("jrouter")));
+        scanner.setIncludeExpressions(new HashSet<>(Arrays.asList("jrouter.impl.**")));
+        scanner.setExcludeExpressions(new HashSet<>(Arrays.asList("jrouter.result.**", "jrouter.interceptor.**")));
+        //add actions
+        for (Class<?> cls : scanner.getClasses()) {
+            actionFactory.addActions(cls);
+        }
+        return actionFactory;
+    }
 ```
 
 ### Springframework Integration: ###
@@ -68,7 +124,7 @@
             <!-- optional default:null -->
             interceptorMethodChecker = jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)
             <!-- optional default:null -->
-            actionFilter = 
+            actionFilter =
         </value>
     </property>
 
