@@ -338,8 +338,7 @@ class PathTree<V> implements Serializable {
 
             IndexKey[] iks = matcher.indexKeys;
             if (iks != null) {
-                for (int i = 0; i < iks.length; i++) {
-                    IndexKey ik = iks[i];
+                for (IndexKey ik : iks) {
                     //不做索引下标映射
                     //matchParameters.put(i + "", paths[ik.index]);
                     //不做匹配路径键值的重复判断

@@ -25,9 +25,9 @@ import jrouter.annotation.Result;
 /**
  * {@link Action}代理类接口。
  *
- * @param <K> Path type.
+ * @param <P> Path type.
  */
-public interface ActionProxy<K> {
+public interface ActionProxy<P> {
 
     /**
      * 返回所代理的Action对象。
@@ -41,7 +41,7 @@ public interface ActionProxy<K> {
      *
      * @return Action所对应的全路径（可能为带参数的动态路径，而非真实调用路径）。
      */
-    K getPath();
+    P getPath();
 
     /**
      * 返回Action的命名空间。
@@ -111,10 +111,19 @@ public interface ActionProxy<K> {
     Map<String, Result> getResults();
 
     /**
+     * 返回调用的底层方法。
+     *
+     * @return 调用的底层方法。
+     */
+    java.lang.reflect.Method getMethod();
+
+    /**
      * 返回调用方法的描述信息。
      *
      * @return 调用方法的描述信息。
+     *
+     * @deprecated
      */
+    @Deprecated
     String getMethodInfo();
-
 }

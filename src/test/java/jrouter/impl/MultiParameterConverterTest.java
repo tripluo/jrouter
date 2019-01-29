@@ -99,6 +99,8 @@ public class MultiParameterConverterTest {
         convert = new Object[]{str1, str2};
         assertArrayEquals(new Object[]{str1, str2, null}, testConvertMethod(c, "test6", null, convert));  //match
         assertArrayEquals(new Object[]{obj, str1, str2}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //invoke params & match
+        assertArrayEquals(new Object[]{null, null, obj}, testConvertMethod(c, "test6", new Object[]{null, null, obj}, convert));  //invoke params & match
+        assertArrayEquals(new Object[]{obj, obj, obj}, testConvertMethod(c, "test6", new Object[]{obj, obj, obj}, convert));  //invoke params & match
         convert = new Object[]{sb1, sb2};
         assertArrayEquals(new Object[]{sb1, sb2, null}, testConvertMethod(c, "test6", null, convert));  //match & fill null
         assertArrayEquals(new Object[]{obj, sb1, null}, testConvertMethod(c, "test6", new Object[]{obj}, convert));  //invoke params & match & fill null
@@ -125,7 +127,7 @@ public class MultiParameterConverterTest {
             for (Method m : methods) {
                 TEST_METHODS.put(m.getName(), m);
             }
-            assertTrue(TEST_METHODS.size() == 7);
+            assertTrue(TEST_METHODS.size() >= 7);
         }
 
         public void test() {

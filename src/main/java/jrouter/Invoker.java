@@ -16,6 +16,8 @@
  */
 package jrouter;
 
+import java.lang.reflect.Method;
+
 /**
  * 调用底层方法的接口。
  */
@@ -26,6 +28,7 @@ public interface Invoker {
      *
      * @param <T> 方法调用结果的类型。
      *
+     * @param method {@code Method}对象。
      * @param obj 调用方法的对象。
      * @param params 用于方法调用的参数。
      *
@@ -33,5 +36,5 @@ public interface Invoker {
      *
      * @throws JRouterException 如果发生调用异常。
      */
-    <T> T invoke(Object obj, Object... params) throws JRouterException;
+    <T> T invoke(Method method, Object obj, Object... params) throws JRouterException;
 }

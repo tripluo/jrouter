@@ -1,7 +1,18 @@
 
 JROUTER CHANGELOG
 ==========================
-http://jrouter.net/
+https://jrouter.net/
+
+Changes in version 1.7.7 (2019-01-30)
+* 新增PathGenerator接口，抽象方法路径生成器。
+* ActionProxy接口新增获取getMethod方法；废弃getMethodInfo方法。
+* ActionFactory接口新增getPathGenerator方法获取PathGenerator。
+* 完善Invoker接口，新增Method参数。
+* PathActionFactory.Properties新增pathGenerator变量，提供默认String返回类型的PathGenerator实现。
+* 重构PathActionFactory，移动buildActionPath方法至PathActionFactory.Properties类内部。
+* 完善测试用例。
+* 更新可选依赖包springframework至 4.3.22.
+
 
 Changes in version 1.7.6 (2018-08-18)
 * 修正ActionFilter接口参数。

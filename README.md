@@ -30,7 +30,7 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.7.6</version>
+    <version>1.7.7</version>
 </dependency>
 ```
 
@@ -67,6 +67,8 @@ import org.springframework.context.annotation.Bean;
         properties.setObjectFactory(new SpringObjectFactory(applicationContext));
         //default:null
         properties.setMethodChecker(new JavassistMethodChecker("jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)"));
+        //default:PathActionFactory.$
+        properties.setPathGenerator(...);
 
         PathActionFactory actionFactory = new PathActionFactory(properties);
         //add interceptors
@@ -125,6 +127,8 @@ import org.springframework.context.annotation.Bean;
             interceptorMethodChecker = jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)
             <!-- optional default:null -->
             actionFilter =
+            <!-- optional default:PathActionFactory.$ -->
+            pathGenerator =
         </value>
     </property>
 

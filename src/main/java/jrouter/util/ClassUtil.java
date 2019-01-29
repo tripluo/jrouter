@@ -57,7 +57,7 @@ public class ClassUtil {
      */
     public static Set<Class<?>> getClasses(String... packageNames) {
         Set<Class<?>> classes = new LinkedHashSet<>();
-        getClasses(classes, packageNames);
+        loadClasses(classes, packageNames);
         return classes;
     }
 
@@ -67,7 +67,7 @@ public class ClassUtil {
      * @param classes 指定的Class名称集合。
      * @param packageNames 指定的包的名称。
      */
-    private static void getClasses(Collection<Class<?>> classes, String... packageNames) {
+    private static void loadClasses(Collection<Class<?>> classes, String... packageNames) {
         //recursive
         boolean recursive = true;
         for (String packageName : packageNames) {
@@ -86,7 +86,7 @@ public class ClassUtil {
                     if ("file".equals(protocol)) {
                         String filePath = URLDecoder.decode(url.getFile(), DECODING);
                         //以文件的方式扫描整个包下的文件 并添加到集合中
-                        getClassesByPackageFile(packageName, filePath, recursive, classes);
+                        loadClassesByPackageFile(packageName, filePath, recursive, classes);
                     } //if jar
                     else if ("jar".equals(protocol)) {
                         JarFile jar = null;
@@ -143,7 +143,7 @@ public class ClassUtil {
      * @param recursive 是否递归文件目录。
      * @param classes 指定的Class名称集合。
      */
-    private static void getClassesByPackageFile(String packageName, String packagePath, final boolean recursive,
+    private static void loadClassesByPackageFile(String packageName, String packagePath, final boolean recursive,
             Collection<Class<?>> classes) {
         //package directory
         File dir = new File(packagePath);
@@ -163,7 +163,7 @@ public class ClassUtil {
         for (File file : dirfiles) {
             //if directory
             if (file.isDirectory()) {
-                getClassesByPackageFile(packageName + '.' + file.getName(),
+                loadClassesByPackageFile(packageName + '.' + file.getName(),
                         file.getAbsolutePath(), recursive, classes);
             } else {
                 //remove .class suffix

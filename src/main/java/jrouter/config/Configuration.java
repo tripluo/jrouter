@@ -18,7 +18,10 @@ package jrouter.config;
 
 import java.beans.IntrospectionException;
 import java.beans.PropertyDescriptor;
-import java.io.*;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -30,25 +33,17 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import jrouter.ActionFactory;
 import jrouter.config.AopAction.Type;
-import jrouter.impl.PathActionFactory;
-import jrouter.impl.PathActionProxy;
 import jrouter.impl.Injector;
 import jrouter.impl.InterceptorProxy;
-import jrouter.util.AntPathMatcher;
-import jrouter.util.ClassScanner;
-import jrouter.util.ClassUtil;
-import jrouter.util.CollectionUtil;
-import jrouter.util.StringUtil;
+import jrouter.impl.PathActionFactory;
+import jrouter.impl.PathActionProxy;
+import jrouter.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.xml.sax.EntityResolver;
-import org.xml.sax.ErrorHandler;
-import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
-import org.xml.sax.SAXParseException;
+import org.xml.sax.*;
 
 /**
  * 启动jrouter容器的入口配置类。
@@ -483,7 +478,7 @@ public class Configuration implements Serializable {
      */
     private static Map<String, Object> parseProperties(Class<?> cls, List<Element> propnodes) throws
             IntrospectionException {
-        Map<String, Object> properties = new LinkedHashMap<String, Object>();
+        Map<String, Object> properties = new LinkedHashMap<>();
         for (Element prop : propnodes) {
             String pName = prop.getAttribute(NAME);
             if (null != properties.put(pName, prop.getAttribute(VALUE))) {
@@ -924,16 +919,17 @@ public class Configuration implements Serializable {
                 //排除指定配置的类
                 Set<Class<?>> specified = new HashSet<>();
 
+                Object newObj =null;
                 //interceptor
                 for (Object obj : interceptors) {
-                    obj = newInstance(factory, obj);
-                    Map<String, Object> props = interceptorProperties.get(obj.getClass());
+                    newObj = newInstance(factory, obj);
+                    Map<String, Object> props = interceptorProperties.get(newObj.getClass());
                     if (props != null) {
-                        injectProperties(obj, props, true);
+                        injectProperties(newObj, props, true);
                     }
                     //add interceptor
-                    pathActionFactory.addInterceptors(obj);
-                    specified.add(obj.getClass());
+                    pathActionFactory.addInterceptors(newObj);
+                    specified.add(newObj.getClass());
                 }
                 //auto-scan interceptors
                 for (Class<?> cls : scanComponents) {
@@ -947,14 +943,14 @@ public class Configuration implements Serializable {
 
                 //interceptor-stack
                 for (Object obj : interceptorStacks) {
-                    obj = newInstance(factory, obj);
-                    Map<String, Object> props = interceptorStackProperties.get(obj.getClass());
+                    newObj = newInstance(factory, obj);
+                    Map<String, Object> props = interceptorStackProperties.get(newObj.getClass());
                     if (props != null) {
-                        injectProperties(obj, props, true);
+                        injectProperties(newObj, props, true);
                     }
                     //add interceptor stacks
-                    pathActionFactory.addInterceptorStacks(obj);
-                    specified.add(obj.getClass());
+                    pathActionFactory.addInterceptorStacks(newObj);
+                    specified.add(newObj.getClass());
                 }
                 //scan interceptorStacks
                 for (Class<?> cls : scanComponents) {
@@ -968,14 +964,14 @@ public class Configuration implements Serializable {
 
                 //result-type
                 for (Object obj : resultTypes) {
-                    obj = newInstance(factory, obj);
-                    Map<String, Object> props = resultTypeProperties.get(obj.getClass());
+                    newObj = newInstance(factory, obj);
+                    Map<String, Object> props = resultTypeProperties.get(newObj.getClass());
                     if (props != null) {
-                        injectProperties(obj, props, true);
+                        injectProperties(newObj, props, true);
                     }
                     //add result types
-                    pathActionFactory.addResultTypes(obj);
-                    specified.add(obj.getClass());
+                    pathActionFactory.addResultTypes(newObj);
+                    specified.add(newObj.getClass());
                 }
                 //scan resultTypes
                 for (Class<?> cls : scanComponents) {
@@ -989,14 +985,14 @@ public class Configuration implements Serializable {
 
                 //result
                 for (Object obj : results) {
-                    obj = newInstance(factory, obj);
-                    Map<String, Object> props = resultProperties.get(obj.getClass());
+                    newObj = newInstance(factory, obj);
+                    Map<String, Object> props = resultProperties.get(newObj.getClass());
                     if (props != null) {
-                        injectProperties(obj, props, true);
+                        injectProperties(newObj, props, true);
                     }
                     //add result types
-                    pathActionFactory.addResults(obj);
-                    specified.add(obj.getClass());
+                    pathActionFactory.addResults(newObj);
+                    specified.add(newObj.getClass());
                 }
                 //scan results
                 for (Class<?> cls : scanComponents) {
@@ -1010,17 +1006,17 @@ public class Configuration implements Serializable {
 
                 //action
                 for (Object obj : actions) {
-                    obj = newInstance(factory, obj);
-                    Map<String, Object> props = actionProperties.get(obj.getClass());
+                    newObj = newInstance(factory, obj);
+                    Map<String, Object> props = actionProperties.get(newObj.getClass());
                     if (props != null) {
-                        injectProperties(obj, props, true);
+                        injectProperties(newObj, props, true);
                         //store the class properties for new instance of prototype action
-                        Injector.putClassProperties(obj.getClass(), props);
+                        Injector.putClassProperties(newObj.getClass(), props);
                     }
 
                     //add result types
-                    pathActionFactory.addActions(obj);
-                    specified.add(obj.getClass());
+                    pathActionFactory.addActions(newObj);
+                    specified.add(newObj.getClass());
                 }
 
                 //scan actions
@@ -1228,9 +1224,8 @@ public class Configuration implements Serializable {
      *
      * @return 此配置对象的引用。
      */
-    public Configuration setActionFactoryClass(Class<? extends ActionFactory> actionFactoryClass) {
+    public void setActionFactoryClass(Class<? extends ActionFactory> actionFactoryClass) {
         this.actionFactoryClass = actionFactoryClass;
-        return this;
     }
 
     /**

@@ -126,7 +126,7 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
      */
     private CtMethod createInovkeMethod(CtClass clazz, Class<?> targetClass, Method method) throws
             CannotCompileException {
-        StringBuilder body = new StringBuilder("public Object invoke(Object obj, Object[] params){");
+        StringBuilder body = new StringBuilder("public Object invoke(java.lang.reflect.Method m, Object obj, Object[] params){");
         boolean voidMethod = void.class == method.getReturnType();
         if (!voidMethod) {
             body.append("return ($w)");

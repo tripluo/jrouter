@@ -32,6 +32,9 @@ public class DefaultResult { //NOPMD ClassNamingConventions
     /** actionForward结果类型名称 */
     public static final String FORWARD = "actionForward";
 
+    /** result not found */
+    public static final String RESULT_NOT_FOUND = "resultNotFound";
+
     /**
      * 默认结果类型，未作任何处理。
      *
@@ -55,10 +58,6 @@ public class DefaultResult { //NOPMD ClassNamingConventions
         return invocation.getActionFactory().invokeAction(invocation.getResult().location(), invocation.getParameters());
     }
     ////////////////////////////////////////////////////////////////////////////
-    /**
-     * result not found
-     */
-    public static final String RESULT_NOT_FOUND = "resultNotFound";
 
     /**
      * result not found

@@ -30,21 +30,6 @@ import jrouter.ParameterConverter;
 public class MultiParameterConverterFactory implements ConverterFactory {
 
     /**
-     * 不缓存转换参数位置的工厂类。提供一个便捷的无参数构造类。
-     * MultiParameterConverterFactory.NoFixedOrder()即 MultiParameterConverterFactory(false)。
-     */
-    public static class NoFixedOrder extends MultiParameterConverterFactory {
-
-        /**
-         * 不缓存转换参数位置的工厂类。
-         */
-        public NoFixedOrder() {
-            super(false);
-        }
-
-    }
-
-    /**
      * 缓存转换参数匹配的位置
      */
     private Map<Method, int[]> methodParametersCache;
@@ -61,6 +46,21 @@ public class MultiParameterConverterFactory implements ConverterFactory {
      * 多参数转换器，线程安全的单例对象。
      */
     private final ParameterConverter parameterConverter;
+
+    /**
+     * 不缓存转换参数位置的工厂类。提供一个便捷的无参数构造类。
+     * MultiParameterConverterFactory.NoFixedOrder()即 MultiParameterConverterFactory(false)。
+     */
+    public static class NoFixedOrder extends MultiParameterConverterFactory {
+
+        /**
+         * 不缓存转换参数位置的工厂类。
+         */
+        public NoFixedOrder() {
+            super(false);
+        }
+
+    }
 
     /**
      * 创建固定参数自动映射转换器的工厂类。

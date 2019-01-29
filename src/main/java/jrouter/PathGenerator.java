@@ -14,20 +14,27 @@
  * limitations under the License.
  *
  */
-package jrouter.bytecode.javassist;
+package jrouter;
 
 import java.lang.reflect.Method;
-import jrouter.Invoker;
 
 /**
- * Invoker接口的封装，本质未实现方法。
+ * Path generator.
  *
- * @see JavassistMethodInvokerFactory#newInstance(java.lang.Class, java.lang.reflect.Method)
+ * @param <P> path type.
+ *
+ * @since 1.7.7
  */
-public class JavassistInvoker implements Invoker {
+//@FunctionalInterface
+public interface PathGenerator<P> {
 
-    @Override
-    public <T> T invoke(Method method, Object obj, Object... params) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
+    /**
+     * Generate the path(s).
+     *
+     * @param targetClass 底层方法所表示的 {@code Class} 对象。
+     * @param method 底层方法。
+     *
+     * @return the generated Path(s).
+     */
+    P[] generatePath(Class<?> targetClass, Method method);
 }

@@ -22,6 +22,7 @@ import java.lang.reflect.Method;
 import jrouter.AbstractProxy;
 import jrouter.ActionFactory;
 import jrouter.Invoker;
+import jrouter.util.MethodUtil;
 
 /**
  * 默认方法代理类实现，封装了调用代理方法时及异常的处理。
@@ -120,14 +121,23 @@ public class DefaultProxy extends AbstractProxy {
      */
     private Object invoke(Method method, Object obj, Object... params) {
         try {
-            return invoker == null ? method.invoke(obj, params) : invoker.invoke(obj, params);
+            return invoker == null ? method.invoke(obj, params) : invoker.invoke(method, obj, params);
         } catch (IllegalAccessException e) {
             throw new InvocationProxyException(e, this);
         } catch (InvocationTargetException e) {
             throw new InvocationProxyException(e.getTargetException(), this);//NOPMD PreserveStackTrace
         } //convert Exception to InvocationProxyException
-        catch (Exception e) {
+        catch (Exception e) {//NOPMD IdenticalCatchBranches
             throw new InvocationProxyException(e, this);
         }
+    }
+
+    /**
+     * 返回调用方法的描述信息。
+     *
+     * @return 调用方法的描述信息。
+     */
+    public String getMethodInfo() {
+        return MethodUtil.getMethod(method);
     }
 }

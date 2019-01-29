@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Map;
 import jrouter.ActionFactory;
 import jrouter.ActionFilter;
+import jrouter.ActionInvocation;
 import jrouter.ConverterFactory;
 import jrouter.JRouterException;
 import jrouter.MethodInvokerFactory;
@@ -62,9 +63,9 @@ import org.slf4j.LoggerFactory;
  * 提供默认的方法检查器{@link JavassistMethodChecker}。
  * </p>
  *
- * @param <K> 调用{@link Action}的标识。
+ * @param <P> 调用{@link Action}的标识。
  */
-public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
+public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 日志
@@ -87,7 +88,7 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
      * 创建方法转换器的工厂对象。
      */
     @lombok.Getter
-    private final ConverterFactory converterFactory;
+    private final ConverterFactory<ActionInvocation<P>> converterFactory;
 
     /**
      * 方法检查器。
@@ -434,14 +435,14 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
      */
     private InterceptorStackProxy createInterceptorStackProxy(Field field, Object obj) throws IllegalAccessException {
         InterceptorStack interceptorStack = field.getAnnotation(InterceptorStack.class);
-        String name = interceptorStack.name().trim();
+        String stackName = interceptorStack.name().trim();
 
         //interceptorStack name
         //未指定拦截栈名称则取字符串的值为名称
-        if (StringUtil.isEmpty(name)) {
-            name = field.get(obj).toString();
+        if (StringUtil.isEmpty(stackName)) {
+            stackName = field.get(obj).toString();
             //空命名异常
-            if (StringUtil.isEmpty(name)) {
+            if (StringUtil.isEmpty(stackName)) {
                 throw new IllegalArgumentException("Null name of InterceptorStack : "
                         + field.getName() + " at " + objectFactory.getClass(obj));
             }
@@ -454,17 +455,17 @@ public abstract class AbstractActionFactory<K> implements ActionFactory<K> {
             list = new ArrayList<>(names.length);
             //add interceptorStack
             //for (int i = names.length - 1; i >= 0; i--) {
-            for (int i = 0; i < names.length; i++) {
-                InterceptorProxy ip = interceptors.get(names[i]);
+            for (String name : names) {
+                InterceptorProxy ip = interceptors.get(name);
                 //if null
                 if (ip == null) {
-                    LOG.warn("No such Interceptor [{}] for : {}", names[i], field);
+                    LOG.warn("No such Interceptor [{}] for : {}", name, field);
                 } else {
                     list.add(ip);
                 }
             }
         }
-        return new InterceptorStackProxy(name, field, list);
+        return new InterceptorStackProxy(stackName, field, list);
     }
 
     /**

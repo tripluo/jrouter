@@ -47,6 +47,34 @@ public class Injector { //NOPMD ClassNamingConventions
     static final Map<String, Injection[]> ACTION_INJECTION = new HashMap<>();
 
     /**
+     * 所支持的属性转换对象类型
+     */
+    private static final Set<Class<?>> SUPPORT_TYPES = new HashSet<>(18);
+
+    //初始化所支持的对象类型。
+    static {
+        //String to Class
+        SUPPORT_TYPES.add(Class.class);
+        SUPPORT_TYPES.add(String.class);
+        SUPPORT_TYPES.add(boolean.class);
+        SUPPORT_TYPES.add(Boolean.class);
+        SUPPORT_TYPES.add(byte.class);
+        SUPPORT_TYPES.add(Byte.class);
+        SUPPORT_TYPES.add(char.class);
+        SUPPORT_TYPES.add(Character.class);
+        SUPPORT_TYPES.add(double.class);
+        SUPPORT_TYPES.add(Double.class);
+        SUPPORT_TYPES.add(float.class);
+        SUPPORT_TYPES.add(Float.class);
+        SUPPORT_TYPES.add(int.class);
+        SUPPORT_TYPES.add(Integer.class);
+        SUPPORT_TYPES.add(long.class);
+        SUPPORT_TYPES.add(Long.class);
+        SUPPORT_TYPES.add(short.class);
+        SUPPORT_TYPES.add(Short.class);
+    }
+
+    /**
      * private constructor
      */
     private Injector() {
@@ -189,6 +217,7 @@ public class Injector { //NOPMD ClassNamingConventions
         }
         return support;
     }
+
     /**
      * 注入指定对象的属性。
      *
@@ -217,33 +246,6 @@ public class Injector { //NOPMD ClassNamingConventions
 //                }
 //            }
 //        }
-    /**
-     * 所支持的属性转换对象类型
-     */
-    private static final Set<Class<?>> SUPPORT_TYPES = new HashSet<>(18);
-
-    //初始化所支持的对象类型。
-    static {
-        //String to Class
-        SUPPORT_TYPES.add(Class.class);
-        SUPPORT_TYPES.add(String.class);
-        SUPPORT_TYPES.add(boolean.class);
-        SUPPORT_TYPES.add(Boolean.class);
-        SUPPORT_TYPES.add(byte.class);
-        SUPPORT_TYPES.add(Byte.class);
-        SUPPORT_TYPES.add(char.class);
-        SUPPORT_TYPES.add(Character.class);
-        SUPPORT_TYPES.add(double.class);
-        SUPPORT_TYPES.add(Double.class);
-        SUPPORT_TYPES.add(float.class);
-        SUPPORT_TYPES.add(Float.class);
-        SUPPORT_TYPES.add(int.class);
-        SUPPORT_TYPES.add(Integer.class);
-        SUPPORT_TYPES.add(long.class);
-        SUPPORT_TYPES.add(Long.class);
-        SUPPORT_TYPES.add(short.class);
-        SUPPORT_TYPES.add(Short.class);
-    }
 
     /**
      * 转换字符串至指定类型的对象。

@@ -17,10 +17,9 @@
 package jrouter;
 
 import java.lang.reflect.Method;
-import jrouter.util.MethodUtil;
 
 /**
- * 提供方法代理的一个抽象类，包括了方法所属的对象、方法对象本身及调用方法是否单例。
+ * 提供方法代理的一个抽象类，包括了{@link Method}对象、调用{@cocd Method}的对象。
  */
 public abstract class AbstractProxy {
 
@@ -51,17 +50,7 @@ public abstract class AbstractProxy {
      * @return 方法调用后的结果。
      *
      * @throws JRouterException 如果发生方法调用错误。
-     *
      * @see Method#invoke(java.lang.Object, java.lang.Object[])
      */
     public abstract Object invoke(Object... params) throws JRouterException;
-
-    /**
-     * 返回调用方法的描述信息。
-     *
-     * @return 调用方法的描述信息。
-     */
-    public String getMethodInfo() {
-        return MethodUtil.getMethod(method);
-    }
 }

@@ -21,7 +21,8 @@
         <!-- optional default -->
         <property name="converterFactory" value="jrouter.impl.MultiParameterConverterFactory"/>
         <!-- optional default:null -->
-        <property name="interceptorMethodChecker" value="jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)"/>
+        <property name="interceptorMethodChecker"
+                  value="jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)"/>
     </action-factory>
 
     <!-- scan classes only in root configuration, use ',' as separate -->

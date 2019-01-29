@@ -77,7 +77,7 @@ public class JavassistMethodChecker {
     /**
      * 分析指定的{@code Method}对象体，检查是否匹配指定的模式。
      *
-     * @param method 待检查的{@code Metohd}对象。
+     * @param method 待检查的{@code Method}对象。
      *
      * @return 是否匹配指定的模式。
      */

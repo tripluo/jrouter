@@ -29,8 +29,8 @@
                     <xsd:element ref="result-type"/>
                     <xsd:element ref="result"/>
                     <xsd:element ref="component-scan"/>
-                    <xsd:element ref="include" />
-                    <xsd:element ref="aop-config" />
+                    <xsd:element ref="include"/>
+                    <xsd:element ref="aop-config"/>
                 </xsd:choice>
             </xsd:sequence>
         </xsd:complexType>

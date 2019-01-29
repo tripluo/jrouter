@@ -46,7 +46,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
 
     /** ActionFactory */
     @lombok.Getter
-    private final ActionFactory actionFactory;
+    private final ActionFactory<String> actionFactory;
 
     /** PathActionProxy */
     @lombok.Getter

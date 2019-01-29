@@ -22,9 +22,9 @@ import jrouter.annotation.Action;
 /**
  * ActionFactory接口。
  *
- * @param <K> 调用{@link Action}的标识。
+ * @param <P> 调用{@link Action}的标识。
  */
-public interface ActionFactory<K> {
+public interface ActionFactory<P> {
 
     /**
      * 返回Action过滤器。
@@ -48,26 +48,33 @@ public interface ActionFactory<K> {
     MethodInvokerFactory getMethodInvokerFactory();
 
     /**
+     * 返回路径生成器。
+     *
+     * @return 路径生成器。
+     */
+    PathGenerator<P> getPathGenerator();
+
+    /**
      * 返回创建方法转换器的工厂对象。
      *
      * @param <T> ActionInvocation type.
      *
      * @return 创建方法转换器的工厂对象。
      */
-    <T extends ActionInvocation<?>> ConverterFactory<T> getConverterFactory();
+    <T extends ActionInvocation<P>> ConverterFactory<T> getConverterFactory();
 
     /**
      * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。
      *
      * @param <T> 调用Action的结果类型。
-     * @param key Action的映射标识。
+     * @param path Action的映射标识。
      * @param params 用于Action的调用参数。
      *
      * @return 调用后的结果。
      *
      * @throws JRouterException 如果发生调用错误。
      */
-    <T> T invokeAction(K key, Object... params) throws JRouterException;
+    <T> T invokeAction(P path, Object... params) throws JRouterException;
 
     /**
      * 移除ActionFactory中所有关联关系。

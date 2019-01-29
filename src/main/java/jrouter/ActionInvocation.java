@@ -33,14 +33,14 @@ public interface ActionInvocation<P> {
      *
      * @return ActionFactory。
      */
-    <T> ActionFactory<T> getActionFactory();
+    ActionFactory<P> getActionFactory();
 
     /**
      * 返回ActionInvocation持有的ActionProxy。
      *
      * @return ActionInvocation持有的ActionProxy。
      */
-    <T> ActionProxy<T> getActionProxy();
+    ActionProxy<P> getActionProxy();
 
     /**
      * 返回Aciton调用的路径参数。
