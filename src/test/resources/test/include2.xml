@@ -2,7 +2,7 @@
 <jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../../main/resources/jrouter-1.6.xsd">
     <!-- action -->
-    <action class="jrouter.URLTestAction2"/>
+    <action class="net.jrouter.URLTestAction2"/>
     <!-- circular reference -->
     <include file="test/include1.xml"/>
 </jrouter>

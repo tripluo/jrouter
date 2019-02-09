@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:context="http://www.springframework.org/schema/context"
+       xmlns="http://www.springframework.org/schema/beans"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
        http://www.springframework.org/schema/beans/spring-beans.xsd
        http://www.springframework.org/schema/context
@@ -9,7 +9,7 @@
     <description>jrouter与springframework集成的配置文件</description>
 
     <!-- 使用annotation 自动注册bean, 并保证@Required,@Autowired的属性被注入 -->
-    <context:component-scan base-package="jrouter"/>
+    <context:component-scan base-package="net.jrouter"/>
 
     <!-- test spring inject -->
     <bean id="springInject" class="java.lang.String">
@@ -17,12 +17,12 @@
     </bean>
 
     <!-- test action -->
-    <bean id="URLTestAction2" class="jrouter.URLTestAction2"/>
-    <bean id="simpleAction" class="jrouter.SimpleAction"/>
+    <bean id="URLTestAction2" class="net.jrouter.URLTestAction2"/>
+    <bean id="simpleAction" class="net.jrouter.SimpleAction"/>
 
     <!-- JRouter ActionFactory Test -->
-    <bean id="actionFactoryTest" class="jrouter.spring.DefaultActionFactoryBean">
-        <property name="actionFactoryClass" value="jrouter.impl.PathActionFactory"/>
+    <bean id="actionFactoryTest" class="net.jrouter.spring.DefaultActionFactoryBean">
+        <property name="actionFactoryClass" value="net.jrouter.impl.PathActionFactory"/>
         <property name="actionFactoryProperties">
             <value>
                 defaultInterceptorStack = empty
@@ -37,38 +37,38 @@
         <property name="componentClassScanProperties">
             <list>
                 <value>
-                    package = jrouter
+                    package = net.jrouter
                     includeExpression = **.*Interceptor, **.*InterceptorStack
-                    excludeExpression = jrouter.result.*
+                    excludeExpression = net.jrouter.result.*
                 </value>
             </list>
         </property>
         <property name="resultTypes">
             <list>
-                <value>jrouter.result.DefaultResult</value>
+                <value>net.jrouter.result.DefaultResult</value>
             </list>
         </property>
 
         <property name="actions">
             <list>
-                <value>jrouter.PathTestAction</value>
+                <value>net.jrouter.PathTestAction</value>
                 <ref bean="simpleAction"/>
             </list>
         </property>
 
         <property name="aopActions">
             <list>
-                <bean class="jrouter.spring.AopActionBean">
+                <bean class="net.jrouter.spring.AopActionBean">
                     <property name="matches" value="/**"/>
                     <property name="typeName" value="override"/>
                 </bean>
-                <bean class="jrouter.spring.AopActionBean">
+                <bean class="net.jrouter.spring.AopActionBean">
                     <property name="matches" value="/test/**"/>
                     <property name="interceptorStackNames" value="demo"/>
                     <property name="interceptorNames" value="springInject"/>
                     <property name="typeName" value="add-after"/>
                 </bean>
-                <bean class="jrouter.spring.AopActionBean">
+                <bean class="net.jrouter.spring.AopActionBean">
                     <property name="matches" value="/test/param"/>
                     <property name="interceptorNames" value="timer,timer,springInject"/>
                     <property name="typeName" value="add-before"/>

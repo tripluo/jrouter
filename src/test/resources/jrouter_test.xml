@@ -2,51 +2,51 @@
 <jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../main/resources/jrouter-1.6.xsd">
 
-    <action-factory class="jrouter.impl.PathActionFactory$ColonString">
+    <action-factory class="net.jrouter.impl.PathActionFactory$ColonString">
         <property name="defaultInterceptorStack" value="empty"/>
         <property name="defaultResultType" value="empty"/>
         <property name="defaultStringResultType" value="empty"/>
         <property name="pathSeparator" value="/"/>
         <property name="extension" value="."/>
         <property name="actionCacheNumber" value="100000"/>
-        <property name="converterFactory" value="jrouter.impl.MultiParameterConverterFactory"/>
-        <property name="actionFilter" value="jrouter.spring.RequestMappingActionFilter"/>
+        <property name="converterFactory" value="net.jrouter.impl.MultiParameterConverterFactory$NoFixedOrder"/>
+        <property name="actionFilter" value="net.jrouter.spring.RequestMappingActionFilter"/>
         <property name="notExist" value="-1-1-1"/>
     </action-factory>
 
     <!-- interceptor -->
-    <interceptor class="jrouter.interceptor.SampleInterceptor"/>
+    <interceptor class="net.jrouter.interceptor.SampleInterceptor"/>
 
     <!-- interceptor-stack -->
-    <interceptor-stack class="jrouter.interceptor.DefaultInterceptorStack"/>
+    <interceptor-stack class="net.jrouter.interceptor.DefaultInterceptorStack"/>
 
     <!-- result-type -->
-    <result-type class="jrouter.result.DefaultResult"/>
+    <result-type class="net.jrouter.result.DefaultResult"/>
 
     <!-- result -->
-    <result class="jrouter.result.DefaultResult"/>
+    <result class="net.jrouter.result.DefaultResult"/>
 
     <!-- demo interceptor-stack -->
-    <interceptor-stack class="jrouter.interceptor.DemoInterceptor"/>
+    <interceptor-stack class="net.jrouter.interceptor.DemoInterceptor"/>
 
     <!-- demo intercepror -->
-    <interceptor class="jrouter.interceptor.DemoInterceptor">
+    <interceptor class="net.jrouter.interceptor.DemoInterceptor">
         <property name="value" value="demo interceptor"/>
         <property name="number" value="10000"/>
         <property name="null" value="not supported"/>
     </interceptor>
 
     <!-- demo result-type -->
-    <result-type class="jrouter.result.DemoResult">
+    <result-type class="net.jrouter.result.DemoResult">
         <property name="value" value="demo result"/>
         <property name="null" value="not supported"/>
     </result-type>
 
     <!-- demo result -->
-    <result class="jrouter.result.DemoResult"/>
+    <result class="net.jrouter.result.DemoResult"/>
 
     <!-- demo action -->
-    <action class="jrouter.SimpleAction">
+    <action class="net.jrouter.SimpleAction">
         <property name="string" value="admin"/>
         <property name="number" value="300"/>
         <property name="number" value="200"/>

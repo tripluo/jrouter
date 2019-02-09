@@ -2,7 +2,7 @@
 <jrouter xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="../../main/resources/jrouter-1.6.xsd">
 
-    <action-factory class="jrouter.impl.PathActionFactory">
+    <action-factory class="net.jrouter.impl.PathActionFactory">
         <property name="defaultInterceptorStack" value="empty"/>
         <property name="defaultResultType" value="empty"/>
         <property name="extension" value="."/>
@@ -10,26 +10,26 @@
     </action-factory>
 
     <!-- result -->
-    <result-type class="jrouter.result.DefaultResult"/>
+    <result-type class="net.jrouter.result.DefaultResult"/>
 
     <!-- demo intercepror -->
-    <interceptor class="jrouter.interceptor.DemoInterceptor">
+    <interceptor class="net.jrouter.interceptor.DemoInterceptor">
         <property name="value" value="demo interceptor"/>
         <property name="number" value="10000"/>
         <property name="null" value="not supported"/>
     </interceptor>
 
     <!-- demo result-type -->
-    <result-type class="jrouter.result.DemoResult">
+    <result-type class="net.jrouter.result.DemoResult">
         <property name="value" value="demo result"/>
         <property name="null" value="not supported"/>
     </result-type>
 
     <!-- demo result -->
-    <result class="jrouter.result.DemoResult"/>
+    <result class="net.jrouter.result.DemoResult"/>
 
     <!-- demo action -->
-    <action class="jrouter.SimpleAction">
+    <action class="net.jrouter.SimpleAction">
         <property name="string" value="admin"/>
         <property name="number" value="300"/>
         <property name="number" value="200"/>
@@ -42,8 +42,8 @@
     </action>
 
     <!-- scan classes, use ',' as separate -->
-    <component-scan package="jrouter"
-                    excludeExpression="jrouter.result.*, jrouter.TestDuplicate*.**"/>
+    <component-scan package="net.jrouter"
+                    excludeExpression="net.jrouter.result.*, net.jrouter.TestDuplicate*.**"/>
 
     <!-- aop -->
     <aop-config>

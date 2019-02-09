@@ -3,13 +3,13 @@
          xsi:noNamespaceSchemaLocation="jrouter-1.6.xsd">
 
     <!-- optional default -->
-    <action-factory class="jrouter.impl.PathActionFactory">
+    <action-factory class="net.jrouter.impl.PathActionFactory">
         <!-- optional default:null -->
         <property name="defaultInterceptorStack" value="empty"/>
         <!-- optional default:null -->
         <property name="defaultResultType" value="empty"/>
         <!-- optional default deprecated since 1.6.6 -->
-        <!--<property name="actionInvocationClass" value="jrouter.impl.PathActionInvocation"/>-->
+        <!--<property name="actionInvocationClass" value="net.jrouter.impl.PathActionInvocation"/>-->
         <!-- optional default -->
         <property name="pathSeparator" value="/"/>
         <!-- optional default -->
@@ -19,10 +19,10 @@
         <!-- optional default -->
         <property name="bytecode" value="javassist"/>
         <!-- optional default -->
-        <property name="converterFactory" value="jrouter.impl.MultiParameterConverterFactory"/>
+        <property name="converterFactory" value="net.jrouter.impl.MultiParameterConverterFactory"/>
         <!-- optional default:null -->
         <property name="interceptorMethodChecker"
-                  value="jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)"/>
+                  value="net.jrouter.ActionInvocation.invoke(**)|net.jrouter.ActionInvocation.invokeActionOnly(**)"/>
     </action-factory>
 
     <!-- scan classes only in root configuration, use ',' as separate -->
@@ -32,16 +32,16 @@
     />
 
     <!-- interceptor -->
-    <interceptor class="jrouter.interceptor.SampleInterceptor"/>
+    <interceptor class="net.jrouter.interceptor.SampleInterceptor"/>
 
     <!-- interceptor-stack -->
-    <interceptor-stack class="jrouter.interceptor.DefaultInterceptorStack"/>
+    <interceptor-stack class="net.jrouter.interceptor.DefaultInterceptorStack"/>
 
     <!-- result-type -->
-    <result-type class="jrouter.result.DefaultResult"/>
+    <result-type class="net.jrouter.result.DefaultResult"/>
 
     <!-- result -->
-    <result class="jrouter.result.DefaultResult"/>
+    <result class="net.jrouter.result.DefaultResult"/>
 
     <!-- actions -->
     <!-- add action tags -->

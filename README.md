@@ -30,17 +30,17 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.7.7</version>
+    <version>1.8.0</version>
 </dependency>
 ```
 
 ###  JavaConfig: ###
 ```
-import jrouter.ActionFactory;
-import jrouter.bytecode.javassist.JavassistMethodChecker;
-import jrouter.impl.PathActionFactory;
-import jrouter.spring.SpringObjectFactory;
-import jrouter.util.ClassScanner;
+import net.jrouter.ActionFactory;
+import net.jrouter.bytecode.javassist.JavassistMethodChecker;
+import net.jrouter.impl.PathActionFactory;
+import net.jrouter.spring.SpringObjectFactory;
+import net.jrouter.util.ClassScanner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 ...
@@ -66,24 +66,24 @@ import org.springframework.context.annotation.Bean;
         //default:PathActionFactory.DefaultObjectFactory
         properties.setObjectFactory(new SpringObjectFactory(applicationContext));
         //default:null
-        properties.setMethodChecker(new JavassistMethodChecker("jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)"));
+        properties.setMethodChecker(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke(**)|net.jrouter.ActionInvocation.invokeActionOnly(**)"));
         //default:PathActionFactory.$
         properties.setPathGenerator(...);
 
         PathActionFactory actionFactory = new PathActionFactory(properties);
         //add interceptors
-        actionFactory.addInterceptors(jrouter.interceptor.SampleInterceptor.class);
+        actionFactory.addInterceptors(net.jrouter.interceptor.SampleInterceptor.class);
         //add interceptorStacks
-        actionFactory.addInterceptorStacks(jrouter.interceptor.DefaultInterceptorStack.class);
+        actionFactory.addInterceptorStacks(net.jrouter.interceptor.DefaultInterceptorStack.class);
         //add resultTypes
-        actionFactory.addResultTypes(jrouter.result.DefaultResult.class);
+        actionFactory.addResultTypes(net.jrouter.result.DefaultResult.class);
         //add results
-        actionFactory.addResults(jrouter.result.DefaultResult.class);
+        actionFactory.addResults(net.jrouter.result.DefaultResult.class);
 
         ClassScanner scanner = new ClassScanner();
-        scanner.setIncludePackages(new HashSet<>(Arrays.asList("jrouter")));
-        scanner.setIncludeExpressions(new HashSet<>(Arrays.asList("jrouter.impl.**")));
-        scanner.setExcludeExpressions(new HashSet<>(Arrays.asList("jrouter.result.**", "jrouter.interceptor.**")));
+        scanner.setIncludePackages(new HashSet<>(Arrays.asList("net.jrouter")));
+        scanner.setIncludeExpressions(new HashSet<>(Arrays.asList("net.jrouter.impl.**")));
+        scanner.setExcludeExpressions(new HashSet<>(Arrays.asList("net.jrouter.result.**", "net.jrouter.interceptor.**")));
         //add actions
         for (Class<?> cls : scanner.getClasses()) {
             actionFactory.addActions(cls);
@@ -95,20 +95,20 @@ import org.springframework.context.annotation.Bean;
 ### Springframework Integration: ###
 ```xml
 <!-- JRouter ActionFactory -->
-<bean id="actionFactory" class="jrouter.spring.DefaultActionFactoryBean">
+<bean id="actionFactory" class="net.jrouter.spring.DefaultActionFactoryBean">
     <!-- optional default:null -->
     <property name="configLocation" value="classpath:jrouter.xml" />
     <!-- optional default -->
-    <property name="actionFactoryClass" value="jrouter.impl.PathActionFactory"/>
+    <property name="actionFactoryClass" value="net.jrouter.impl.PathActionFactory"/>
     <!-- optional default -->
     <property name="objectFactory">
-        <bean class="jrouter.spring.SpringObjectFactory"/>
+        <bean class="net.jrouter.spring.SpringObjectFactory"/>
     </property>
     <!-- optional default -->
     <property name="actionFactoryProperties">
         <value>
             <!-- optional default:null deprecated since 1.6.6 -->
-            <!--actionInvocationClass = jrouter.impl.PathActionInvocation-->
+            PathActionInvocation
             <!-- optional default:null -->
             defaultInterceptorStack = empty
             <!-- optional default:null -->
@@ -122,9 +122,9 @@ import org.springframework.context.annotation.Bean;
             <!-- optional default -->
             bytecode = javassist
             <!-- optional default -->
-            converterFactory = jrouter.impl.MultiParameterConverterFactory
+            converterFactory = net.jrouter.impl.MultiParameterConverterFactory
             <!-- optional default:null -->
-            interceptorMethodChecker = jrouter.ActionInvocation.invoke(**)|jrouter.ActionInvocation.invokeActionOnly(**)
+            interceptorMethodChecker = net.jrouter.ActionInvocation.invoke(**)|net.jrouter.ActionInvocation.invokeActionOnly(**)
             <!-- optional default:null -->
             actionFilter =
             <!-- optional default:PathActionFactory.$ -->
@@ -137,11 +137,11 @@ import org.springframework.context.annotation.Bean;
         <list>
             <value>
                 <!-- required -->
-                package = jrouter
+                package = net.jrouter
                 <!-- optional, if empty means all -->
-                includeExpression = jrouter.impl.**
+                includeExpression = net.jrouter.impl.**
                 <!-- optional -->
-                excludeExpression = jrouter.result.**, jrouter.interceptor.**
+                excludeExpression = net.jrouter.result.**, net.jrouter.interceptor.**
             </value>
         </list>
     </property>
@@ -149,25 +149,25 @@ import org.springframework.context.annotation.Bean;
     <property name="interceptors">
         <list>
             <!-- the value can be the class name or the ref bean: -->
-            <value>jrouter.interceptor.SampleInterceptor</value>
+            <value>net.jrouter.interceptor.SampleInterceptor</value>
         </list>
     </property>
     <property name="interceptorStacks">
         <list>
             <!-- the value can be the class name or the ref bean: -->
-            <value>jrouter.interceptor.DefaultInterceptorStack</value>
+            <value>net.jrouter.interceptor.DefaultInterceptorStack</value>
         </list>
     </property>
     <property name="resultTypes">
         <list>
             <!-- the value can be the class name or the ref bean: -->
-            <value>jrouter.result.DefaultResult</value>
+            <value>net.jrouter.result.DefaultResult</value>
         </list>
     </property>
     <property name="results">
         <list>
             <!-- the value can be the class name or the ref bean: -->
-            <value>jrouter.result.DefaultResult</value>
+            <value>net.jrouter.result.DefaultResult</value>
         </list>
     </property>
     <property name="actions">
@@ -190,7 +190,7 @@ import org.springframework.context.annotation.Bean;
 
     <property name="aopActions">
         <list>
-            <bean class="jrouter.spring.AopActionBean">
+            <bean class="net.jrouter.spring.AopActionBean">
                 <property name="matches" value="/**"/>
                 <property name="interceptorStackNames" value="empty"/>
                 <property name="interceptorNames" value=""/>

@@ -6,7 +6,7 @@
             <![CDATA[
             JRouter Schema, version 1.6 Authors: sunjumper@163.com.
             This defines a simple and consistent way of creating components, managed by a JRouter ActionFactory,
-            read by jrouter.config.Configuration.
+            read by net.jrouter.config.Configuration.
             ]]>
         </xsd:documentation>
     </xsd:annotation>
@@ -38,7 +38,7 @@
 
     <xsd:element name="action-factory">
         <xsd:annotation>
-            <xsd:documentation source="java:jrouter.ActionFactory">
+            <xsd:documentation source="java:net.jrouter.ActionFactory">
                 <![CDATA[
                 The JRouter ActionFactory configuration.
                 ]]>
