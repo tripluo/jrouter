@@ -17,13 +17,13 @@
 
 ★ 结果类型（ResultType）
 
-![outline](https://raw.githubusercontent.com/innjj/jrouter/master/outline.png)
+![outline](https://raw.githubusercontent.com/tripluo/jrouter/master/outline.png)
 
 ● require [jdk 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 ● require [slf4j](http://www.slf4j.org/download.html)
 
-◇ [changelog](https://github.com/innjj/jrouter/blob/master/src/main/resources/changelog.txt)
+◇ [changelog](https://github.com/tripluo/jrouter/blob/master/src/main/resources/changelog.txt)
 
 ### Maven: ###
 ```xml

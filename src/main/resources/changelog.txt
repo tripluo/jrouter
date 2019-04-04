@@ -3,7 +3,7 @@ JROUTER CHANGELOG
 ==========================
 https://jrouter.net/
 
-Changes in version 1.8.0 (2019-02-22)
+Changes in version 1.8.0 (2019-04-05)
 * 重构包名jrouter为net.jrouter。
 * 修正MultiParameterConverter#convert方法的参数匹配逻辑。
 * 修正DefaultProxy#invoke关于变长参数不正确的操作。
