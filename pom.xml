@@ -5,10 +5,10 @@
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.8.0</version>
+    <version>1.8.1</version>
     <name>JRouter</name>
     <inceptionYear>2010</inceptionYear>
-    <url>http://www.jrouter.net/</url>
+    <url>https://jrouter.net/</url>
 
     <dependencies>
         <!-- slf4j -->
@@ -117,7 +117,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.3</version>
+                <version>0.8.4</version>
                 <executions>
                     <!--
                     <execution>
@@ -142,6 +142,39 @@
     </build>
     <profiles>
         <profile>
+            <id>checkstyle</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <!-- checkstyle -->
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-checkstyle-plugin</artifactId>
+                        <version>3.1.0</version>
+                        <configuration>
+                            <configLocation>${checkstyle.config.file}</configLocation>
+                            <failOnViolation>false</failOnViolation>
+                            <failsOnError>false</failsOnError>
+                            <includeTestSourceDirectory>false</includeTestSourceDirectory>
+                            <logViolationsToConsole>true</logViolationsToConsole>
+                            <violationSeverity>warning</violationSeverity>
+                        </configuration>
+                        <executions>
+                            <execution>
+                                <id>checkstyle</id>
+                                <phase>validate</phase>
+                                <goals>
+                                    <goal>check</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
             <id>pmd</id>
             <activation>
                 <activeByDefault>false</activeByDefault>
@@ -152,17 +185,17 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-pmd-plugin</artifactId>
-                        <version>3.11.0</version>
+                        <version>3.12.0</version>
                         <dependencies>
                             <dependency>
                                 <groupId>net.sourceforge.pmd</groupId>
                                 <artifactId>pmd-core</artifactId>
-                                <version>6.12.0</version>
+                                <version>6.14.0</version>
                             </dependency>
                             <dependency>
                                 <groupId>net.sourceforge.pmd</groupId>
                                 <artifactId>pmd-java</artifactId>
-                                <version>6.12.0</version>
+                                <version>6.14.0</version>
                             </dependency>
                         </dependencies>
                         <executions>
@@ -261,7 +294,8 @@
     </profiles>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.22.RELEASE</spring.version>
+        <spring.version>4.3.24.RELEASE</spring.version>
+        <checkstyle.config.file></checkstyle.config.file>
         <pmd.rule.file></pmd.rule.file>
     </properties>
     <licenses>
@@ -272,9 +306,9 @@
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:innjj/jrouter.git</connection>
-        <developerConnection>scm:git:git@github.com:innjj/jrouter.git</developerConnection>
-        <url>https://github.com/innjj/jrouter</url>
+        <connection>scm:git:git@github.com:tripluo/jrouter.git</connection>
+        <developerConnection>scm:git:git@github.com:tripluo/jrouter.git</developerConnection>
+        <url>https://github.com/tripluo/jrouter</url>
     </scm>
     <developers>
         <developer>

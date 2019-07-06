@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.interceptor;
 
 import net.jrouter.annotation.InterceptorStack;
@@ -35,7 +36,10 @@ public class DefaultInterceptorStack {
      * @see SampleInterceptor#logging
      * @see SampleInterceptor#timer
      */
-    @InterceptorStack(interceptors = {SampleInterceptor.LOGGING, SampleInterceptor.TIMER})
+    @InterceptorStack(interceptors = {
+            @InterceptorStack.Interceptor(SampleInterceptor.LOGGING),
+            @InterceptorStack.Interceptor(SampleInterceptor.TIMER)
+    })
     public static final String SAMPLE_INTERCEPTOR_STACK = "sample";
 
 }

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.interceptor;
 
 import net.jrouter.ActionInvocation;
@@ -29,7 +30,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 public class DemoInterceptor {
 
     /** demo interceptor & interceptor stack */
-    @InterceptorStack(interceptors = {"demo"})
+    @InterceptorStack(interceptors = {@InterceptorStack.Interceptor("demo")})
     public static final String DEMO = "demo";
 
     /** spring inject interceptor */

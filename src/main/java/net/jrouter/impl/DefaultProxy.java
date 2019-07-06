@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.impl;
 
 import java.lang.reflect.InvocationTargetException;
@@ -69,7 +70,7 @@ public class DefaultProxy extends AbstractProxy {
         } catch (InvocationTargetException e) {
             throw new InvocationProxyException(e.getTargetException(), this);//NOPMD PreserveStackTrace
         } //convert Exception to InvocationProxyException
-        catch (Exception e) {//NOPMD IdenticalCatchBranches
+        catch (Exception e) { //NOPMD IdenticalCatchBranches
             throw new InvocationProxyException(e, this);
         }
     }

@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.annotation;
 
 import java.lang.annotation.*;
@@ -55,7 +56,9 @@ public @interface Namespace {
      * @return 指定拦截器集合的名称集合。
      *
      * @see net.jrouter.interceptor.DefaultInterceptorStack#EMPTY_INTERCEPTOR_STACK
+     * @deprecated 1.8.1
      */
+    @Deprecated
     String[] interceptors() default {};
 
     /**

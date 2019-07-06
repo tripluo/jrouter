@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.bytecode.javassist;
 
 import java.lang.reflect.Method;
@@ -265,9 +266,9 @@ public class JavassistMethodChecker {
                         if (before == Character.MIN_VALUE) {
                             before = c;
                         }
-                        if (before == '&') {//NOPMD
+                        if (before == '&') { //NOPMD
                             all.add(name);
-                        } else if (before == '|') {//NOPMD
+                        } else if (before == '|') { //NOPMD
                             any.add(name);
                         }
                     }
@@ -282,9 +283,9 @@ public class JavassistMethodChecker {
             name = StringUtil.trim(pattern.substring(p, i));
             if (StringUtil.isNotEmpty(name)) {
                 //if no separator
-                if (before == Character.MIN_VALUE || before == '&') {//NOPMD
+                if (before == Character.MIN_VALUE || before == '&') { //NOPMD
                     all.add(name);
-                } else if (before == '|') {//NOPMD
+                } else if (before == '|') { //NOPMD
                     any.add(name);
                 }
             }

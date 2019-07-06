@@ -14,16 +14,14 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.util;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import net.jrouter.interceptor.DefaultInterceptorStack;
-import net.jrouter.interceptor.DemoInterceptor;
-import net.jrouter.interceptor.DemoThreadActionContextInterceptor;
-import net.jrouter.interceptor.SampleInterceptor;
+import net.jrouter.interceptor.*;
 import net.jrouter.result.DefaultResult;
 import net.jrouter.result.DemoResult;
 import static org.junit.Assert.assertTrue;
@@ -66,6 +64,7 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
         assertCollectionEqualContains(new Class<?>[]{
                         DefaultInterceptorStack.class,
+                        DemoInterceptorStack.class,
                         SampleInterceptor.class,
                         DefaultResult.class,
                         DemoInterceptor.class,
@@ -80,6 +79,7 @@ public class ClassScannerTest {
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
         assertCollectionEqualContains(new Class<?>[]{
                         DefaultInterceptorStack.class,
+                        DemoInterceptorStack.class,
                         DemoThreadActionContextInterceptor.class,
                         DefaultResult.class,
                         DemoInterceptor.class,
@@ -102,6 +102,7 @@ public class ClassScannerTest {
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
         assertCollectionEqualContains(new Class<?>[]{
                         DefaultInterceptorStack.class,
+                        DemoInterceptorStack.class,
                         DemoThreadActionContextInterceptor.class,
                         DefaultResult.class,
                         DemoInterceptor.class,
@@ -136,6 +137,7 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
         classScanner.setExcludeExpressions(stringToSet("net.jrouter.interceptor.DefaultInterceptorStack"));
         assertCollectionEqualContains(new Class<?>[]{
+                        DemoInterceptorStack.class,
                         SampleInterceptor.class,
                         DefaultResult.class,
                         DemoInterceptor.class,

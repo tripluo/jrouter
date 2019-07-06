@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter;
 
 import net.jrouter.annotation.*;
@@ -61,7 +62,7 @@ public class TestDuplicate {
 
     public static class DuplicateInterceptor1 {
 
-        @InterceptorStack(interceptors = {"demo"})
+        @InterceptorStack(interceptors = {@InterceptorStack.Interceptor("demo")})
         public static final String DEMO = DemoInterceptor.DEMO;
 
         @Interceptor(name = DemoInterceptor.SPRING_DEMO)

@@ -14,11 +14,13 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter;
 
 import net.jrouter.annotation.Action;
 import net.jrouter.annotation.Namespace;
 import net.jrouter.interceptor.DefaultInterceptorStack;
+import net.jrouter.interceptor.DemoInterceptorStack;
 import net.jrouter.interceptor.SampleInterceptor;
 
 /**
@@ -100,6 +102,21 @@ public class InterceptorTestAction {
 
         @Action(name = "3", interceptors = {SampleInterceptor.TIMER})
         public void test3() {
+        }
+    }
+
+    @Namespace(name = "/test4")
+    public static class Action4 {
+
+        /**
+         * @see DemoInterceptorStack#MATCHED_INTERCEPTOR_STACK
+         */
+        @Action(name = "matched")
+        public void test1() {
+        }
+
+        @Action(name = "2", interceptorStack = DemoInterceptorStack.MATCHED_INTERCEPTOR_STACK)
+        public void test2() {
         }
     }
 }

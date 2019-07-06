@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.interceptor;
 
 import net.jrouter.ActionInvocation;
@@ -26,11 +27,11 @@ import net.jrouter.annotation.InterceptorStack;
  */
 public class DemoThreadActionContextInterceptor {
 
-    @InterceptorStack(interceptors = {"demoThread"})
+    @InterceptorStack(interceptors = {@InterceptorStack.Interceptor("demoThread")})
     public static final String DEMO_THREAD = "demoThread";
 
     /** ThreadLocal */
-    private static final ThreadLocal<ActionInvocation> threadLocal = new ThreadLocal<>();
+    private static final ThreadLocal<ActionInvocation> THREAD_LOCAL = new ThreadLocal<>();
 
     /** Action调用结束后是否清除线程变量中的ActionInvocation对象，默认清除 */
     private boolean removeActionInvocation = true;
@@ -48,12 +49,12 @@ public class DemoThreadActionContextInterceptor {
     @Interceptor(name = DEMO_THREAD)
     public Object test(ActionInvocation invocation) {
         try {
-            threadLocal.set(invocation);
+            THREAD_LOCAL.set(invocation);
             return invocation.invoke();
         } finally {
             //just keep thread local ActionInvocation for test
             if (removeActionInvocation)
-                threadLocal.remove();
+                THREAD_LOCAL.remove();
         }
     }
 
@@ -63,6 +64,6 @@ public class DemoThreadActionContextInterceptor {
      * @return ActionInvocationn对象。
      */
     public static ActionInvocation get() {
-        return threadLocal.get();
+        return THREAD_LOCAL.get();
     }
 }

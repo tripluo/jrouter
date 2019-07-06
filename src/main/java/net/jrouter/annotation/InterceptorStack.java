@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.annotation;
 
 import java.lang.annotation.*;
@@ -42,9 +43,59 @@ public @interface InterceptorStack {
     //String parent() default "";
 
     /**
-     * 包含的拦截器名称集合。
+     * 包含的拦截器集合。
      *
-     * @return 所包含的拦截器名称集合。
+     * @return 所包含的拦截器集合。
      */
-    String[] interceptors() default {};
+    Interceptor[] interceptors() default {};
+
+    /**
+     * 包含匹配的路径集合（默认空不包含任何）。
+     *
+     * @return
+     *
+     * @since 1.8.1
+     */
+    String[] include() default {};
+
+    /**
+     * 排除匹配的路径集合（默认空不排除任何）。
+     *
+     * @return
+     *
+     * @since 1.8.1
+     */
+    String[] exclude() default {};
+
+    /**
+     * 排序值，默认0。多匹配后者覆盖前者。
+     *
+     * @return 排序值。
+     */
+    int order() default 0;
+
+    /**
+     * 包含于拦截栈的拦截器配置。
+     */
+    @Target({})
+    @Retention(RetentionPolicy.RUNTIME)
+    @Documented
+    @interface Interceptor {
+
+        /**
+         * 拦截器名称。
+         *
+         * @return 拦截器名称。
+         */
+        String value();
+
+        /**
+         * 排除匹配的路径集合（默认空不排除任何）。
+         *
+         * @return
+         *
+         * @since 1.8.1
+         */
+        String[] exclude() default {};
+    }
 }

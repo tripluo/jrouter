@@ -14,10 +14,12 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.impl;
 
 import net.jrouter.InterceptorTestAction;
 import net.jrouter.interceptor.DefaultInterceptorStack;
+import net.jrouter.interceptor.DemoInterceptorStack;
 import net.jrouter.interceptor.SampleInterceptor;
 import org.junit.After;
 import static org.junit.Assert.assertEquals;
@@ -41,11 +43,12 @@ public class ActionFactory4Test {
 
         factory.addInterceptors(SampleInterceptor.class);
         factory.addInterceptorStacks(DefaultInterceptorStack.class);
+        factory.addInterceptorStacks(DemoInterceptorStack.class);
 
         factory.addActions(InterceptorTestAction.Action1.class);
         factory.addActions(InterceptorTestAction.Action2.class);
         factory.addActions(InterceptorTestAction.Action3.class);
-
+        factory.addActions(InterceptorTestAction.Action4.class);
     }
 
     @After
@@ -86,5 +89,10 @@ public class ActionFactory4Test {
         assertEquals(ap32.getInterceptorProxies(), factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
         assertEquals(1, ap33.getInterceptorProxies().size());
         assertEquals(ap33.getInterceptorProxies().get(0).getName(), SampleInterceptor.TIMER);
+
+        PathActionProxy ap41 = factory.getActions().get("/test4/matched");
+        PathActionProxy ap42 = factory.getActions().get("/test4/2");
+        assertEquals(ap41.getInterceptorProxies(), factory.getInterceptorStacks().get(DemoInterceptorStack.MATCHED_INTERCEPTOR_STACK).getInterceptors());
+        assertEquals(ap41.getInterceptorProxies(), factory.getInterceptorStacks().get(DemoInterceptorStack.MATCHED_INTERCEPTOR_STACK).getInterceptors());
     }
 }

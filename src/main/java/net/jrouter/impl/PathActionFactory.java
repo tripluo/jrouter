@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.impl;
 
 import java.lang.annotation.Annotation;
@@ -23,6 +24,7 @@ import java.lang.reflect.Modifier;
 import java.util.*;
 import net.jrouter.*;
 import net.jrouter.annotation.*;
+import net.jrouter.util.AntPathMatcher;
 import net.jrouter.util.CollectionUtil;
 import net.jrouter.util.MethodUtil;
 import net.jrouter.util.StringUtil;
@@ -54,6 +56,12 @@ public class PathActionFactory extends AbstractActionFactory<String> {
     private final char pathSeparator;
 
     /**
+     * 路径分隔符。
+     */
+    @lombok.Getter
+    private final AntPathMatcher pathMatcher;
+
+    /**
      * 全匹配标识。
      *
      * @deprecated
@@ -73,7 +81,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
     private final int actionCacheNumber;
 
     /**
-     * 默认拦截栈名称。作用于初始化Action时的配置。
+     * 默认拦截栈名称。作用于初始化Action时的配置，如若配置全路径匹配的{@link InterceptorStack#include()}亦相当于取代此配置项。
      *
      * @see #createActionProxy(Method, Object)
      */
@@ -120,6 +128,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         //pass properties
         this.pathGenerator = properties.pathGenerator;
         this.pathSeparator = properties.pathSeparator;
+        this.pathMatcher = new AntPathMatcher(String.valueOf(this.pathSeparator));
         this.extension = properties.extension;
         this.actionCacheNumber = properties.actionCacheNumber;
         this.defaultInterceptorStack = properties.defaultInterceptorStack;
@@ -705,17 +714,17 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                 addActionInterceptors(inters, stackName, ap);
             } else {
                 //是否已设置action的拦截器集合
-                boolean setInterceptors = false;
+                boolean hasActionInterceptors = false;
                 //namespace interceptorStack & interceptors
                 if (ns != null) {
                     //namespace interceptorStack
                     if (StringUtil.isNotEmpty(stackName = ns.interceptorStack().trim())) {
-                        setInterceptors = true;
+                        hasActionInterceptors = true;
                         addActionInterceptors(inters, stackName, ap);
                     }
                     //namespace interceptors
                     if (ns.interceptors().length != 0) {
-                        setInterceptors = true;
+                        hasActionInterceptors = true;
                         for (String name : ns.interceptors()) {
                             InterceptorProxy ip = getInterceptors().get(name);
                             if (ip == null) {
@@ -729,8 +738,46 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                     }
                 }
                 //defaultInterceptorStack
-                if (!setInterceptors) {
-                    if (StringUtil.isNotEmpty(stackName = getDefaultInterceptorStack())) {
+                if (!hasActionInterceptors) {
+                    InterceptorStackProxy matchedInterceptorStack = null;
+                    //单一路径匹配多个拦截栈，提示告警信息
+                    out:
+                    for (Map.Entry<String, InterceptorStackProxy> entry : getInterceptorStacks().entrySet()) {
+                        InterceptorStackProxy stackProxy = entry.getValue();
+                        InterceptorStackProxy matched = null;
+                        String[] includes = stackProxy.getInterceptorStack().include();
+                        String[] excludes = stackProxy.getInterceptorStack().exclude();
+                        //has include
+                        if (CollectionUtil.isNotEmpty(includes)) {
+                            //exclude first
+                            if (CollectionUtil.isNotEmpty(excludes)) {
+                                for (String exclude : excludes) {
+                                    if (pathMatcher.match(exclude, path)) {
+                                        continue out;
+                                    }
+                                }
+                            }
+                            for (String include : includes) {
+                                if (pathMatcher.match(include, path)) {
+                                    matched = stackProxy;
+                                    break;
+                                }
+                            }
+                            //has one matched
+                            if (matched != null) {
+                                //之前已有匹配拦截栈
+                                if (matchedInterceptorStack != null) {
+                                    LOG.warn("Action [{}] matched InterceptorStack [{} - {}] override [{} - {}].",
+                                            path, matched.getName(), matched.getFieldName(), matchedInterceptorStack.getName(), matchedInterceptorStack.getFieldName());
+                                }
+                                //取最后匹配
+                                matchedInterceptorStack = matched;
+                            }
+                        }
+                    }
+                    if (matchedInterceptorStack != null) {
+                        addActionInterceptors(inters, matchedInterceptorStack.getName(), ap);
+                    } else if (StringUtil.isNotEmpty(stackName = getDefaultInterceptorStack())) {
                         addActionInterceptors(inters, stackName, ap);
                     }
                 }
@@ -766,12 +813,22 @@ public class PathActionFactory extends AbstractActionFactory<String> {
      */
     private void addActionInterceptors(List<InterceptorProxy> interceptors, String stackName, PathActionProxy ap) {
         InterceptorStackProxy isp = getInterceptorStacks().get(stackName);
+        List<InterceptorStackProxy.InterceptorDelegate> delegates = null;
         if (isp == null) {
             if (LOG.isWarnEnabled()) {
                 LOG.warn("No such InterceptorStack [{}] at : {}", stackName, ap.getMethodInfo());
             }
-        } else if (isp.getInterceptors() != null) {
-            interceptors.addAll(isp.getInterceptors());
+        } else if ((delegates = isp.getInterceptorDelegates()) != null) {
+            out:
+            for (InterceptorStackProxy.InterceptorDelegate delegate : delegates) {
+                String[] excludes = delegate.getInterceptor().exclude();
+                for (String exclude : excludes) {
+                    if (pathMatcher.match(exclude, ap.getPath())) {
+                        continue out;
+                    }
+                }
+                interceptors.add(delegate.getInterceptorProxy());
+            }
         }
     }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -796,7 +853,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         /**
          * @see PathActionFactory#actionCacheNumber
          */
-        private int actionCacheNumber = 10000;
+        private int actionCacheNumber = 10_000;
 
         /**
          * @see PathActionFactory#defaultInterceptorStack
@@ -866,7 +923,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                 String name = e.getKey();
                 Object value = e.getValue();
                 if (value == null) {
-                    LOG.warn("Ingore null value Property [{}].", name);
+                    LOG.warn("Ignore null value Property [{}].", name);
                     continue;
                 }
                 //string value

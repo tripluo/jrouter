@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package net.jrouter.impl;
 
 import net.jrouter.JRouterException;
@@ -61,7 +62,7 @@ public class InvocationProxyException extends JRouterException {
      */
     public Throwable getSource() {
         Throwable cur = this.getCause();
-        while (cur instanceof InvocationProxyException && (cur = cur.getCause()) != null) {//NOPMD for EmptyWhileStmt
+        while (cur instanceof InvocationProxyException && (cur = cur.getCause()) != null) { //NOPMD for EmptyWhileStmt
         }
         return cur;
     }

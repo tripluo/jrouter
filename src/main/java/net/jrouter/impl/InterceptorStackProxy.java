@@ -14,11 +14,13 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.impl;
 
 import java.lang.reflect.Field;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import net.jrouter.annotation.InterceptorStack;
+import net.jrouter.util.CollectionUtil;
 
 /**
  * 拦截栈的代理类，包括了拦截栈的名称、字段来源及其所包含的拦截器集合。
@@ -32,21 +34,42 @@ public final class InterceptorStackProxy {
     /** 拦截栈取名字段 */
     private final Field field;
 
-    /** 包含的拦截器集合 */
+    /** 拦截栈 */
     @lombok.Getter
-    private final List<InterceptorProxy> interceptors;
+    private final InterceptorStack interceptorStack;
+
+    /** 包含的拦截器集合 */
+    @lombok.Getter(lombok.AccessLevel.PACKAGE)
+    private final List<InterceptorDelegate> interceptorDelegates;
 
     /**
      * 构造一个拦截栈的代理类，包含拦截栈的名称、字段来源及其所包含的拦截器集合。
      *
      * @param name 拦截栈的名称。
      * @param field 拦截栈字段来源。
-     * @param interceptors 包含的拦截器集合。
+     * @param interceptorDelegates 包含的拦截器集合。
      */
-    public InterceptorStackProxy(String name, Field field, List<InterceptorProxy> interceptors) {
+    public InterceptorStackProxy(String name, Field field, InterceptorStack interceptorStack, List<InterceptorDelegate> interceptorDelegates) {
         this.name = name;
         this.field = field;
-        this.interceptors = interceptors;
+        this.interceptorStack = interceptorStack;
+        this.interceptorDelegates = interceptorDelegates;
+    }
+
+    /**
+     * 返回拦截栈所包含的拦截器的代理集合。
+     *
+     * @return 拦截栈所包含的拦截器的代理集合。
+     */
+    public List<InterceptorProxy> getInterceptors() {
+        if (CollectionUtil.isNotEmpty(interceptorDelegates)) {
+            List<InterceptorProxy> interceptors = new ArrayList<>(interceptorDelegates.size());
+            for (InterceptorDelegate delegate : interceptorDelegates) {
+                interceptors.add(delegate.interceptorProxy);
+            }
+            return interceptors;
+        }
+        return Collections.EMPTY_LIST;
     }
 
     /**
@@ -62,10 +85,10 @@ public final class InterceptorStackProxy {
     public String toString() {
         StringBuilder msg = new StringBuilder();
         msg.append('[');
-        if (interceptors != null) {
-            Iterator<InterceptorProxy> it = interceptors.iterator();
+        if (interceptorDelegates != null) {
+            Iterator<InterceptorDelegate> it = interceptorDelegates.iterator();
             while (it.hasNext()) {
-                msg.append(it.next().getName());
+                msg.append(it.next().interceptorProxy.getName());
                 if (it.hasNext()) {
                     msg.append(", ");
                 }
@@ -73,5 +96,32 @@ public final class InterceptorStackProxy {
         }
         msg.append(']');
         return msg.toString();
+    }
+
+    /**
+     * Extended InterceptorProxy.
+     */
+    @lombok.Getter
+    public final static class InterceptorDelegate {
+
+        /**
+         * InterceptorStack.Interceptor.
+         */
+        private final InterceptorStack.Interceptor interceptor;
+
+        /**
+         * Interceptor Proxy.
+         */
+        private final InterceptorProxy interceptorProxy;
+
+        /**
+         * Constructor.
+         */
+        public InterceptorDelegate(InterceptorStack.Interceptor interceptor, InterceptorProxy interceptorProxy) {
+            Objects.requireNonNull(interceptor);
+            Objects.requireNonNull(interceptorProxy);
+            this.interceptor = interceptor;
+            this.interceptorProxy = interceptorProxy;
+        }
     }
 }

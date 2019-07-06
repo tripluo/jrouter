@@ -14,15 +14,13 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.impl;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import net.jrouter.*;
 import net.jrouter.annotation.*;
 import net.jrouter.bytecode.javassist.JavassistMethodChecker;
@@ -131,7 +129,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         this.methodChecker = prop.methodChecker;
         //initiate
         this.interceptors = new HashMap<>();
-        this.interceptorStacks = new HashMap<>();
+        this.interceptorStacks = new LinkedHashMap<>();
         this.resultTypes = new HashMap<>();
         this.results = new HashMap<>();
     }
@@ -232,7 +230,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     + isp.getFieldName() + " override "
                     + interceptorStacks.get(name).getFieldName());
         } else if (LOG.isInfoEnabled()) {
-            LOG.info("Add InterceptorStack [{}] : {}", name, isp);
+            LOG.info("Add InterceptorStack [{}] : {}", name, isp.toString());
         }
         interceptorStacks.put(name, isp);
     }
@@ -249,6 +247,17 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         Class<?> cls = isCls ? (Class) obj : objectFactory.getClass(obj);
         Object invoker = isCls ? null : obj;
         Field[] fs = cls.getDeclaredFields();
+        //低到高（相等排后）排序
+        SortedSet<InterceptorStackProxy> sortedSet = new TreeSet<>(new Comparator<InterceptorStackProxy>() {
+
+            @Override
+            public int compare(InterceptorStackProxy newOne, InterceptorStackProxy exist) {
+                int x = newOne.getInterceptorStack().order();
+                int y = exist.getInterceptorStack().order();
+                //low -> high
+                return (x < y) ? -1 : 1;
+            }
+        });
         //TODO 是否成员变量
         for (Field f : fs) {
             int mod = f.getModifiers();
@@ -258,19 +267,22 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 try {
                     //static field
                     if (Modifier.isStatic(mod)) {
-                        addInterceptorStack(createInterceptorStackProxy(f, null));
+                        sortedSet.add(createInterceptorStackProxy(f, null));
                     } else {
                         //为类对象且调用者为 null
                         if (isCls && invoker == null) {
                             invoker = objectFactory.newInstance(cls);
                         }
                         //the same object
-                        addInterceptorStack(createInterceptorStackProxy(f, invoker));
+                        sortedSet.add(createInterceptorStackProxy(f, invoker));
                     }
                 } catch (IllegalAccessException e) {
                     throw new JRouterException(e);
                 }
             }
+        }
+        for (InterceptorStackProxy stackProxy : sortedSet) {
+            addInterceptorStack(stackProxy);
         }
     }
 
@@ -426,36 +438,33 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
     private InterceptorStackProxy createInterceptorStackProxy(Field field, Object obj) throws IllegalAccessException {
         InterceptorStack interceptorStack = field.getAnnotation(InterceptorStack.class);
         String stackName = interceptorStack.name().trim();
-
         //interceptorStack name
         //未指定拦截栈名称则取字符串的值为名称
         if (StringUtil.isEmpty(stackName)) {
             stackName = field.get(obj).toString();
             //空命名异常
             if (StringUtil.isEmpty(stackName)) {
-                throw new IllegalArgumentException("Null name of InterceptorStack : "
-                        + field.getName() + " at " + objectFactory.getClass(obj));
+                throw new IllegalArgumentException("Null name of InterceptorStack : " + field.getName() + " at " + objectFactory.getClass(obj));
             }
         }
-        //interceptors name
-        String[] names = interceptorStack.interceptors();
-
-        List<InterceptorProxy> list = null;
-        if (names != null) {
-            list = new ArrayList<>(names.length);
+        //interceptors
+        InterceptorStack.Interceptor[] interceptors = interceptorStack.interceptors();
+        List<InterceptorStackProxy.InterceptorDelegate> list = null;
+        if (interceptors != null) {
+            list = new ArrayList<>(interceptors.length);
             //add interceptorStack
             //for (int i = names.length - 1; i >= 0; i--) {
-            for (String name : names) {
-                InterceptorProxy ip = interceptors.get(name);
+            for (InterceptorStack.Interceptor interceptor : interceptors) {
+                InterceptorProxy ip = this.interceptors.get(interceptor.value());
                 //if null
                 if (ip == null) {
-                    LOG.warn("No such Interceptor [{}] for : {}", name, field);
+                    LOG.warn("No such Interceptor [{}] for : {}", interceptor, field);
                 } else {
-                    list.add(ip);
+                    list.add(new InterceptorStackProxy.InterceptorDelegate(interceptor, ip));
                 }
             }
         }
-        return new InterceptorStackProxy(stackName, field, list);
+        return new InterceptorStackProxy(stackName, field, interceptorStack, list);
     }
 
     /**
@@ -561,12 +570,12 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 String strValue = value.toString().trim();
                 if (value instanceof String && StringUtil.isNotBlank(strValue)) {
                     try {
-                        this.objectFactory = (ObjectFactory) (DefaultObjectFactory._newInstance(ClassUtil.loadClass(strValue)));
+                        this.objectFactory = (ObjectFactory) (DefaultObjectFactory.newInstance0(ClassUtil.loadClass(strValue)));
                     } catch (ClassNotFoundException ex) {
                         throw new JRouterException(ex);
                     }
                 } else if (value instanceof Class) {
-                    this.objectFactory = (ObjectFactory) (DefaultObjectFactory._newInstance((Class) value));
+                    this.objectFactory = (ObjectFactory) (DefaultObjectFactory.newInstance0((Class) value));
                 } else {
                     //设置创建对象的工厂对象
                     this.objectFactory = (ObjectFactory) value; //throw exception if not matched
@@ -578,7 +587,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 String name = e.getKey();
                 Object val = e.getValue();
                 if (val == null) {
-                    LOG.warn("Ingore null value Property [{}].", name);
+                    LOG.warn("Ignore null value Property [{}].", name);
                     continue;
                 }
                 //string value
@@ -653,11 +662,11 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
         @Override
         public <T> T newInstance(Class<T> clazz) {
-            return _newInstance(clazz);
+            return newInstance0(clazz);
         }
 
         //default new object with empty construction method
-        private static <T> T _newInstance(Class<T> clazz) {//NOPMD MethodNamingConventions
+        private static <T> T newInstance0(Class<T> clazz) { //NOPMD MethodNamingConventions
             try {
                 return clazz.newInstance();
             } catch (IllegalAccessException | InstantiationException e) {

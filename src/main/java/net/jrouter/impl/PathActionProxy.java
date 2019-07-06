@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.impl;
 
 import java.lang.reflect.InvocationTargetException;
@@ -77,7 +78,7 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public PathActionProxy(ActionFactory actionFactory, String namespace, String path, Action action, Method method, //NOPMD ExcessiveParameterList
+    public PathActionProxy(ActionFactory actionFactory, String namespace, String path, Action action, Method method, //SUPPRESS CHECKSTYLE NOPMD ExcessiveParameterList
                            Object object) {
         super(method, object, actionFactory);
         this.actionFactory = actionFactory;

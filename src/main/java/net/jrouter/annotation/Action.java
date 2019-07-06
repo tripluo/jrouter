@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.annotation;
 
 import java.lang.annotation.*;
@@ -26,13 +27,13 @@ import java.lang.annotation.*;
  * Action指定的拦截器集合 = 存在Action指定的拦截栈 ? 指定拦截栈的拦截器集合 + 指定的拦截器集合 : 指定的拦截器集合。
  * </p>
  * <p>
- * Action最终的拦截器集合 = Action指定拦截器集合 > 命名空间拦截器集合 > 全局默认拦截器集合。
+ * Action最终的拦截器集合 = Action指定拦截器集合 > 命名空间拦截器集合 > 路径匹配拦截栈（拦截器集合） > 全局默认拦截器集合。
  * </p>
  *
  * <p>
  * Action上拦截栈优先级：</p>
  * <p>
- * Action指定拦截栈 > 命名空间拦截栈 > 全局默认拦截栈。
+ * Action指定拦截栈 > 命名空间拦截栈 > 路径匹配拦截栈 > 全局默认拦截栈。
  * </p>
  * <p>
  * 若需表明Action不包含任何拦截器，应该指定其拦截栈为空拦截栈；直接指定其拦截器集合为空集合不产生任何效果。
@@ -76,7 +77,10 @@ public @interface Action {
      * Action指定的拦截器集合的名称集合，指定空集合无效。
      *
      * @return Action指定的拦截器集合的名称集合。
+     *
+     * @deprecated 1.8.1
      */
+    @Deprecated
     String[] interceptors() default {};
 
     /**

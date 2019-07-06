@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.config;
 
 import java.io.Serializable;
@@ -22,7 +23,10 @@ import net.jrouter.annotation.Action;
 
 /**
  * 针对相应路径的所有{@link Action}，添加/修改其对应的拦截器集合。
+ *
+ * @deprecated 1.8.1
  */
+@Deprecated
 public class AopAction implements Serializable {
 
     private static final long serialVersionUID = 1L;

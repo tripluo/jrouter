@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter.impl;
 
 import java.util.HashMap;
@@ -132,7 +133,6 @@ public class PathTreeTest {
         assertEquals("/aa/*/c1/d1", tree.get("/aa/b2/c1/d1"));
         assertEquals("/aa/*/c1/d1/e1", tree.get("/aa/b1/c1/d1/e1"));
         assertEquals("/aa/*/c1/d1/e1", tree.get("/aa/b2/c1/d1/e1"));
-
 
         assertEquals("/aa/b4/{k1}/d1", tree.get("/aa/b4/c1/d1"));
         assertEquals("/aa/b4/{k1}/d2", tree.get("/aa/b4/c1/d2"));

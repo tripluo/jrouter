@@ -14,6 +14,7 @@
  * limitations under the License.
  *
  */
+
 package net.jrouter;
 
 import java.util.Arrays;
@@ -55,7 +56,7 @@ public class SimpleAction {
      * 测试与 springframework 的集成注入。
      */
     @Autowired
-    private URLTestAction2 URLTestAction2;
+    private URLTestAction2 urlTestAction2;
 
     /**
      * 测试与 springframework 的集成注入。
@@ -64,8 +65,8 @@ public class SimpleAction {
      */
     @Action(interceptors = {DemoInterceptor.SPRING_DEMO})
     public URLTestAction2 springInject() {
-        Assert.assertNotNull(URLTestAction2);
-        return URLTestAction2;
+        Assert.assertNotNull(urlTestAction2);
+        return urlTestAction2;
     }
 
     /**
