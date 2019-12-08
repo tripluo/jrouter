@@ -20,6 +20,8 @@ package net.jrouter.util;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
+import java.util.HashMap;
+import java.util.Map;
 import net.jrouter.AbstractProxy;
 import net.jrouter.ActionInvocation;
 import net.jrouter.ParameterConverter;
@@ -37,6 +39,34 @@ public class MethodUtil {
             = Modifier.PUBLIC | Modifier.PROTECTED | Modifier.PRIVATE
             | Modifier.ABSTRACT | Modifier.STATIC | Modifier.FINAL
             | Modifier.SYNCHRONIZED | Modifier.NATIVE;
+
+    /**
+     * Primitive types.
+     */
+    private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES = new HashMap<>(16);
+
+    static {
+        PRIMITIVE_TYPES.put(boolean.class, Boolean.class);
+        PRIMITIVE_TYPES.put(byte.class, Byte.class);
+        PRIMITIVE_TYPES.put(char.class, Character.class);
+        PRIMITIVE_TYPES.put(double.class, Double.class);
+        PRIMITIVE_TYPES.put(float.class, Float.class);
+        PRIMITIVE_TYPES.put(int.class, Integer.class);
+        PRIMITIVE_TYPES.put(long.class, Long.class);
+        PRIMITIVE_TYPES.put(short.class, Short.class);
+        PRIMITIVE_TYPES.put(void.class, Void.class);
+    }
+
+    /**
+     * 获取基本类型相应的对象类型。
+     *
+     * @param cls 指定的类型。
+     *
+     * @return 基本类型相应的对象类型。
+     */
+    public static Class<?> getPrimitiveClass(Class<?> cls) {
+        return PRIMITIVE_TYPES.get(cls);
+    }
 
     /**
      * 返回方法名和参数类型, 不包含返回类型及异常描述。
@@ -191,6 +221,94 @@ public class MethodUtil {
         }
     }
 
+    /**
+     * 匹配指定参数类型相对于方法参数类型的映射；
+     * 匹配顺序不考虑父子优先级，指定参数按顺序优先匹配；{@code null}不匹配任何参数类型。
+     *
+     * @param method 指定的方法。
+     * @param matchStart 参数匹配起始位置。
+     * @param actualParameterTypes 指定的参数类型。
+     *
+     * @return 指定参数类型相对于方法参数类型的映射。
+     */
+    public static int[] match(Method method, int matchStart, Class<?>[] actualParameterTypes) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        int[] idx = new int[parameterTypes.length];
+        //flags
+        boolean[] convertMatched = null;
+        if (actualParameterTypes != null) {
+            convertMatched = new boolean[actualParameterTypes.length];
+        }
+        for (int i = matchStart; i < idx.length; i++) {
+            //初始值-1, 无匹配
+            idx[i] = -1;
+            if (actualParameterTypes != null) {
+                Class<?> parameterType = getObjectClass(parameterTypes[i]);
+                for (int j = 0; j < actualParameterTypes.length; j++) {
+                    //不考虑父子优先级，参数按顺序优先匹配。
+                    if (!convertMatched[j] && parameterType.isAssignableFrom(actualParameterTypes[j])) {
+                        idx[i] = j;
+                        convertMatched[j] = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return idx;
+    }
+
+    /**
+     * 匹配指定参数相对于方法参数类型的映射；
+     * 匹配顺序不考虑父子优先级，指定参数按顺序优先匹配；{@code null}不匹配任何参数类型。
+     *
+     * @param method 指定的方法。
+     * @param matchStart 参数匹配起始位置。
+     * @param parameters 指定的参数。
+     *
+     * @return 指定参数相对于方法参数类型的映射。
+     */
+    public static int[] match(Method method, int matchStart, Object[] parameters) {
+        Class<?>[] parameterTypes = method.getParameterTypes();
+        int[] idx = new int[parameterTypes.length];
+        //flags
+        boolean[] convertMatched = null;
+        if (parameters != null) {
+            convertMatched = new boolean[parameters.length];
+        }
+        for (int i = matchStart; i < idx.length; i++) {
+            //初始值-1, 无匹配
+            idx[i] = -1;
+            if (parameters != null) {
+                Class<?> parameterType = getObjectClass(parameterTypes[i]);
+                for (int j = 0; j < parameters.length; j++) {
+                    //不考虑父子优先级，参数按顺序优先匹配。
+                    if (!convertMatched[j] && parameterType.isInstance(parameters[j])) {
+                        idx[i] = j;
+                        convertMatched[j] = true;
+                        break;
+                    }
+                }
+            }
+        }
+        return idx;
+    }
+
+    /**
+     * Get Class.
+     *
+     * @param cls Original Class.
+     *
+     * @return Class.
+     */
+    private static Class<?> getObjectClass(Class<?> cls) {
+        if (cls.isPrimitive()) {
+            Class<?> pCls = getPrimitiveClass(cls);
+            if (pCls != null) {
+                return pCls;
+            }
+        }
+        return cls;
+    }
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**

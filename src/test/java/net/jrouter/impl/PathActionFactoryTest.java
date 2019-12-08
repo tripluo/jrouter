@@ -42,7 +42,7 @@ public class PathActionFactoryTest {
         prop.setDefaultInterceptorStack(DemoThreadActionContextInterceptor.DEMO_THREAD);
         prop.setDefaultResultType(DefaultResult.EMPTY);
         factory = new PathActionFactory(prop);
-
+        assertEquals(factory, prop.getActionFactory());
         //interceptor
         factory.addInterceptors(new DemoThreadActionContextInterceptor(false));
 

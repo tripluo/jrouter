@@ -132,6 +132,25 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         this.interceptorStacks = new LinkedHashMap<>();
         this.resultTypes = new HashMap<>();
         this.results = new HashMap<>();
+        invokeAwareInterfaces(
+                prop,
+                this.objectFactory,
+                this.converterFactory,
+                this.actionFilter,
+                this.methodInvokerFactory,
+                this.methodChecker
+        );
+    }
+
+    /**
+     * 设置指定的所需的接口类型.
+     */
+    protected void invokeAwareInterfaces(Object... objs) {
+        for (Object obj : objs) {
+            if (obj instanceof ActionFactoryAware) {
+                ((ActionFactoryAware) obj).setActionFactory(this);
+            }
+        }
     }
 
     /**
@@ -184,6 +203,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      * @see net.jrouter.annotation.Interceptor
      */
     public void addInterceptors(Object obj) {
+        invokeAwareInterfaces(obj);
         boolean isCls = obj instanceof Class;
         Class<?> cls = isCls ? (Class) obj : objectFactory.getClass(obj);
         Object invoker = isCls ? null : obj;
@@ -207,6 +227,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     //为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
+                        invokeAwareInterfaces(invoker);
                     }
                     //the same object
                     addInterceptor(createInterceptorProxy(m, invoker));
@@ -243,6 +264,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      * @see net.jrouter.annotation.InterceptorStack
      */
     public void addInterceptorStacks(Object obj) {
+        invokeAwareInterfaces(obj);
         boolean isCls = obj instanceof Class;
         Class<?> cls = isCls ? (Class) obj : objectFactory.getClass(obj);
         Object invoker = isCls ? null : obj;
@@ -272,6 +294,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                         //为类对象且调用者为 null
                         if (isCls && invoker == null) {
                             invoker = objectFactory.newInstance(cls);
+                            invokeAwareInterfaces(invoker);
                         }
                         //the same object
                         sortedSet.add(createInterceptorStackProxy(f, invoker));
@@ -316,6 +339,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      * @see net.jrouter.annotation.ResultType
      */
     public void addResultTypes(Object obj) {
+        invokeAwareInterfaces(obj);
         boolean isCls = obj instanceof Class;
         Class<?> cls = isCls ? (Class) obj : objectFactory.getClass(obj);
         Object invoker = isCls ? null : obj;
@@ -339,6 +363,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     //为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
+                        invokeAwareInterfaces(invoker);
                     }
                     //the same object
                     addResultType(createResultTypeProxy(m, invoker));
@@ -375,6 +400,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      * @see net.jrouter.annotation.Result
      */
     public void addResults(Object obj) {
+        invokeAwareInterfaces(obj);
         boolean isCls = obj instanceof Class;
         Class<?> cls = isCls ? (Class) obj : objectFactory.getClass(obj);
         Object invoker = isCls ? null : obj;
@@ -398,6 +424,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     //为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
+                        invokeAwareInterfaces(invoker);
                     }
                     //the same object
                     addResult(createResultProxy(m, invoker));
@@ -499,7 +526,13 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      */
     @lombok.Getter
     @lombok.Setter
-    public static class Properties {
+    public static class Properties implements ActionFactoryAware {
+
+        /**
+         * {@link ActionFactory} object.
+         */
+        @lombok.NonNull
+        private ActionFactory actionFactory;
 
         /**
          * @see AbstractActionFactory#objectFactory
@@ -652,6 +685,17 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 //throw exception if not matched
                 return (T) value;
             }
+        }
+
+        /**
+         * Get {@link ActionFactory} object.
+         *
+         * @param <T> ActionFactory type.
+         *
+         * @return {@link ActionFactory} object.
+         */
+        public <T extends ActionFactory> T getActionFactory() {
+            return (T) actionFactory;
         }
     }
 

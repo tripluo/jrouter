@@ -22,6 +22,8 @@ package net.jrouter;
  */
 public class NotFoundException extends JRouterException {
 
+    private static final long serialVersionUID = 1L;
+
     /**
      * 构造一个包含指定详细消息的NotFoundException。
      *

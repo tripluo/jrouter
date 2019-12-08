@@ -55,7 +55,7 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
     private static final AtomicInteger COUNTER = new AtomicInteger(0x10000);
 
     static {
-//        CtClass.debugDump = System.getProperty("user.home") + "/Desktop" + "/javaDebug";
+        //CtClass.debugDump = System.getProperty("user.home") + "/Desktop" + "/javaDebug";
         ClassPool.getDefault().insertClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
     }
 
@@ -104,7 +104,7 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
             //final
             clazz.setModifiers(Modifier.FINAL);
             //invoke method
-            clazz.addMethod(createInovkeMethod(clazz, targetClass, method));
+            clazz.addMethod(createInvokeMethod(clazz, targetClass, method));
         } finally {
             classPool.removeClassPath(classPath);
             classPool.clearImportedPackages();
@@ -125,7 +125,7 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
      *
      * @throws CannotCompileException when bytecode transformation has failed.
      */
-    private CtMethod createInovkeMethod(CtClass clazz, Class<?> targetClass, Method method) throws
+    private CtMethod createInvokeMethod(CtClass clazz, Class<?> targetClass, Method method) throws
             CannotCompileException {
         StringBuilder body = new StringBuilder("public Object invoke(java.lang.reflect.Method m, Object obj, Object[] params){");
         boolean voidMethod = void.class == method.getReturnType();

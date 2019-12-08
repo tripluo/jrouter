@@ -18,7 +18,6 @@
 package net.jrouter.impl;
 
 import java.lang.reflect.Method;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import net.jrouter.ActionInvocation;
@@ -26,28 +25,12 @@ import net.jrouter.ConverterFactory;
 import net.jrouter.JRouterException;
 import net.jrouter.ParameterConverter;
 import net.jrouter.util.CollectionUtil;
+import net.jrouter.util.MethodUtil;
 
 /**
  * 创建多参数自动映射转换器的工厂类。
  */
 public class MultiParameterConverterFactory implements ConverterFactory {
-
-    /**
-     * Primitive types.
-     */
-    private static final Map<Class<?>, Class<?>> PRIMITIVE_TYPES = new HashMap<>(8);
-
-    static {
-        PRIMITIVE_TYPES.put(boolean.class, Boolean.class);
-        PRIMITIVE_TYPES.put(byte.class, Byte.class);
-        PRIMITIVE_TYPES.put(char.class, Character.class);
-        PRIMITIVE_TYPES.put(double.class, Double.class);
-        PRIMITIVE_TYPES.put(float.class, Float.class);
-        PRIMITIVE_TYPES.put(int.class, Integer.class);
-        PRIMITIVE_TYPES.put(long.class, Long.class);
-        PRIMITIVE_TYPES.put(short.class, Short.class);
-        PRIMITIVE_TYPES.put(void.class, Void.class);
-    }
 
     /**
      * 缓存转换参数匹配的位置
@@ -120,8 +103,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
         @Override
         public Object[] convert(Method method, Object obj, Object[] originalParams, Object[] convertParams) throws
                 JRouterException {
-            Class<?>[] parameterTypes = method.getParameterTypes();
-            int paramSize = parameterTypes.length;
+            int paramSize = method.getParameterTypes().length;
             //无参数的方法
             if (paramSize == 0) {
                 return CollectionUtil.EMPTY_OBJECT_ARRAY;
@@ -130,7 +112,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
                 return new Object[paramSize];
             }
             Object[] allParams = CollectionUtil.append(originalParams, convertParams);
-            int[] idx = match(method, 0, parameterTypes, allParams);
+            int[] idx = match(method, 0, allParams);
             if (paramSize == allParams.length && !CollectionUtil.contains(-1, idx)) {
                 return allParams;
             }
@@ -147,14 +129,14 @@ public class MultiParameterConverterFactory implements ConverterFactory {
          * 如果追加注入的参数类型固定，则会缓存记录。
          *
          * @param method 指定的方法。
-         * @param parameterTypes 方法的参数类型。
+         * @param matchStart 参数匹配起始位置。
          * @param parameters 注入的参数。
          *
          * @return 注入的参数相对于方法参数类型中的映射。
          *
          * @see #methodParametersCache
          */
-        private int[] match(Method method, int matchStart, Class<?>[] parameterTypes, Object[] parameters) {
+        private int[] match(Method method, int matchStart, Object[] parameters) {
             int[] idx = null;
             if (fixedOrder) {
                 //get from cache
@@ -163,26 +145,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
                     return idx;
                 }
             }
-            idx = new int[parameterTypes.length];
-            boolean[] convertMatched = null;
-            if (parameters != null) {
-                convertMatched = new boolean[parameters.length];
-            }
-            for (int i = matchStart; i < idx.length; i++) {
-                //初始值-1, 无匹配
-                idx[i] = -1;
-                if (parameters != null) {
-                    Class<?> parameterType = getClass(parameterTypes[i]);
-                    for (int j = 0; j < parameters.length; j++) {
-                        //不考虑父子优先级，参数按顺序优先匹配。
-                        if (!convertMatched[j] && parameterType.isInstance(parameters[j])) {
-                            idx[i] = j;
-                            convertMatched[j] = true;
-                            break;
-                        }
-                    }
-                }
-            }
+            idx = MethodUtil.match(method, matchStart, parameters);
             if (fixedOrder) {
                 //put in cache
                 methodParametersCache.put(method, idx);
@@ -190,21 +153,5 @@ public class MultiParameterConverterFactory implements ConverterFactory {
             return idx;
         }
 
-        /**
-         * Get Class.
-         *
-         * @param cls Original Class.
-         *
-         * @return Class.
-         */
-        private Class<?> getClass(Class<?> cls) {
-            if (cls.isPrimitive()) {
-                Class<?> pCls = PRIMITIVE_TYPES.get(cls);
-                if (pCls != null) {
-                    return pCls;
-                }
-            }
-            return cls;
-        }
     }
 }

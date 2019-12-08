@@ -2,6 +2,12 @@
 JROUTER CHANGELOG
 ==========================
 https://jrouter.net/
+
+Changes in version 1.8.2 (2019-12-08)
+* 新增ActionFactoryAware接口，提供设置ActionFactory对象。
+* 完善AbstractActionFactory、PathActionFactory，提供属性对象获取ActionFactory对象。
+
+
 Changes in version 1.8.1 (2019-07-06)
 * 重新设计@InterceptorStack注解类，根据匹配路径配置Action的拦截器。
 * 废弃在@Namespace和@Action上指定特定的拦截器集合，减少设计复杂度。

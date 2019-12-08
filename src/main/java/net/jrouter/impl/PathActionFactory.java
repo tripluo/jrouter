@@ -137,6 +137,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         pathActions = new PathTreeMap<>(pathSeparator);
         actionCache = new ActionCache(new java.util.concurrent.ConcurrentHashMap<String, ActionCacheEntry>(),
                 Collections.synchronizedMap(new net.jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber)));
+        invokeAwareInterfaces(this.pathGenerator);
     }
 
     /**
@@ -576,7 +577,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                             + exist.getMethodInfo());
                 } //新增与原有相同的匹配路径，考虑匹配级别是否相同???
                 //TODO
-                //            else if (0 == PathTree.compareMathedPath(newAction.getPath(), exist.getPath())) {
+                //            else if (0 == PathTree.compareMatchedPath(newAction.getPath(), exist.getPath())) {
                 //                throw new JRouterException("Duplicate matched path Action [" + aPath + "] : "
                 //                        + ap.getMethodInfo() + " override "
                 //                        + exist.getMethodInfo());
@@ -600,6 +601,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
      * @see net.jrouter.annotation.Action
      */
     public void addActions(Object obj) {
+        invokeAwareInterfaces(obj);
         //判断传入参数为类或实例对象
         boolean isCls = obj instanceof Class;
         Class<?> cls = isCls ? (Class) obj : getObjectFactory().getClass(obj);
@@ -628,6 +630,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                     } else {
                         if (isCls && invoker == null) {
                             invoker = getObjectFactory().newInstance(cls);
+                            invokeAwareInterfaces(invoker);
                         }
                         //the same object
                         addAction(createActionProxy(m, invoker));
