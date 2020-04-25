@@ -49,7 +49,7 @@ public class ActionFactory2Test {
         //result
         factory.addResultTypes(DefaultResult.class);
 
-        //aciotn
+        //action
         //class
         factory.addActions(net.jrouter.URLTestAction.class);
         //object

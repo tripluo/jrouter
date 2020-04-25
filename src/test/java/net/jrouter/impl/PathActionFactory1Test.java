@@ -57,7 +57,7 @@ public class PathActionFactory1Test {
         properties.setDefaultResultType(TestResult.DEMO);
         factory = new ColonString(properties);
 
-        //path aciotn
+        //path action
         factory.addActions(net.jrouter.URLTestAction.class);
     }
 

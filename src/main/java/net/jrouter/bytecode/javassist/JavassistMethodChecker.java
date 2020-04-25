@@ -64,7 +64,7 @@ public class JavassistMethodChecker {
         this.allMatch = new ArrayList<>();
         this.anyMatch = new ArrayList<>();
         this.sourcePattern = pattern;
-        this.prasePattern(pattern);
+        this.parsePattern(pattern);
     }
 
     /**
@@ -246,7 +246,7 @@ public class JavassistMethodChecker {
     }
 
     //parse &| as separator, no group
-    private void prasePattern(String pattern) {
+    private void parsePattern(String pattern) {
         pattern = StringUtil.trim(pattern, '&', '|');
         List<String> all = new ArrayList<>(4);
         List<String> any = new ArrayList<>(4);
@@ -310,12 +310,12 @@ public class JavassistMethodChecker {
     private static CtMethod toMethod(Method m) throws javassist.NotFoundException {
         ClassPool classPool = ClassPool.getDefault();
         Class[] params = m.getParameterTypes();
-        String[] paramTypeNams = new String[params.length];
-        for (int i = 0; i < paramTypeNams.length; i++) {
-            paramTypeNams[i] = params[i].getName();
+        String[] paramTypeNames = new String[params.length];
+        for (int i = 0; i < paramTypeNames.length; i++) {
+            paramTypeNames[i] = params[i].getName();
         }
         return classPool.get(m.getDeclaringClass().getName()).
-                getDeclaredMethod(m.getName(), classPool.get(paramTypeNams));
+                getDeclaredMethod(m.getName(), classPool.get(paramTypeNames));
     }
 
     /**

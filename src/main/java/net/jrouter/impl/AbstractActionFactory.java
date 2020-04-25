@@ -121,6 +121,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      * @param prop 指定的{@code Properties}。
      */
     public AbstractActionFactory(Properties prop) {
+        prop.afterPropertiesSet();
         //pass properties
         this.objectFactory = prop.objectFactory;
         this.converterFactory = prop.converterFactory;
@@ -536,9 +537,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
         /**
          * @see AbstractActionFactory#objectFactory
+         * @see #loadComponent
          */
         @lombok.NonNull
-        private ObjectFactory objectFactory;
+        private ObjectFactory objectFactory = new DefaultObjectFactory();
 
         /**
          * @see AbstractActionFactory#methodInvokerFactory
@@ -563,27 +565,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         private ActionFilter actionFilter;
 
         /**
-         * <p>
-         * 提供默认的{@code ActionFilter}实现{@link DefaultActionFilter}。
-         * </p>
-         * <p>
-         * 提供默认的{@code ConverterFactory}实现{@link MultiParameterConverterFactory}。
-         * </p>
-         * <p>
-         * 提供默认的{@code MethodInvokerFactory}实现{@link JavassistMethodInvokerFactory}。
-         * </p>
-         * <p>
-         * 提供默认的{@code ObjectFactory}实现{@link DefaultObjectFactory}。
-         * </p>
+         * Empty Constructor.
          */
         public Properties() {
-            objectFactory = new DefaultObjectFactory();
-            converterFactory = new MultiParameterConverterFactory(true);
-            actionFilter = new DefaultActionFilter();
-            //check if javassist is supported
-            if (ClassUtil.isJavassistSupported()) {
-                methodInvokerFactory = new JavassistMethodInvokerFactory();
-            }
+            super();
         }
 
         /**
@@ -684,6 +669,35 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
             } else {
                 //throw exception if not matched
                 return (T) value;
+            }
+        }
+
+        /**
+         * <p>
+         * 提供默认的{@code ActionFilter}实现{@link DefaultActionFilter}。
+         * </p>
+         * <p>
+         * 提供默认的{@code ConverterFactory}实现{@link MultiParameterConverterFactory}。
+         * </p>
+         * <p>
+         * 提供默认的{@code MethodInvokerFactory}实现{@link JavassistMethodInvokerFactory}。
+         * </p>
+         * <p>
+         * 提供默认的{@code ObjectFactory}实现{@link DefaultObjectFactory}。
+         * </p>
+         */
+        protected void afterPropertiesSet() {
+            if (converterFactory == null) {
+                converterFactory = new MultiParameterConverterFactory(true);
+            }
+            if (actionFilter == null) {
+                actionFilter = new DefaultActionFilter();
+            }
+            if (methodInvokerFactory == null) {
+                //check if javassist is supported
+                if (ClassUtil.isJavassistSupported()) {
+                    methodInvokerFactory = new JavassistMethodInvokerFactory();
+                }
             }
         }
 

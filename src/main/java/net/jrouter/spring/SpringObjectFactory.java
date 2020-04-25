@@ -30,7 +30,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 public class SpringObjectFactory implements ObjectFactory, ApplicationContextAware {
 
     /**
-     * springframework 的AutowireCapableBeanFactory对象。
+     * {@link AutowireCapableBeanFactory}对象。
      */
     protected AutowireCapableBeanFactory autowireCapableBeanFactory;
 
@@ -47,14 +47,23 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
     private int autowireMode = AutowireCapableBeanFactory.AUTOWIRE_BY_NAME;
 
     /**
-     * 构造一个空对象。
+     * Empty Constructor.
      */
     public SpringObjectFactory() {
         super();
     }
 
     /**
-     * 构造一个指定ApplicationContext的对象。
+     * Constructor.
+     *
+     * @param autowireCapableBeanFactory {@link AutowireCapableBeanFactory}。
+     */
+    public SpringObjectFactory(AutowireCapableBeanFactory autowireCapableBeanFactory) {
+        this.autowireCapableBeanFactory = autowireCapableBeanFactory;
+    }
+
+    /**
+     * Constructor.
      *
      * @param applicationContext ApplicationContext对象。
      */
@@ -76,7 +85,7 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
     }
 
     /**
-     * If the given context is assignable to AutowireCapbleBeanFactory or contains a parent or a factory that is, then
+     * If the given context is assignable to AutowireCapableBeanFactory or contains a parent or a factory that is, then
      * set the autoWiringFactory appropriately.
      *
      * @param context the application context

@@ -61,7 +61,7 @@ public class DemoThreadActionContextInterceptor {
     /**
      * 返回线程变量中的ActionInvocation对象。
      *
-     * @return ActionInvocationn对象。
+     * @return ActionInvocation对象。
      */
     public static ActionInvocation get() {
         return THREAD_LOCAL.get();

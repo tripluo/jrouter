@@ -49,11 +49,11 @@ class PathTreeMap<V> extends AbstractMap<String, V> implements Serializable {
     /**
      * 添加指定的全路径与其相关联的值至视图。
      *
-     * @param fullpath 指定的全路径。
+     * @param fullPath 指定的全路径。
      * @param value 与路径相关联的值。
      */
-    private void addEntrySet(String fullpath, V value) {
-        entrySet.add(new SimpleImmutableEntry<>(fullpath, value));
+    private void addEntrySet(String fullPath, V value) {
+        entrySet.add(new SimpleImmutableEntry<>(fullPath, value));
     }
 
     @Override
@@ -62,11 +62,11 @@ class PathTreeMap<V> extends AbstractMap<String, V> implements Serializable {
     }
 
     @Override
-    public V put(String fullpath, V value) {
-        V res = tree.put(fullpath, value);
+    public V put(String fullPath, V value) {
+        V res = tree.put(fullPath, value);
         //if add new to addEntrySet
         if (res == null) {
-            addEntrySet(fullpath, value);
+            addEntrySet(fullPath, value);
         }
         return res;
     }
@@ -74,13 +74,13 @@ class PathTreeMap<V> extends AbstractMap<String, V> implements Serializable {
     /**
      * @see PathTree#get(String, Map)
      */
-    public V get(String fullpath, Map<String, String> matchParameters) {
-        return tree.get(fullpath, matchParameters);
+    public V get(String fullPath, Map<String, String> matchParameters) {
+        return tree.get(fullPath, matchParameters);
     }
 
     @Override
-    public V get(Object fullpath) {
-        return tree.get(fullpath.toString(), null);
+    public V get(Object fullPath) {
+        return tree.get(fullPath.toString(), null);
     }
 
     @Override
@@ -145,40 +145,40 @@ class PathTree<V> implements Serializable {
     /**
      * 判断是否为根路径。
      *
-     * @param fullpath 指定的全路径。
+     * @param fullPath 指定的全路径。
      *
      * @return 是否为根路径。
      */
-    private boolean isRoot(String fullpath) {
-        return fullpath.length() == 1 && pathSeparator == fullpath.charAt(0);
+    private boolean isRoot(String fullPath) {
+        return fullPath.length() == 1 && pathSeparator == fullPath.charAt(0);
     }
 
     /**
      * 添加路径与其相关联的值，并返回原有路径的值；
      * 如果原有路径已存在值则保留并返回该值，不存在则返回 null。
      *
-     * @param fullpath 指定的相关路径。
+     * @param fullPath 指定的相关路径。
      * @param value 与路径相关联的值。
      *
      * @return 以前与路径相关联的值，如果没有则返回 null。
      *
      * @throws NullPointerException 如果路径相关联的值为 null。
      */
-    public V put(String fullpath, V value) {
+    public V put(String fullPath, V value) {
         if (value == null) {
             throw new NullPointerException();//NOPMD
         }
         //root path
-        if (isRoot(fullpath)) {
+        if (isRoot(fullPath)) {
             V oldRoot = root.value;
             root.value = value;
             return oldRoot;
         }
 
-        final String[] paths = parsePath(fullpath);
+        final String[] paths = parsePath(fullPath);
         int len = paths.length;
         if (len == 0) {
-            throw new IllegalArgumentException("Null path : " + fullpath);
+            throw new IllegalArgumentException("Null path : " + fullPath);
         }
         TreeNode<V> cur = root;
         for (int i = 0; i < len - 1; i++) {
@@ -194,28 +194,28 @@ class PathTree<V> implements Serializable {
     /**
      * 获取指定路径相关联的值；如果不包含该路径的关联关系，则返回 null。
      *
-     * @param fullpath 指定路径的名称。
+     * @param fullPath 指定路径的名称。
      *
      * @return 指定路径相关联的值；如果不包含该路径的关联关系，则返回 null。
      */
-    public V get(String fullpath) {
-        return get(fullpath, null);
+    public V get(String fullPath) {
+        return get(fullPath, null);
     }
 
     /**
      * 获取指定路径相关联的值；如果不包含该路径的关联关系，则返回 null。
      *
-     * @param fullpath 指定路径的名称。
+     * @param fullPath 指定路径的名称。
      * @param matchParameters 路径中匹配的键值映射。
      *
      * @return 指定路径相关联的值；如果不包含该路径的关联关系，则返回 null。
      */
-    public V get(String fullpath, Map<String, String> matchParameters) {
+    public V get(String fullPath, Map<String, String> matchParameters) {
         //root path
-        if (isRoot(fullpath)) {
+        if (isRoot(fullPath)) {
             return root.value;
         }
-        String[] paths = parsePath(fullpath);
+        String[] paths = parsePath(fullPath);
 
         int len = paths.length;
         if (len == 0) {
@@ -246,7 +246,7 @@ class PathTree<V> implements Serializable {
             }
 //            System.out.println("Next : " + next + ", Current : " + current);
             if (next.isEmpty()) {
-//                System.out.println("Not Found For [" + fullpath + "]");
+//                System.out.println("Not Found For [" + fullPath + "]");
                 //not find
                 return null;
             }
@@ -273,7 +273,7 @@ class PathTree<V> implements Serializable {
             }
         }
         if (next.isEmpty()) {
-//            System.out.println("Not Found For [" + fullpath + "]");
+//            System.out.println("Not Found For [" + fullPath + "]");
             //not find
             return null;
         }
@@ -347,23 +347,23 @@ class PathTree<V> implements Serializable {
     /**
      * 将全路径解析成字符串数组，排除了"连续分割符"。
      *
-     * @param 全路径字符串。
+     * @param fullPath 全路径字符串。
      *
      * @return 解析后的事字符串数组。
      */
-    private String[] parsePath(String fullpath) {
+    private String[] parsePath(String fullPath) {
         List<String> list = new ArrayList<>(5);
-        //fullpath is trimmed
+        //fullPath is trimmed
         int last = -1;
         int cur = -1;
-        int len = fullpath.length();
+        int len = fullPath.length();
         for (int i = 0; i < len; i++) {
-            if (pathSeparator == fullpath.charAt(i)) {
+            if (pathSeparator == fullPath.charAt(i)) {
                 cur = i;
                 if (cur > last) {
                     //avoid ...///...
                     if (cur - last > 1) {
-                        list.add(fullpath.substring(last + 1, cur));
+                        list.add(fullPath.substring(last + 1, cur));
                     }
                     last = cur;
                 }
@@ -371,7 +371,7 @@ class PathTree<V> implements Serializable {
         }
         if (cur < len - 1) {
             cur = len;
-            list.add(fullpath.substring(last + 1, cur));
+            list.add(fullPath.substring(last + 1, cur));
         }
         return list.toArray(new String[list.size()]);
     }
@@ -503,7 +503,6 @@ class PathTree<V> implements Serializable {
          *
          * @param paths 子节点全路径解析后的路径字符串数组。
          * @param child 指定的子路径名称。
-         * @param value 与子路径相关联的值，仅路径的末节点包含相关联的值。
          *
          * @return 新增子路径的节点；如果原子路径节点存在则返回原子路径节点。
          */
@@ -617,7 +616,7 @@ class PathTree<V> implements Serializable {
          * @param leaf 叶子节点。
          * @param paths 节点全路径解析后的路径字符串数组。
          */
-        private void setLeafIndexKeys(TreeNode<V> leaf, String paths[]) {
+        private void setLeafIndexKeys(TreeNode<V> leaf, String[] paths) {
             //仅叶子节点有相关联的值才添加索引/值数组
             if (leaf.value != null) {
                 List<IndexKey> keys = new ArrayList<>(paths.length);

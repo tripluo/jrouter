@@ -19,6 +19,7 @@ package net.jrouter.spring;
 
 import java.util.*;
 import net.jrouter.*;
+import net.jrouter.annotation.Action;
 import net.jrouter.config.AopAction;
 import net.jrouter.config.Configuration;
 import net.jrouter.impl.PathActionFactory;
@@ -90,7 +91,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     /**
      * 设置ActionFactory中创建{@link Action}转换器。
      *
-     * @see AbstractActionFactory#getActionFilter()
+     * @see ActionFactory#getActionFilter()
      */
     @lombok.Setter
     private ActionFilter actionFilter;
@@ -99,7 +100,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      * 添加ActionFactory的属性映射集合。
      *
      * @see Configuration#actionFactoryProperties
-     * @see net.jrouter.impl.PathActionFactory#setActionFactoryProperties(java.util.Map)
+     * @see net.jrouter.impl.PathActionFactory.Properties#properties(Map)
      */
     @lombok.Setter
     private Properties actionFactoryProperties = new Properties();

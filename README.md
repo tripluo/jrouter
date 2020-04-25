@@ -30,7 +30,7 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.8.2</version>
+    <version>1.8.3</version>
 </dependency>
 ```
 
@@ -67,7 +67,7 @@ import org.springframework.context.annotation.Bean;
         properties.setObjectFactory(new SpringObjectFactory(applicationContext));
         //default:null
         properties.setMethodChecker(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke(**)|net.jrouter.ActionInvocation.invokeActionOnly(**)"));
-        //default:PathActionFactory.$
+        //default:PathActionFactory.StringPathGenerator
         properties.setPathGenerator(...);
 
         PathActionFactory actionFactory = new PathActionFactory(properties);
@@ -107,14 +107,14 @@ import org.springframework.context.annotation.Bean;
     <!-- optional default -->
     <property name="actionFactoryProperties">
         <value>
-            <!-- optional default:null deprecated since 1.6.6 -->
-            PathActionInvocation
             <!-- optional default:null -->
             defaultInterceptorStack = empty
             <!-- optional default:null -->
             defaultResultType = empty
             <!-- optional default -->
             pathSeparator = /
+            <!-- optional default -->
+            pathGenerator = net.jrouter.impl.PathActionFactory$StringPathGenerator
             <!-- optional default:null -->
             extension =
             <!-- optional default -->

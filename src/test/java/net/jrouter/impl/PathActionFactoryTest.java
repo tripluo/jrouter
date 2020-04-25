@@ -52,7 +52,7 @@ public class PathActionFactoryTest {
         //result
         factory.addResultTypes(DefaultResult.class);
 
-        //path aciotn
+        //path action
         factory.addActions(net.jrouter.PathTestAction.class);
 
     }

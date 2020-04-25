@@ -348,7 +348,6 @@ public class JavassistProxyObjectFactory {
         Collection<Method> mismatched = Collections.EMPTY_LIST;
     }
 
-
     /**
      * 匹配规则： 方法同名、返回值兼容、忽略参数个数类型、默认顺序优先。
      * <p>

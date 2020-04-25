@@ -87,7 +87,7 @@ public class ActionFactoryTest {
         //result
         factory.addResultTypes(DefaultResult.class);
 
-        //aciotn
+        //action
         factory.addActions(net.jrouter.SimpleAction.class);
 
         assertSame(null, factory.getDefaultInterceptorStack());

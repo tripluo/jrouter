@@ -127,6 +127,10 @@ public class ClassUtil {
                             }
                         } catch (IOException e) {
                             LOG.error("IOException when loading files from : " + url, e);
+                        } finally {
+                            if (jar != null) {
+                                jar.close();
+                            }
                         }
                     }
                 }

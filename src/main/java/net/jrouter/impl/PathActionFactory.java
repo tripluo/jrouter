@@ -479,32 +479,32 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         /**
          * "type:location"形式的字符串解析；以第一个':'划分。
          *
-         * @param pathinfo "type:location"形式的字符串。
+         * @param pathInfo "type:location"形式的字符串。
          * @param def type和location的默认值。
          *
          * @return 解析后的{type,location}字符串数组。
          */
-        private static String[] parseMatch(String pathinfo, String... def) {
+        private static String[] parseMatch(String pathInfo, String... def) {
             String type = def[0];
             String loc = def[1];
-            int idx = pathinfo.indexOf(':');
+            int idx = pathInfo.indexOf(':');
             String temp = null;
             switch (idx) {
                 case -1:
-                    if (!(temp = StringUtil.trim(pathinfo)).isEmpty()) {
+                    if (!(temp = StringUtil.trim(pathInfo)).isEmpty()) {
                         type = temp;
                     }
                     break;
                 case 0:
-                    if (!(temp = StringUtil.trim(pathinfo.substring(1))).isEmpty()) {
+                    if (!(temp = StringUtil.trim(pathInfo.substring(1))).isEmpty()) {
                         loc = temp;
                     }
                     break;
                 default:
-                    if (!(temp = StringUtil.trim(pathinfo.substring(0, idx))).isEmpty()) {
+                    if (!(temp = StringUtil.trim(pathInfo.substring(0, idx))).isEmpty()) {
                         type = temp;
                     }
-                    if (!(temp = StringUtil.trim(pathinfo.substring(idx + 1))).isEmpty()) {
+                    if (!(temp = StringUtil.trim(pathInfo.substring(idx + 1))).isEmpty()) {
                         loc = temp;
                     }
                     break;
@@ -655,8 +655,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
     private PathActionProxy[] createActionProxy(final Method method, final Object obj) throws IllegalAccessException,
             InvocationTargetException {
         Namespace ns = getActionFilter().getNamespace(obj, method);
-        //trim empty and '/'
-        String namespace = ns == null ? Character.toString(pathSeparator) : pathSeparator + StringUtil.trim(ns.name(), pathSeparator);
+        String namespace = buildNamespace(this.pathSeparator, ns);
         //use ActionFilter first
         Action action = getActionFilter().getAction(obj, method);
         //如果Action为null
@@ -808,6 +807,14 @@ public class PathActionFactory extends AbstractActionFactory<String> {
     }
 
     /**
+     * Build namespaces' value.
+     */
+    private static String buildNamespace(char pathSeparator, Namespace ns) {
+        //trim empty and '/'
+        return ns == null ? Character.toString(pathSeparator) : pathSeparator + StringUtil.trim(ns.name(), pathSeparator);
+    }
+
+    /**
      * 由指定拦截栈名称添加拦截器至Action的拦截器集合。
      *
      * @param interceptors Action的拦截器集合。
@@ -871,45 +878,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         /**
          * @see PathActionFactory#pathGenerator
          */
-        private PathGenerator<String> pathGenerator = new PathGenerator<String>() {
-
-            @Override
-            public String[] generatePath(Class<?> targetClass, Method method) {
-                Namespace ns = getActionFilter().getNamespace(targetClass, method);
-                //trim empty and '/'
-                String namespace = ns == null ? Character.toString(pathSeparator) : pathSeparator + StringUtil.trim(ns.name(), pathSeparator);
-                //use ActionFilter first
-                Action action = getActionFilter().getAction(targetClass, method);
-                //如果Action为null
-                if (action == null) {
-                    if (ns != null && ns.autoIncluded()) {
-                        action = EMPTY_ACTION;
-                    }
-                    if (action == null) {
-                        throw new NotFoundException("@Action or specific ActionFilter is required : " + MethodUtil.getMethod(method));
-                    }
-                }
-
-                String[] names = action.name();
-                //name优先value
-                if (names.length == 0) {
-                    names = action.value();
-                }
-                //name/value都未赋值或Action为null的情况
-                if (names.length == 0) {
-                    names = new String[]{""};
-                }
-                //去重复的path
-                Collection<String> paths = new LinkedHashSet<>(1);
-                for (String name : names) {
-                    if (name != null) {
-                        //Action名称可为空字符串
-                        paths.add(buildActionPath(namespace, name.trim(), method));
-                    }
-                }
-                return paths.toArray(new String[paths.size()]);
-            }
-        };
+        private PathGenerator<String> pathGenerator;
 
         /**
          * Default Constructor.
@@ -960,6 +929,96 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             return this;
         }
 
+        @Override
+        protected void afterPropertiesSet() {
+            super.afterPropertiesSet();
+            if (pathGenerator == null) {
+                pathGenerator = new StringPathGenerator(pathSeparator);
+            }
+        }
+    }
+
+    @Override
+    public Map<String, PathActionProxy> getActions() {
+        return pathActions;
+    }
+
+    /**
+     * 返回缓存的Action路径与其代理对象的映射。
+     *
+     * @return 缓存的Action路径与其代理对象的映射。
+     */
+    public Map<String, Object> getActionCache() {
+        return (Map) actionCache.toMap();
+    }
+
+    /**
+     * {@code String}类型路径生成器。
+     */
+    public static class StringPathGenerator implements PathGenerator<String>, ActionFactoryAware {
+
+        /**
+         * @see PathActionFactory.Properties#pathSeparator
+         */
+        @lombok.Getter
+        private final char pathSeparator;
+
+        @lombok.Getter
+        private ActionFactory actionFactory;
+
+        /**
+         * Constructor.
+         */
+        public StringPathGenerator() {
+            this(PathTree.PATH_SEPARATOR);
+        }
+
+        /**
+         * Constructor.
+         *
+         * @param pathSeparator 路径分隔符。
+         */
+        public StringPathGenerator(char pathSeparator) {
+            this.pathSeparator = pathSeparator;
+        }
+
+        @Override
+        public String[] generatePath(Class<?> targetClass, Method method) {
+            Namespace ns = getActionFactory().getActionFilter().getNamespace(targetClass, method);
+            //trim empty and '/'
+            String namespace = buildNamespace(pathSeparator, ns);
+            //use ActionFilter first
+            Action action = getActionFactory().getActionFilter().getAction(targetClass, method);
+            //如果Action为null
+            if (action == null) {
+                if (ns != null && ns.autoIncluded()) {
+                    action = EMPTY_ACTION;
+                }
+                if (action == null) {
+                    throw new NotFoundException("@Action or specific ActionFilter is required : " + MethodUtil.getMethod(method));
+                }
+            }
+
+            String[] names = action.name();
+            //name优先value
+            if (names.length == 0) {
+                names = action.value();
+            }
+            //name/value都未赋值或Action为null的情况
+            if (names.length == 0) {
+                names = new String[]{""};
+            }
+            //去重复的path
+            Collection<String> paths = new LinkedHashSet<>(1);
+            for (String name : names) {
+                if (name != null) {
+                    //Action名称可为空字符串
+                    paths.add(buildActionPath(namespace, name.trim(), method));
+                }
+            }
+            return paths.toArray(new String[paths.size()]);
+        }
+
         /**
          * 提供继承修改构建Action路径。
          * 最终构建的路径已删除前导空白和尾部空白、以{@linkplain #getPathSeparator() pathSeparator}起始、
@@ -996,20 +1055,10 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             return path;
         }
 
-    }
-
-    @Override
-    public Map<String, PathActionProxy> getActions() {
-        return pathActions;
-    }
-
-    /**
-     * 返回缓存的Action路径与其代理对象的映射。
-     *
-     * @return 缓存的Action路径与其代理对象的映射。
-     */
-    public Map<String, Object> getActionCache() {
-        return (Map) actionCache.toMap();
+        @Override
+        public void setActionFactory(ActionFactory actionFactory) {
+            this.actionFactory = actionFactory;
+        }
     }
 
     /**

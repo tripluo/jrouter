@@ -58,7 +58,7 @@ public class ActionFactory3Test {
         //result
         factory1.addResultTypes(DefaultResult.class);
 
-        //aciotn
+        //action
         factory1.addActions(net.jrouter.URLTestAction.class);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ public class ActionFactory3Test {
         //result
         factory2.addResultTypes(DefaultResult.class);
 
-        //aciotn
+        //action
         factory2.addActions(net.jrouter.URLTestAction2.class);
     }
 
