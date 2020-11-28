@@ -74,7 +74,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      * 创建方法转换器的工厂对象。
      */
     @lombok.Getter
-    private final ConverterFactory<ActionInvocation<P>> converterFactory;
+    private final ConverterFactory converterFactory;
 
     /**
      * 方法检查器。

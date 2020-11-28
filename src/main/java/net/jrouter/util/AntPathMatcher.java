@@ -79,6 +79,10 @@ public class AntPathMatcher {
 
     private String pathSeparator = DEFAULT_PATH_SEPARATOR;
 
+    @lombok.Setter
+    private boolean caseSensitive = true;
+
+    @lombok.Setter
     private boolean trimTokens = false;
 
     public AntPathMatcher() {
@@ -95,15 +99,6 @@ public class AntPathMatcher {
      */
     public void setPathSeparator(String pathSeparator) {
         this.pathSeparator = (pathSeparator != null ? pathSeparator : DEFAULT_PATH_SEPARATOR);
-    }
-
-    /**
-     * Specify whether to trim tokenized paths and patterns.
-     * <p>
-     * Default is {@code false}.
-     */
-    public void setTrimTokens(boolean trimTokens) {
-        this.trimTokens = trimTokens;
     }
 
     /**
@@ -172,12 +167,15 @@ public class AntPathMatcher {
      * @return {@code true} if the supplied {@code path} matched, {@code false} if it didn't
      */
     protected boolean doMatch(String pattern, String path, boolean fullMatch, Map<String, String> uriTemplateVariables) {
-
         if (path.startsWith(this.pathSeparator) != pattern.startsWith(this.pathSeparator)) {
             return false;
         }
 
         String[] pattDirs = tokenizePath(pattern);
+        if (fullMatch && this.caseSensitive && !isPotentialMatch(path, pattDirs)) {
+            return false;
+        }
+
         String[] pathDirs = tokenizePath(path);
 
         int pattIdxStart = 0;
@@ -292,6 +290,57 @@ public class AntPathMatcher {
         }
 
         return true;
+    }
+
+    private boolean isPotentialMatch(String path, String[] pattDirs) {
+        if (!this.trimTokens) {
+            int pos = 0;
+            for (String pattDir : pattDirs) {
+                int skipped = skipSeparator(path, pos, this.pathSeparator);
+                pos += skipped;
+                skipped = skipSegment(path, pos, pattDir);
+                if (skipped < pattDir.length()) {
+                    return (skipped > 0 || (pattDir.length() > 0 && isWildcardChar(pattDir.charAt(0))));
+                }
+                pos += skipped;
+            }
+        }
+        return true;
+    }
+
+    private int skipSegment(String path, int pos, String prefix) {
+        int skipped = 0;
+        for (int i = 0; i < prefix.length(); i++) {
+            char c = prefix.charAt(i);
+            if (isWildcardChar(c)) {
+                return skipped;
+            }
+            int currPos = pos + skipped;
+            if (currPos >= path.length()) {
+                return 0;
+            }
+            if (c == path.charAt(currPos)) {
+                skipped++;
+            }
+        }
+        return skipped;
+    }
+
+    private int skipSeparator(String path, int pos, String separator) {
+        int skipped = 0;
+        while (path.startsWith(separator, pos + skipped)) {
+            skipped += separator.length();
+        }
+        return skipped;
+    }
+
+    private boolean isWildcardChar(char c) {
+        for (char candidate : WILDCARD_CHARS) {
+            if (c == candidate) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -208,7 +208,7 @@ public class JavassistProxyObjectFactory {
         Class<?>[] targetParameterTypes = target.getParameterTypes();
         int targetParameterLength = targetParameterTypes.length;
         if (targetParameterLength != 0) {
-            int[] idx = MethodUtil.match(target, 0, proxyParameterTypes);
+            int[] idx = MethodUtil.match(target, proxyParameterTypes);
             //p1,p2...pn
             for (int i = 0; i < targetParameterLength - 1; i++) {
                 if (idx[i] == -1) {

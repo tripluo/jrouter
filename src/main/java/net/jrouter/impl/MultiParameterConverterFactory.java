@@ -90,7 +90,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
      * 此参数转换器可能需要ActionFactory支持，在创建ActionInvocation时区分处理原始参数和转换参数。
      */
     @Override
-    public ParameterConverter getParameterConverter(ActionInvocation actionInvocation) {
+    public ParameterConverter getParameterConverter() {
         return parameterConverter;
     }
 
@@ -112,10 +112,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
                 return new Object[paramSize];
             }
             Object[] allParams = CollectionUtil.append(originalParams, convertParams);
-            int[] idx = match(method, 0, allParams);
-            if (paramSize == allParams.length && !CollectionUtil.contains(-1, idx)) {
-                return allParams;
-            }
+            int[] idx = match(method, allParams);
             Object[] newArgs = new Object[paramSize];
             for (int i = 0; i < paramSize; i++) {
                 newArgs[i] = (idx[i] == -1 ? null : allParams[idx[i]]);
@@ -129,14 +126,13 @@ public class MultiParameterConverterFactory implements ConverterFactory {
          * 如果追加注入的参数类型固定，则会缓存记录。
          *
          * @param method 指定的方法。
-         * @param matchStart 参数匹配起始位置。
          * @param parameters 注入的参数。
          *
          * @return 注入的参数相对于方法参数类型中的映射。
          *
          * @see #methodParametersCache
          */
-        private int[] match(Method method, int matchStart, Object[] parameters) {
+        private int[] match(Method method, Object[] parameters) {
             int[] idx = null;
             if (fixedOrder) {
                 //get from cache
@@ -145,7 +141,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
                     return idx;
                 }
             }
-            idx = MethodUtil.match(method, matchStart, parameters);
+            idx = MethodUtil.match(method, parameters);
             if (fixedOrder) {
                 //put in cache
                 methodParametersCache.put(method, idx);

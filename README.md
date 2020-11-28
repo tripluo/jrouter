@@ -30,7 +30,7 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.8.3</version>
+    <version>1.8.4</version>
 </dependency>
 ```
 

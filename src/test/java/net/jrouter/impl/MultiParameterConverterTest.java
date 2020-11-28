@@ -35,6 +35,7 @@ public class MultiParameterConverterTest {
     public void testConvert() throws Exception {
 
         Object obj = new Object();
+        Object[] objects = new Object[0];
         CharSequence str1 = "String_1";
         CharSequence str2 = "String_2";
         CharSequence sb1 = new StringBuilder("StringBuilder_1");
@@ -83,6 +84,10 @@ public class MultiParameterConverterTest {
         convert = new Object[]{sb1};
         assertArrayEquals(new Object[]{null, sb1}, testConvertMethod(c, "test5", new Object[]{sb1}, null));
         assertArrayEquals(new Object[]{null, sb1}, testConvertMethod(c, "test5", new Object[]{obj, sb1}, null));
+        assertArrayEquals(new Object[]{null, null}, testConvertMethod(c, "test5", new Object[]{objects}, null));
+        assertArrayEquals(new Object[]{str1, sb1}, testConvertMethod(c, "test5", new Object[]{str1, sb1}, null));
+        assertArrayEquals(new Object[]{str1, sb1}, testConvertMethod(c, "test5", new Object[]{sb1, str1}, null));
+        assertArrayEquals(new Object[]{str1, sb2}, testConvertMethod(c, "test5", new Object[]{str1, sb2, sb1}, null));
 
         //test6(CharSequence s1, CharSequence s2, String obj)
         assertArrayEquals(new Object[3], testConvertMethod(c, "test6", new Object[]{obj}, null));

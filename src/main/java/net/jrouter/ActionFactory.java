@@ -58,11 +58,9 @@ public interface ActionFactory<P> {
     /**
      * 返回创建方法转换器的工厂对象。
      *
-     * @param <T> ActionInvocation type.
-     *
      * @return 创建方法转换器的工厂对象。
      */
-    <T extends ActionInvocation<P>> ConverterFactory<T> getConverterFactory();
+    ConverterFactory getConverterFactory();
 
     /**
      * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。

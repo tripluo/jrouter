@@ -260,6 +260,71 @@ public class CollectionUtil {
     }
 
     /**
+     * 转换{@code booleans}数组中{@code true}值下标为相应{@code int}数组。
+     *
+     * @param booleans {@code boolean} array
+     *
+     * @return {@code int} array
+     */
+    public static int[] convert(boolean[] booleans) {
+        if (booleans == null) {
+            return null;
+        }
+        if (booleans.length == 0) {
+            return EMPTY_INT_ARRAY;
+        }
+        int size = 0;
+        for (boolean b : booleans) {
+            if (b) {
+                size++;
+            }
+        }
+        if (size == 0) {
+            return EMPTY_INT_ARRAY;
+        }
+        int[] res = new int[size];
+        int idx = 0;
+        for (int i = 0; i < booleans.length; i++) {
+            if (booleans[i]) {
+                res[idx++] = i;
+            }
+        }
+        return res;
+    }
+
+    /**
+     * 转换{@code int}数组为相应{@code boolean}数组（0正数下标为{@code true}）。
+     *
+     * @param nums {@code int} array
+     *
+     * @return {@code boolean} array
+     */
+    public static boolean[] convert(int[] nums) {
+        if (nums == null) {
+            return null;
+        }
+        if (nums.length == 0) {
+            return EMPTY_BOOLEAN_ARRAY;
+        }
+        int max = Integer.MIN_VALUE;
+        for (int num : nums) {
+            if (num > max) {
+                max = num;
+            }
+        }
+        if (max <= 0) {
+            return EMPTY_BOOLEAN_ARRAY;
+        }
+        boolean[] res = new boolean[max + 1];
+        for (int num : nums) {
+            if (num >= 0) {
+                res[num] = true;
+            }
+        }
+        return res;
+    }
+
+    /**
      * 依照指定的字符解析字符串至指定类型的集合。
      * 如果指定的集合为 null，则默认设置为{@link ArrayList}集合类型；
      * 如果原字符串为 null，则直接返回集合；

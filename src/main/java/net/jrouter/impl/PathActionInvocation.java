@@ -83,8 +83,9 @@ public class PathActionInvocation implements ActionInvocation<String> {
     private Result result;
 
     /** Action路径的参数匹配映射 */
+    @lombok.Getter
     @lombok.Setter(lombok.AccessLevel.PACKAGE)
-    private Map<String, String> actionPathParameters;
+    private Map<String, String> pathParameters;
 
     /** 方法参数转换器 */
     @Dynamic
@@ -113,7 +114,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
     @Override
     public Object invokeActionOnly(Object... params) throws InvocationProxyException {
         Object[] originalParams = this.originalParameters;
-        //addititional parameters pass to Actoin
+        //additional parameters pass to Action
         if (CollectionUtil.isNotEmpty(params)) {
             originalParams = CollectionUtil.append(params, this); //TODO
         }
@@ -133,7 +134,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
             throw new IllegalStateException("Action [" + actionProxy.getPath() + "] has already been executed");
         }
         if (parameterConverter == null && actionFactory.getConverterFactory() != null) {
-            parameterConverter = actionFactory.getConverterFactory().getParameterConverter(this);
+            parameterConverter = actionFactory.getConverterFactory().getParameterConverter();
         }
         //recursive invoke
         if (interceptors != null && interceptorIndex < interceptors.size()) {
@@ -153,17 +154,6 @@ public class PathActionInvocation implements ActionInvocation<String> {
     @Override
     public Object[] getParameters() {
         return originalParameters;
-    }
-
-    /**
-     * TODO
-     * <p>
-     * 返回Action路径匹配的键值映射，不包含任何匹配的键值则返回空映射。
-     *
-     * @return Action路径匹配的键值映射。
-     */
-    public Map<String, String> getActionPathParameters() {
-        return actionPathParameters;
     }
 
     /**

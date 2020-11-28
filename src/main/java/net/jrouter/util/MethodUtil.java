@@ -226,12 +226,12 @@ public class MethodUtil {
      * 匹配顺序不考虑父子优先级，指定参数按顺序优先匹配；{@code null}不匹配任何参数类型。
      *
      * @param method 指定的方法。
-     * @param matchStart 参数匹配起始位置。
      * @param actualParameterTypes 指定的参数类型。
+     * @param excludes 排除方法参数的下标。
      *
      * @return 指定参数类型相对于方法参数类型的映射。
      */
-    public static int[] match(Method method, int matchStart, Class<?>[] actualParameterTypes) {
+    public static int[] match(Method method, Class<?>[] actualParameterTypes, boolean... excludes) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         int[] idx = new int[parameterTypes.length];
         //flags
@@ -239,9 +239,12 @@ public class MethodUtil {
         if (actualParameterTypes != null) {
             convertMatched = new boolean[actualParameterTypes.length];
         }
-        for (int i = matchStart; i < idx.length; i++) {
+        for (int i = 0; i < idx.length; i++) {
             //初始值-1, 无匹配
             idx[i] = -1;
+            if (excludes != null && i < excludes.length && excludes[i] == true) {
+                continue;
+            }
             if (actualParameterTypes != null) {
                 Class<?> parameterType = getObjectClass(parameterTypes[i]);
                 for (int j = 0; j < actualParameterTypes.length; j++) {
@@ -258,33 +261,36 @@ public class MethodUtil {
     }
 
     /**
-     * 匹配指定参数相对于方法参数类型的映射；
+     * 方法参数类型相对于指定参数的匹配映射；
      * 匹配顺序不考虑父子优先级，指定参数按顺序优先匹配；{@code null}不匹配任何参数类型。
      *
      * @param method 指定的方法。
-     * @param matchStart 参数匹配起始位置。
      * @param parameters 指定的参数。
+     * @param excludes 排除方法参数的下标。
      *
-     * @return 指定参数相对于方法参数类型的映射。
+     * @return 方法参数类型相对于指定参数的映射。
      */
-    public static int[] match(Method method, int matchStart, Object[] parameters) {
+    public static int[] match(Method method, Object[] parameters, boolean... excludes) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         int[] idx = new int[parameterTypes.length];
         //flags
-        boolean[] convertMatched = null;
+        boolean[] parameterMatched = null;
         if (parameters != null) {
-            convertMatched = new boolean[parameters.length];
+            parameterMatched = new boolean[parameters.length];
         }
-        for (int i = matchStart; i < idx.length; i++) {
+        for (int i = 0; i < idx.length; i++) {
             //初始值-1, 无匹配
             idx[i] = -1;
+            if (excludes != null && i < excludes.length && excludes[i] == true) {
+                continue;
+            }
             if (parameters != null) {
                 Class<?> parameterType = getObjectClass(parameterTypes[i]);
                 for (int j = 0; j < parameters.length; j++) {
                     //不考虑父子优先级，参数按顺序优先匹配。
-                    if (!convertMatched[j] && parameterType.isInstance(parameters[j])) {
+                    if (!parameterMatched[j] && parameterType.isInstance(parameters[j])) {
                         idx[i] = j;
-                        convertMatched[j] = true;
+                        parameterMatched[j] = true;
                         break;
                     }
                 }

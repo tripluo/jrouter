@@ -5,17 +5,44 @@
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.8.3</version>
+    <version>1.8.4</version>
     <name>JRouter</name>
     <inceptionYear>2010</inceptionYear>
     <url>https://jrouter.net/</url>
-
+    <licenses>
+        <license>
+            <name>The Apache Software License, Version 2.0</name>
+            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:git@github.com:tripluo/jrouter.git</connection>
+        <developerConnection>scm:git:git@github.com:tripluo/jrouter.git</developerConnection>
+        <url>https://github.com/tripluo/jrouter</url>
+    </scm>
+    <developers>
+        <developer>
+            <id>tripluo</id>
+            <name>Luo Li</name>
+            <email>sunjumper@163.com</email>
+        </developer>
+    </developers>
+    <description>
+        jrouter是一个围绕对象方法基于责任链（拦截器）模式设计的开源轻量级Java容器。它专注于方法的映射、调用、拦截和结果处理，采用基于配置和注解的方式来抽取和收集程序中对象的方法（method）以用于路由映射，HTTP控制器，RPC，各种应用等。
+    </description>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.version>4.3.28.RELEASE</spring.version>
+        <checkstyle.config.file></checkstyle.config.file>
+        <pmd.rule.file></pmd.rule.file>
+    </properties>
     <dependencies>
         <!-- slf4j -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.25</version>
+            <version>1.7.30</version>
         </dependency>
         <!-- logback -->
         <dependency>
@@ -40,7 +67,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.25</version>
+            <version>1.7.30</version>
             <optional>true</optional>
         </dependency>
         <!-- javassist -->
@@ -61,7 +88,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
         <!-- spring test -->
@@ -294,34 +321,5 @@
                 </repository>
             </distributionManagement>
         </profile>
-
     </profiles>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.25.RELEASE</spring.version>
-        <checkstyle.config.file></checkstyle.config.file>
-        <pmd.rule.file></pmd.rule.file>
-    </properties>
-    <licenses>
-        <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-    <scm>
-        <connection>scm:git:git@github.com:tripluo/jrouter.git</connection>
-        <developerConnection>scm:git:git@github.com:tripluo/jrouter.git</developerConnection>
-        <url>https://github.com/tripluo/jrouter</url>
-    </scm>
-    <developers>
-        <developer>
-            <id>tripluo</id>
-            <name>Luo Li</name>
-            <email>sunjumper@163.com</email>
-        </developer>
-    </developers>
-    <description>
-        jrouter是一个围绕对象方法基于责任链（拦截器）模式设计的开源轻量级Java容器。它专注于方法的映射、调用、拦截和结果处理，采用基于配置和注解的方式来抽取和收集程序中对象的方法（method）以用于路由映射，HTTP控制器，RPC，各种应用等。
-    </description>
 </project>

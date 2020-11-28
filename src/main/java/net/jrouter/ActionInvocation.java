@@ -17,6 +17,7 @@
 
 package net.jrouter;
 
+import java.util.Map;
 import net.jrouter.annotation.Action;
 import net.jrouter.annotation.Dynamic;
 import net.jrouter.annotation.Result;
@@ -143,4 +144,11 @@ public interface ActionInvocation<P> {
      * @return 提供给参数转换器的参数。
      */
     Object[] getConvertParameters();
+
+    /**
+     * 返回Action路径匹配的键值映射，不包含任何匹配的键值则返回空映射。
+     *
+     * @return Action路径匹配的键值映射。
+     */
+    Map<String, String> getPathParameters();
 }

@@ -108,11 +108,11 @@ public class PathActionFactoryTest {
         Map<String, String> excepted = new HashMap<>();
 
         factory.invokeAction("/xx/yy/zz");
-        assertNotNull(getActionPathParameters());
+        assertNotNull(getPathParameters());
         factory.invokeAction("/aa/b1/c1/d0");
-        assertNotNull(getActionPathParameters());
+        assertNotNull(getPathParameters());
         factory.invokeAction("/aa/b1/c1/d1");
-        assertNotNull(getActionPathParameters());
+        assertNotNull(getPathParameters());
 
         try {
             factory.invokeAction("/aa/zzz/c1/d1/e1/null/null/null");
@@ -159,8 +159,8 @@ public class PathActionFactoryTest {
      *
      * @return 返回Action路径匹配的键值映射。
      */
-    private Map<String, String> getActionPathParameters() {
-        return ((PathActionInvocation) DemoThreadActionContextInterceptor.get()).getActionPathParameters();
+    private Map<String, String> getPathParameters() {
+        return ((PathActionInvocation) DemoThreadActionContextInterceptor.get()).getPathParameters();
     }
 
     /**
@@ -171,7 +171,7 @@ public class PathActionFactoryTest {
      */
     private void assertPathParameters(Map<String, String> excepted, String path) {
         factory.invokeAction(path);
-        Map<String, String> actual = getActionPathParameters();
+        Map<String, String> actual = getPathParameters();
         assertEquals(excepted, actual);
         //clear the excepted map at last
         excepted.clear();

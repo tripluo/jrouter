@@ -160,4 +160,19 @@ public class CollectionUtilTest {
         assertArrayEquals(new Object[]{1, 2, "1", "2"}, CollectionUtil.append(new Object[]{1, 2}, new Object[]{"1", "2"}));
         assertArrayEquals(new Object[]{1, 2, "1", "2"}, CollectionUtil.append(new Object[]{1, 2}, "1", "2"));
     }
+
+    /**
+     * Test of convert method, of class CollectionUtil.
+     */
+    @Test
+    public void testConvert() {
+        assertArrayEquals(null, CollectionUtil.convert((int[]) null));
+        assertArrayEquals(new int[0], CollectionUtil.convert(new boolean[0]));
+
+        assertArrayEquals(new boolean[]{false, true}, CollectionUtil.convert(new int[]{1}));
+        assertArrayEquals(new boolean[]{true, true, false, true}, CollectionUtil.convert(new int[]{1, 0, 3}));
+
+        assertArrayEquals(new int[]{1}, CollectionUtil.convert(new boolean[]{false, true}));
+        assertArrayEquals(new int[]{0, 1, 3}, CollectionUtil.convert(new boolean[]{true, true, false, true}));
+    }
 }

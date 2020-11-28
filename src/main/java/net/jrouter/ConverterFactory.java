@@ -19,17 +19,13 @@ package net.jrouter;
 
 /**
  * ConverterFactory接口。负责创建转换对象。
- *
- * @param <T> ActionInvocation type.
  */
-public interface ConverterFactory<T extends ActionInvocation<?>> {
+public interface ConverterFactory {
 
     /**
      * 根据参数创建或返回参数转换对象。
      *
-     * @param actionInvocation Action运行时上下文。
-     *
      * @return 参数转换对象。
      */
-    ParameterConverter getParameterConverter(T actionInvocation);
+    ParameterConverter getParameterConverter();
 }

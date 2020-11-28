@@ -2,6 +2,12 @@
 JROUTER CHANGELOG
 ==========================
 https://jrouter.net/
+Changes in version 1.8.4 (2020-11-28)
+* ActionInvocation接口新增getPathParameters方法获取Action路径匹配的键值映射。
+* 重构PathActionInvocation变量actionPathParameters为pathParameters。
+* 修正ConverterFactory接口参数。
+
+
 Changes in version 1.8.3 (2020-04-25)
 * 新增PathActionFactory.StringPathGenerator内部类，提供路径生成。
 * AbstractActionFactory.Properties新增afterPropertiesSet方法提供默认值的加载。

@@ -254,7 +254,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         //create PathActionInvocation
         PathActionInvocation ai = new PathActionInvocation(path, this, ap, params);
         //setActionPathParameters
-        ai.setActionPathParameters(matchParameters);
+        ai.setPathParameters(matchParameters);
         return ai;
     }
 
