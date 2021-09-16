@@ -20,7 +20,7 @@ package net.jrouter;
 import java.lang.reflect.Method;
 
 /**
- * 提供方法代理的一个抽象类，包括了{@link Method}对象、调用{@cocd Method}的对象。
+ * 提供方法代理的一个抽象类，包括了{@link Method}对象、调用{@code Method}的对象。
  */
 public abstract class AbstractProxy {
 

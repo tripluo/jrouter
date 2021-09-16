@@ -1021,8 +1021,8 @@ public class PathActionFactory extends AbstractActionFactory<String> {
 
         /**
          * 提供继承修改构建Action路径。
-         * 最终构建的路径已删除前导空白和尾部空白、以{@linkplain #getPathSeparator() pathSeparator}起始、
-         * 并截去尾部{@linkplain #getPathSeparator() pathSeparator}（如果包含）。
+         * 最终构建的路径已删除前导空白和尾部空白、以{@linkplain #pathSeparator}起始、
+         * 并截去尾部{@linkplain #pathSeparator}（如果包含）。
          *
          * @param namespace Namespace名称。
          * @param aname Action的原路径。
@@ -1030,7 +1030,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
          *
          * @return 构建完成的Action路径。
          *
-         * @see #getPathSeparator()
+         * @see #pathSeparator
          */
         protected String buildActionPath(String namespace, String aname, Method method) {
             String path = null;

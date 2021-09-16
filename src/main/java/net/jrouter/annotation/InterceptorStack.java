@@ -50,18 +50,18 @@ public @interface InterceptorStack {
     Interceptor[] interceptors() default {};
 
     /**
-     * 包含匹配的路径集合（默认空不包含任何）。
+     * 匹配的路径集合（默认空不包含任何）。
      *
-     * @return
+     * @return 匹配的路径集合。
      *
      * @since 1.8.1
      */
     String[] include() default {};
 
     /**
-     * 排除匹配的路径集合（默认空不排除任何）。
+     * 不匹配的路径集合（默认空不排除任何）。
      *
-     * @return
+     * @return 不匹配的路径集合。
      *
      * @since 1.8.1
      */
@@ -90,9 +90,9 @@ public @interface InterceptorStack {
         String value();
 
         /**
-         * 排除匹配的路径集合（默认空不排除任何）。
+         * 不匹配的路径集合（默认空不排除任何）。
          *
-         * @return
+         * @return 不匹配的路径集合。
          *
          * @since 1.8.1
          */

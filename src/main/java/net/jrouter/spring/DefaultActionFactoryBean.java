@@ -292,11 +292,9 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * 未直接设置Configuration对象时，提供默认的{@code SpringConfiguration}对象实现。
+     * 未直接设置{@link #configuration}对象时，提供默认的{@code SpringConfiguration}对象实现。
      *
      * @return {@code SpringConfiguration}对象。
-     *
-     * @see #setConfiguration(net.jrouter.config.Configuration)
      */
     protected Configuration createDefaultConfiguration() {
         //create SpringObjectFactory
@@ -315,13 +313,11 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * 未设置objectFactory属性时，提供默认的{@code SpringObjectFactory}对象实现。
+     * 未设置{@link #objectFactory}属性时，提供默认的{@code SpringObjectFactory}对象实现。
      *
      * @param config Configuration对象。
      *
      * @return {@code SpringObjectFactory}对象。
-     *
-     * @see #setObjectFactory(net.jrouter.ObjectFactory)
      */
     protected ObjectFactory createDefaultObjectFactory(Configuration config) {
         //create SpringObjectFactory
@@ -436,12 +432,10 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * 指定的JRouter Configuration类型。
+     * 指定的{@link #configuration}类型。
      *
-     * @param configurationClass 指定的Configuration类型。
+     * @param configurationClass 指定的{@link #configuration}类型。
      *
-     * @see net.jrouter.config.Configuration
-     * @see #setConfiguration(net.jrouter.config.Configuration)
      * @deprecated since 1.6.4
      */
     @Deprecated
@@ -483,7 +477,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
-     * @see #setComponentClassScanProperties(java.util.List)
+     * @see #componentClassScanProperties
      * @deprecated
      */
     @Deprecated

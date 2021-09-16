@@ -48,7 +48,7 @@ public class PathActionFactory2Test {
                     //提供定制化
                     namespace = String.format(namespace, "test");
                 } catch (Exception e) {
-                    log.error("Exception occurs when building action's path.", e);
+                    log.error("Exception occurred when building action's path.", e);
                 }
                 return super.buildActionPath(namespace, aname, method);
             }

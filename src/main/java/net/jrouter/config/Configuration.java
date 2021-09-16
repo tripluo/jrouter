@@ -507,7 +507,7 @@ public class Configuration implements Serializable {
         try {
             stream = include.openStream();
         } catch (IOException e) {
-            throw new ConfigurationException("IOException occurs in included file : " + include, e);
+            throw new ConfigurationException("IOException occurred in included file : " + include, e);
         }
 
         //if circular reference
@@ -802,11 +802,6 @@ public class Configuration implements Serializable {
 
     /**
      * TODO
-     *
-     * @param element
-     * @param attribute
-     *
-     * @return
      */
     private String getTrimmedToNullString(Element element, String attribute) {
         String str = element.getAttribute(attribute);
@@ -1224,8 +1219,6 @@ public class Configuration implements Serializable {
      * 设置ActionFactory的类型。
      *
      * @param actionFactoryClass 指定的ActionFactory类型。
-     *
-     * @return 此配置对象的引用。
      */
     public void setActionFactoryClass(Class<? extends ActionFactory> actionFactoryClass) {
         this.actionFactoryClass = actionFactoryClass;

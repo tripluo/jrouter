@@ -90,9 +90,7 @@ public class ClassUtil {
                         loadClassesByPackageFile(packageName, filePath, recursive, classes);
                     } //if jar
                     else if ("jar".equals(protocol)) {
-                        JarFile jar = null;
-                        try {
-                            jar = ((JarURLConnection) url.openConnection()).getJarFile();
+                        try (JarFile jar = ((JarURLConnection) url.openConnection()).getJarFile()) {
                             Enumeration<JarEntry> entries = jar.entries();
                             while (entries.hasMoreElements()) {
                                 //获取jar里的一个实体 可以是目录 和一些jar包里的其他文件 如META-INF等文件
@@ -127,10 +125,6 @@ public class ClassUtil {
                             }
                         } catch (IOException e) {
                             LOG.error("IOException when loading files from : " + url, e);
-                        } finally {
-                            if (jar != null) {
-                                jar.close();
-                            }
                         }
                     }
                 }

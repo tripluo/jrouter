@@ -511,8 +511,7 @@ public class AntPathMatcher {
     /**
      * Given a full path, returns a {@link Comparator} suitable for sorting patterns in order of
      * explicitness.
-     * <p>
-     * This{@code Comparator} will {@linkplain java.util.List#sort(Comparator) sort}
+     * <p>This{@code Comparator} will {@linkplain java.util.Collections#sort(List, Comparator) sort}
      * a list so that more specific patterns (without uri templates or wild cards) come before
      * generic patterns. So given a list with the following patterns:
      * <ol>
@@ -520,8 +519,7 @@ public class AntPathMatcher {
      * <li>{@code /hotels/{hotel}}</li> <li>{@code /hotels/*}</li>
      * </ol>
      * the returned comparator will sort this list so that the order will be as indicated.
-     * <p>
-     * The full path given as parameter is used to test for exact matches. So when the given path
+     * <p>The full path given as parameter is used to test for exact matches. So when the given path
      * is {@code /hotels/2}, the pattern {@code /hotels/2} will be sorted before {@code /hotels/1}.
      *
      * @param path the full path to use for comparison
@@ -534,8 +532,7 @@ public class AntPathMatcher {
 
     /**
      * Tests whether or not a string matches against a pattern via a {@link Pattern}.
-     * <p>
-     * The pattern may contain special characters: '*' means zero or more characters; '?' means one and
+     * <p>The pattern may contain special characters: '*' means zero or more characters; '?' means one and
      * only one character; '{' and '}' indicate a URI template pattern. For example <tt>/users/{user}</tt>.
      */
     protected static class AntPathStringMatcher {
@@ -546,7 +543,7 @@ public class AntPathMatcher {
 
         private final Pattern pattern;
 
-        private final List<String> variableNames = new LinkedList<>();
+        private final List<String> variableNames = new LinkedList<String>();
 
         public AntPathStringMatcher(String pattern) {
             this(pattern, true);
@@ -580,8 +577,8 @@ public class AntPathMatcher {
                 end = matcher.end();
             }
             patternBuilder.append(quote(pattern, end, pattern.length()));
-            this.pattern = (caseSensitive ? Pattern.compile(patternBuilder.toString())
-                    : Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE));
+            this.pattern = (caseSensitive ? Pattern.compile(patternBuilder.toString()) :
+                    Pattern.compile(patternBuilder.toString(), Pattern.CASE_INSENSITIVE));
         }
 
         private String quote(String s, int start, int end) {
@@ -602,10 +599,10 @@ public class AntPathMatcher {
                 if (uriTemplateVariables != null) {
                     // SPR-8455
                     if (this.variableNames.size() != matcher.groupCount()) {
-                        throw new IllegalArgumentException("The number of capturing groups in the pattern segment "
-                                + this.pattern + " does not match the number of URI template variables it defines, "
-                                + "which can occur if capturing groups are used in a URI template regex. "
-                                + "Use non-capturing groups instead.");
+                        throw new IllegalArgumentException("The number of capturing groups in the pattern segment " +
+                                this.pattern + " does not match the number of URI template variables it defines, " +
+                                "which can occur if capturing groups are used in a URI template regex. " +
+                                "Use non-capturing groups instead.");
                     }
                     for (int i = 1; i <= matcher.groupCount(); i++) {
                         String name = this.variableNames.get(i - 1);

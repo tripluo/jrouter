@@ -78,8 +78,8 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public PathActionProxy(ActionFactory actionFactory, String namespace, String path, Action action, Method method, //SUPPRESS CHECKSTYLE NOPMD ExcessiveParameterList
-                           Object object) {
+    public PathActionProxy(ActionFactory actionFactory, String namespace, String path,
+                           Action action, Method method, Object object) {//SUPPRESS CHECKSTYLE NOPMD ExcessiveParameterList
         super(method, object, actionFactory);
         this.actionFactory = actionFactory;
         this.namespace = namespace;
