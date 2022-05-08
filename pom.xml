@@ -5,7 +5,7 @@
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.8.5-SNAPSHOT</version>
+    <version>1.8.5</version>
     <name>JRouter</name>
     <inceptionYear>2010</inceptionYear>
     <url>https://jrouter.net/</url>
@@ -42,13 +42,13 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.32</version>
+            <version>1.7.36</version>
         </dependency>
         <!-- logback -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.6</version>
+            <version>1.2.11</version>
             <optional>true</optional>
         </dependency>
         <!-- springframework integration -->
@@ -67,7 +67,7 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.32</version>
+            <version>1.7.36</version>
             <optional>true</optional>
         </dependency>
         <!-- javassist -->
@@ -130,7 +130,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.2.2</version>
                 <configuration>
                     <excludes>
                         <exclude>changelog.txt</exclude>
@@ -141,7 +141,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.4</version>
+                <version>0.8.6</version>
                 <executions>
                     <!--
                     <execution>

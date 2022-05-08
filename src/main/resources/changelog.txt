@@ -2,6 +2,11 @@
 JROUTER CHANGELOG
 ==========================
 https://jrouter.net/
+Changes in version 1.8.5 (2022-05-08)
+* 修正注释及文档。
+* 更新依赖包slf4j至 1.7.36.
+
+
 Changes in version 1.8.4 (2020-11-28)
 * ActionInvocation接口新增getPathParameters方法获取Action路径匹配的键值映射。
 * 重构PathActionInvocation变量actionPathParameters为pathParameters。
