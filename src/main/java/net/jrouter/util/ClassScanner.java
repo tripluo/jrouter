@@ -60,7 +60,7 @@ public class ClassScanner {
      * @return 扫描结果的类集合。
      */
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> includes = ClassUtil.getClasses(includePackages.toArray(new String[includePackages.size()]));
+        Set<Class<?>> includes = ClassUtil.getClasses(includePackages.toArray(new String[0]));
         //filter the scan classes
         Iterator<Class<?>> it = includes.iterator();
         out:

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class PathActionProxy extends DefaultProxy implements ActionProxy<String>, Cloneable {
 
-    /** 日志 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(PathActionProxy.class);
 
     /** ActionFactory */
@@ -79,7 +79,7 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
      * @param object 代理的方法的对象。
      */
     public PathActionProxy(ActionFactory actionFactory, String namespace, String path,
-                           Action action, Method method, Object object) {//SUPPRESS CHECKSTYLE NOPMD ExcessiveParameterList
+                           Action action, Method method, Object object) {
         super(method, object, actionFactory);
         this.actionFactory = actionFactory;
         this.namespace = namespace;

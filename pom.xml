@@ -5,14 +5,14 @@
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.8.5</version>
+    <version>1.8.6</version>
     <name>JRouter</name>
     <inceptionYear>2010</inceptionYear>
     <url>https://jrouter.net/</url>
     <licenses>
         <license>
             <name>The Apache Software License, Version 2.0</name>
-            <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
+            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
             <distribution>repo</distribution>
         </license>
     </licenses>
@@ -33,7 +33,7 @@
     </description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.30.RELEASE</spring.version>
+        <spring.version>5.3.26</spring.version>
         <checkstyle.config.file></checkstyle.config.file>
         <pmd.rule.file></pmd.rule.file>
     </properties>
@@ -48,7 +48,7 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.11</version>
+            <version>1.2.12</version>
             <optional>true</optional>
         </dependency>
         <!-- springframework integration -->
@@ -74,14 +74,14 @@
         <dependency>
             <groupId>org.javassist</groupId>
             <artifactId>javassist</artifactId>
-            <version>3.25.0-GA</version>
+            <version>3.29.2-GA</version>
             <optional>true</optional>
         </dependency>
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.8</version>
+            <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
         <!-- junit -->
@@ -110,10 +110,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.0</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
                     <showDeprecation>true</showDeprecation>
                 </configuration>
@@ -121,7 +121,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-resources-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.1</version>
                 <configuration>
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
@@ -130,7 +130,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.2</version>
+                <version>3.3.0</version>
                 <configuration>
                     <excludes>
                         <exclude>changelog.txt</exclude>
@@ -141,7 +141,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.6</version>
+                <version>0.8.8</version>
                 <executions>
                     <!--
                     <execution>
@@ -176,7 +176,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-checkstyle-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.2.1</version>
                         <configuration>
                             <configLocation>${checkstyle.config.file}</configLocation>
                             <failOnViolation>false</failOnViolation>
@@ -209,17 +209,17 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-pmd-plugin</artifactId>
-                        <version>3.13.0</version>
+                        <version>3.20.0</version>
                         <dependencies>
                             <dependency>
                                 <groupId>net.sourceforge.pmd</groupId>
                                 <artifactId>pmd-core</artifactId>
-                                <version>6.23.0</version>
+                                <version>6.55.0</version>
                             </dependency>
                             <dependency>
                                 <groupId>net.sourceforge.pmd</groupId>
                                 <artifactId>pmd-java</artifactId>
-                                <version>6.23.0</version>
+                                <version>6.55.0</version>
                             </dependency>
                         </dependencies>
                         <executions>
@@ -232,10 +232,10 @@
                         </executions>
                         <configuration>
                             <linkXRef>false</linkXRef>
+                            <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
                             <!-- pmd代码校验并打印错误 -Dpmd.skip=true -->
                             <failOnViolation>false</failOnViolation>
                             <printFailingErrors>true</printFailingErrors>
-                            <sourceEncoding>${project.build.sourceEncoding}</sourceEncoding>
                             <rulesets>
                                 <ruleset>${pmd.rule.file}</ruleset>
                             </rulesets>
@@ -257,7 +257,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-source-plugin</artifactId>
-                        <version>3.1.0</version>
+                        <version>3.2.1</version>
                         <executions>
                             <execution>
                                 <id>attach-sources</id>
@@ -278,9 +278,10 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.1.1</version>
+                        <version>3.5.0</version>
                         <executions>
                             <execution>
+                                <id>attach-javadoc</id>
                                 <phase>package</phase>
                                 <goals>
                                     <goal>jar</goal>
@@ -288,6 +289,10 @@
                             </execution>
                         </executions>
                         <configuration>
+                            <show>protected</show>
+                            <charset>UTF-8</charset>
+                            <encoding>UTF-8</encoding>
+                            <docencoding>UTF-8</docencoding>
                             <failOnError>false</failOnError>
                         </configuration>
                     </plugin>
@@ -295,7 +300,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>1.6</version>
+                        <version>3.0.1</version>
                         <executions>
                             <execution>
                                 <phase>verify</phase>
@@ -309,7 +314,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-deploy-plugin</artifactId>
-                        <version>2.8.2</version>
+                        <version>3.1.1</version>
                     </plugin>
                 </plugins>
             </build>

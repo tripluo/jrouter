@@ -25,7 +25,7 @@ import net.jrouter.annotation.ResultType;
 /**
  * 内置结果类型。
  */
-public class DefaultResult { //NOPMD ClassNamingConventions
+public class DefaultResult {
 
     /** 默认结果类型名称，不作任何处理 */
     public static final String EMPTY = "empty";

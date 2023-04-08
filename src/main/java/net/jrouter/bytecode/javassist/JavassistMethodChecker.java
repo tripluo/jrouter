@@ -38,7 +38,8 @@ public class JavassistMethodChecker {
     /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(JavassistMethodChecker.class);
 
-    private static final String OPCODES[] = Mnemonic.OPCODE;
+    /** OPCODES */
+    private static final String[] OPCODES = Mnemonic.OPCODE;
 
     /** 方法名匹配器 */
     private final AntPathMatcher methodMatcher = new AntPathMatcher(".");
@@ -177,13 +178,13 @@ public class JavassistMethodChecker {
      */
     private static final class MethodInfo {
 
-        //simplify name
+        /** simplify name */
         private static final String JAVA_LANG = "java.lang.";
 
-        //method name
+        /** method name */
         private String methodName;
 
-        //method parameters
+        /** method parameters */
         private String parametersDescription;
 
         //parse net.jrouter.ActionInvocation.invoke(**) to name/parameters.

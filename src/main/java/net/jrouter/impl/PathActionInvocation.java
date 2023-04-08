@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @Dynamic
 public class PathActionInvocation implements ActionInvocation<String> {
 
-    /** 日志 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(PathActionInvocation.class);
 
     /** Action是否已调用 */
@@ -161,17 +161,17 @@ public class PathActionInvocation implements ActionInvocation<String> {
      */
     public static class ResultProxy implements Result {
 
-        /*
+        /**
          * 结果对象的名称
          */
         private final String name;
 
-        /*
+        /**
          * 结果对象的类型
          */
         private final String type;
 
-        /*
+        /**
          * 结果对象对应的资源路径
          */
         private final String location;

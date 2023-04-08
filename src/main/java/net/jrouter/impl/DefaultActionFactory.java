@@ -28,6 +28,9 @@ import java.util.Map;
 @Deprecated
 public class DefaultActionFactory extends PathActionFactory {
 
+    /**
+     * Constructor.
+     */
     public DefaultActionFactory(Map<String, Object> properties) {
         super(properties);
     }

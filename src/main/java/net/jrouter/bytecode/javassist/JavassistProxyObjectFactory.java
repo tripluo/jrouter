@@ -17,6 +17,7 @@
 
 package net.jrouter.bytecode.javassist;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -94,8 +95,10 @@ public class JavassistProxyObjectFactory {
                 log.debug("Creating proxy class from {} : {}", instanceClass, proxiedInterface);
             }
             Class<T> proxyClass = (Class) createInterfaceProxyClass(instanceClass, proxiedInterface)
-                    .toClass(proxiedInterface.getClassLoader(), proxiedInterface.getProtectionDomain());
-            T t = proxyClass.getDeclaredConstructor().newInstance();
+                    .toClass(Thread.currentThread().getContextClassLoader(), proxiedInterface.getProtectionDomain());
+            Constructor<T> constructor = proxyClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            T t = constructor.newInstance();
             Field f = null;
             f = proxyClass.getDeclaredField(PROXY_CLASS_TARGET_CLASS_FIELD_NAME);
             f.setAccessible(true);

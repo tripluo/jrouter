@@ -22,7 +22,6 @@ import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -66,11 +65,9 @@ import org.xml.sax.*;
  *
  * @see #buildActionFactory()
  */
-public class Configuration implements Serializable {
+public class Configuration {
 
-    private static final long serialVersionUID = 1L;
-
-    /* 日志记录 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +166,7 @@ public class Configuration implements Serializable {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /* ActionFactory的类型，默热为PathActionFactory类型 */
+    /** ActionFactory的类型，默热为PathActionFactory类型 */
     private Class<? extends ActionFactory> actionFactoryClass = PathActionFactory.class;
 
     /** ActionFactory的属性 */
@@ -342,7 +339,7 @@ public class Configuration implements Serializable {
      */
     private static class DocumentLoader {
 
-        /* SAX 错误处理对象 */
+        /** SAX 错误处理对象 */
         static final ErrorHandler ERROR_HANDLER = new ErrorHandler() {
 
             @Override
@@ -361,7 +358,7 @@ public class Configuration implements Serializable {
             }
         };
 
-        /* 用于解析实体的对象 */
+        /** 用于解析实体的对象 */
         static final EntityResolver ENTITY_RESOLVER = new EntityResolver() {
 
             @Override
@@ -904,7 +901,7 @@ public class Configuration implements Serializable {
                         }
                         LOG.debug("Finish check auto scan classes : {}", scanComponents.size());
                     } else {
-                        LOG.debug("No auto scan classes");
+                        LOG.debug("No auto scan classes.");
                     }
                 }
             }
@@ -1141,11 +1138,15 @@ public class Configuration implements Serializable {
             LOG.info("No constructor {}, use {}.<init>(). ",
                     ex.getLocalizedMessage(), actionFactoryClass.getName());
         }
-
         try {
-            factory = con == null
-                    ? actionFactoryClass.newInstance()
-                    : con.newInstance(actionFactoryProperties);
+            if (con == null) {
+                con = actionFactoryClass.getDeclaredConstructor();
+                con.setAccessible(true);
+                factory = con.newInstance();
+            } else {
+                con.setAccessible(true);
+                factory = con.newInstance(actionFactoryProperties);
+            }
             //give subclasses a chance to prepare factory
             afterActionFactoryCreation(factory);
         } catch (ConfigurationException e) {

@@ -373,7 +373,7 @@ class PathTree<V> implements Serializable {
             cur = len;
             list.add(fullPath.substring(last + 1, cur));
         }
-        return list.toArray(new String[list.size()]);
+        return list.toArray(new String[0]);
     }
 
     /**
@@ -636,7 +636,7 @@ class PathTree<V> implements Serializable {
                 }
 //                System.out.println("IndexKey : " + keys);
                 if (!keys.isEmpty()) {
-                    leaf.indexKeys = keys.toArray(new IndexKey[keys.size()]);
+                    leaf.indexKeys = keys.toArray(new IndexKey[0]);
                 }
 //                System.out.println("setChildNode : " + child);
             }
@@ -655,10 +655,14 @@ class PathTree<V> implements Serializable {
 
         private static final long serialVersionUID = 1L;
 
-        //path array index, no more than 32
+        /**
+         * Path array index, no more than 32.
+         */
         private byte index = -1;
 
-        //匹配的键名
+        /**
+         * 匹配的键名。
+         */
         private String matchKey;
 
         /**

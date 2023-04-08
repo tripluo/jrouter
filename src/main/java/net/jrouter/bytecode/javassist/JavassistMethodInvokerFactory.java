@@ -17,6 +17,7 @@
 
 package net.jrouter.bytecode.javassist;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 import javassist.*;
@@ -70,8 +71,11 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Create JavassistInvoker at : {}", MethodUtil.getMethod(method));
             }
-            JavassistInvoker invoker = (JavassistInvoker) (createInvokeClass(targetClass, method).
-                    toClass(targetClass.getClassLoader(), targetClass.getProtectionDomain()).newInstance());
+            Constructor<?> constructor = createInvokeClass(targetClass, method)
+                    .toClass(Thread.currentThread().getContextClassLoader(), targetClass.getProtectionDomain())
+                    .getDeclaredConstructor();
+            constructor.setAccessible(true);
+            JavassistInvoker invoker = (JavassistInvoker) (constructor.newInstance());
             return invoker;
         } catch (Exception e) {
             throw new JRouterException(e);

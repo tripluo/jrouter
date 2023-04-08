@@ -26,6 +26,9 @@ import net.jrouter.ActionInvocation;
  */
 public class ActionInvocationDelegate<P> implements ActionInvocation<P> {
 
+    /**
+     * Delegated object.
+     */
     @lombok.experimental.Delegate
     protected ActionInvocation<P> delegate = null;
 

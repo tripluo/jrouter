@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Bean注入工具类。
  */
-public class Injector { //NOPMD ClassNamingConventions
+public final class Injector {
 
-    /* 日志记录 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
 
     /** 对象类型与其注入属性的映射 */
@@ -132,7 +132,7 @@ public class Injector { //NOPMD ClassNamingConventions
                 if (value instanceof String) {
                     Object convertedValue = Injector.stringToObject((String) value, pd.getPropertyType());
                     if (convertedValue == null) {
-                        LOG.warn("Not supported property [{}] for type [{}] in " + cls, pName, pd.getPropertyType());
+                        LOG.warn("Not supported property [{}] for type [{}] in {}.", pName, pd.getPropertyType(), cls);
                     } else {
                         injections.add(new Injection(pd.getWriteMethod(), convertedValue));
                     }
@@ -141,7 +141,7 @@ public class Injector { //NOPMD ClassNamingConventions
                 }
             }
         }
-        return injections.toArray(new Injection[injections.size()]);
+        return injections.toArray(new Injection[0]);
     }
 
     /*

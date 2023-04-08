@@ -46,7 +46,7 @@ import org.slf4j.LoggerFactory;
  */
 public class PathActionFactory extends AbstractActionFactory<String> {
 
-    /** 日志 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(PathActionFactory.class);
 
     /**
@@ -96,7 +96,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
     @lombok.Getter
     private final String defaultResultType;
 
-    /* default object handler */
+    /** default object handler */
     private ResultTypeProxy cacheDefaultResultType = null;
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -135,8 +135,8 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         this.defaultResultType = properties.defaultResultType;
         //initiate
         pathActions = new PathTreeMap<>(pathSeparator);
-        actionCache = new ActionCache(new java.util.concurrent.ConcurrentHashMap<String, ActionCacheEntry>(),
-                Collections.synchronizedMap(new net.jrouter.util.LRUMap<String, ActionCacheEntry>(actionCacheNumber)));
+        actionCache = new ActionCache(new java.util.concurrent.ConcurrentHashMap<>(),
+                Collections.synchronizedMap(new net.jrouter.util.LRUMap<>(actionCacheNumber)));
         invokeAwareInterfaces(this.pathGenerator);
     }
 
@@ -690,7 +690,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
             }
             //interceptorStack
             String stackName = action.interceptorStack().trim();
-            //not not nullable action's interceptors
+            //not nullable action's interceptors
             String[] interceptorNames = action.interceptors();
 
             List<InterceptorProxy> inters = new ArrayList<>(5);
@@ -963,6 +963,9 @@ public class PathActionFactory extends AbstractActionFactory<String> {
         @lombok.Getter
         private final char pathSeparator;
 
+        /**
+         * ActionFactory.
+         */
         @lombok.Getter
         private ActionFactory actionFactory;
 
@@ -1016,7 +1019,7 @@ public class PathActionFactory extends AbstractActionFactory<String> {
                     paths.add(buildActionPath(namespace, name.trim(), method));
                 }
             }
-            return paths.toArray(new String[paths.size()]);
+            return paths.toArray(new String[0]);
         }
 
         /**

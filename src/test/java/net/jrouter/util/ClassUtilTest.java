@@ -17,6 +17,9 @@
 
 package net.jrouter.util;
 
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 import static org.junit.Assert.*;
 import org.junit.Test;
 
@@ -33,12 +36,19 @@ public class ClassUtilTest {
         assertEquals(0, ClassUtil.getClasses().size());
         assertEquals(0, ClassUtil.getClasses("").size());
 
-        assertEquals(11, ClassUtil.getClasses("net.jrouter.annotation").size());
-        assertEquals(11, ClassUtil.getClasses("net.jrouter.annotation", "net.jrouter.annotation").size());
+//        System.out.println(ClassUtil.getClasses("net.jrouter.annotation"));
+        Set<Class<?>> classes1 = ClassUtil.getClasses("net.jrouter.annotation")
+                .stream().filter(cls -> !Objects.equals("package-info", cls.getSimpleName()))
+                .collect(Collectors.toSet());
+        assertEquals(11, classes1.size());
+        Set<Class<?>> classes2 = ClassUtil.getClasses("net.jrouter.annotation", "net.jrouter.annotation")
+                .stream().filter(cls -> !Objects.equals("package-info", cls.getSimpleName()))
+                .collect(Collectors.toSet());
+        assertEquals(11, classes2.size());
 
         //包含测试类、内部类，不做个数验证
-        assertTrue(!ClassUtil.getClasses("net.jrouter.impl").isEmpty());
-        assertTrue(!ClassUtil.getClasses("net.jrouter.util").isEmpty());
+        assertFalse(ClassUtil.getClasses("net.jrouter.impl").isEmpty());
+        assertFalse(ClassUtil.getClasses("net.jrouter.util").isEmpty());
     }
 
     /**

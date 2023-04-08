@@ -17,6 +17,7 @@
 
 package net.jrouter.impl;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -726,8 +727,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         //default new object with empty construction method
         private static <T> T newInstance0(Class<T> clazz) { //NOPMD MethodNamingConventions
             try {
-                return clazz.newInstance();
-            } catch (IllegalAccessException | InstantiationException e) {
+                Constructor<T> constructor = clazz.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                return constructor.newInstance();
+            } catch (ReflectiveOperationException e) {
                 throw new JRouterException(e);
             }
         }

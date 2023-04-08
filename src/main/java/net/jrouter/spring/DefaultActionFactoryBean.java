@@ -54,13 +54,13 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     @lombok.Setter
     private Resource configLocation;
 
-    /* ActionFactory对象 */
+    /** ActionFactory对象 */
     private T actionFactory;
 
-    /* ActionFactory的类型 */
+    /** ActionFactory的类型 */
     private Class<T> actionFactoryClass = null;
 
-    /* 指定的Configuration */
+    /** 指定的Configuration */
     @lombok.Setter
     private Configuration configuration;
 
@@ -106,23 +106,24 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     private Properties actionFactoryProperties = new Properties();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* 拦截器的bean名称和类名称的集合 */
+
+    /** 拦截器的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> interceptors = null;
 
-    /* 拦截栈的bean名称和类名称的集合 */
+    /** 拦截栈的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> interceptorStacks = null;
 
-    /* 结果类型的bean名称和类名称的集合 */
+    /** 结果类型的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> resultTypes = null;
 
-    /* 结果对象的bean名称和类名称的集合 */
+    /** 结果对象的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> results = null;
 
-    /* Action的bean名称和类名称的集合 */
+    /** Action的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> actions = null;
 
@@ -172,12 +173,16 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         }
         //不保证ActionFactory属性的重复加载
         if (configLocation != null) {
-            LOG.debug("Load configuration : {}", configLocation.getURL());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Load configuration : {}", configLocation.getURL());
+            }
             configuration.load(configLocation.getURL());
         }
 
         if (actionFactoryClass != null) {
-            LOG.debug("Set actionFactoryClass : {}", actionFactoryClass);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Set actionFactoryClass : {}", actionFactoryClass);
+            }
             configuration.setActionFactoryClass(actionFactoryClass);
         } else {
             setDefaultActionFactoryClass(configuration);
@@ -197,7 +202,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
         //添加扫描工具属性
         if (componentClassScanProperties != null) {
-            configuration.addComponentClassScanProperties(componentClassScanProperties.toArray(new Map[componentClassScanProperties.size()]));
+            configuration.addComponentClassScanProperties(componentClassScanProperties.toArray(new Map[0]));
         }
         //convert string to class
         convertList(interceptors, interceptorStacks, resultTypes, results, actions);

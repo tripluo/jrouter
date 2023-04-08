@@ -19,7 +19,7 @@
 
 ![outline](https://raw.githubusercontent.com/tripluo/jrouter/master/outline.png)
 
-● require [jdk 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+● require [jdk 1.8+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 ● require [slf4j](http://www.slf4j.org/download.html)
 
@@ -30,7 +30,7 @@
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.8.5</version>
+    <version>1.8.6</version>
 </dependency>
 ```
 
