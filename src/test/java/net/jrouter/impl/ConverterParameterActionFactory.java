@@ -33,7 +33,7 @@ public class ConverterParameterActionFactory extends PathActionFactory {
     protected ActionInvocation createActionInvocation(String path, Object... params) {
         ActionInvocation<String> ai = super.createActionInvocation(path, params);
         DemoActionInvocation invocation = new DefaultDemoActionInvocation("demo", ai);
-        //重设调用ActionInvocation的调用参数
+        // 重设调用ActionInvocation的调用参数
         invocation.setConvertParameters(invocation);
         return invocation;
     }

@@ -2,6 +2,19 @@
 JROUTER CHANGELOG
 ==========================
 https://jrouter.net/
+Changes in version 1.8.7 (2024-01-28)
+* 完善代码格式、注释及文档。
+* 更新依赖组件spring至 5.3.31.
+* 更新依赖组件javassist至 3.30.2-GA.
+* 更新其他依赖组件。
+
+
+Changes in version 1.8.6 (2023-04-08)
+* 修正注释及文档。
+* 更新依赖包spring至 5.3.26.
+* 更新JDK依赖版本1.8。
+
+
 Changes in version 1.8.5 (2022-05-08)
 * 修正注释及文档。
 * 更新依赖包slf4j至 1.7.36.

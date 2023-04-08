@@ -29,6 +29,6 @@ public class JavassistInvoker implements Invoker {
 
     @Override
     public <T> T invoke(Method method, Object obj, Object... params) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        throw new UnsupportedOperationException("Not implemented here.");
     }
 }

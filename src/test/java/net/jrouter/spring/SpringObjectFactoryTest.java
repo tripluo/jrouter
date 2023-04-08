@@ -38,20 +38,20 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = {"classpath:jrouter-spring_test.xml"})
 public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
 
-    //PathActionFactory
+    // PathActionFactory
     private PathActionFactory factory;
 
-    //ObjectFactory
+    // ObjectFactory
     private ObjectFactory objectFactory;
 
     @Before
     public void setUp() {
-        //SpringObjectFactory
+        // SpringObjectFactory
         objectFactory = new SpringObjectFactory(applicationContext);
 
         PathActionFactory.Properties prop = new PathActionFactory.Properties();
         prop.setObjectFactory(objectFactory);
-        //create ActionFactory not by springframework
+        // create ActionFactory not by springframework
         factory = new PathActionFactory(prop);
 
         factory.addInterceptors(DemoInterceptor.class);
@@ -76,7 +76,7 @@ public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
         SimpleAction sa2 = objectFactory.newInstance(SimpleAction.class);
         sa2.springInject();
         assertNotSame(sa1, sa2);
-        //注入的为单例bean对象
+        // 注入的为单例bean对象
         assertSame(sa1.springInject(), sa2.springInject());
     }
 
@@ -89,7 +89,7 @@ public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
     public void testSpringInject() {
         String url = "/test/springInject";
 
-        //check interceptors
+        // check interceptors
         assertEquals(1, factory.getActions().get(url).getInterceptorProxies().size());
         assertEquals(1, factory.getActions().get(url).getInterceptors().size());
         assertEquals(DemoInterceptor.SPRING_DEMO, factory.getActions().get(url).getInterceptorProxies().get(0).getName());

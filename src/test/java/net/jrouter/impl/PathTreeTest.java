@@ -43,7 +43,7 @@ public class PathTreeTest {
      * *     {k2}       e1         e1      {k2}       *
      * *
      */
-    //模拟路径数据
+    // 模拟路径数据
     public static final String[] PATHS = {
             "/xx/yy/zz",
             "/{k1}",
@@ -74,7 +74,7 @@ public class PathTreeTest {
     public void testBefore() {
         tree = new PathTree<>();
         for (String p : PATHS) {
-            //返回 null 表示添加新节点的原节点无相关联的值
+            // 返回 null 表示添加新节点的原节点无相关联的值
             assertNull(tree.put(p, p));
         }
     }
@@ -84,7 +84,7 @@ public class PathTreeTest {
      */
     @Test
     public void testPut() {
-        //添加已经存在相关联值的路径时，覆盖原有路径的值
+        // 添加已经存在相关联值的路径时，覆盖原有路径的值
         assertEquals("/xx/yy/zz", tree.put("/xx/yy/zz", "/xx/yy/zz"));
         assertEquals("/xx/yy/zz", tree.get("/xx/yy/zz"));
         assertEquals("/xx/yy/zz", tree.put("/xx/yy/zz", "another value"));
@@ -168,29 +168,29 @@ public class PathTreeTest {
         assertEquals(excepted, actual);
 
         excepted.put("k1", "zzz");
-        //"/*"
+        // "/*"
         assertTreePathParameters(excepted, "/zzz");
 
         excepted.put("k1", "zzzzz");
         assertTreePathParameters(excepted, "/zzzzz");
 
-        //"/aa/b3/*/d1"
+        // "/aa/b3/*/d1"
         excepted.put("*", "c1");
         assertTreePathParameters(excepted, "/aa/b3/c1/d1");
         excepted.put("*", "null");
         assertTreePathParameters(excepted, "/aa/b3/null/d1");
 
-        //"/aa/b3/*/d1/{k2}"
+        // "/aa/b3/*/d1/{k2}"
         excepted.put("*", "null1");
         excepted.put("k2", "null2");
         assertTreePathParameters(excepted, "/aa/b3/null1/d1/null2");
 
-        //"/aa/b4/c1/d2/null"
+        // "/aa/b4/c1/d2/null"
         excepted.put("k1", "c1");
         excepted.put("k2", "null");
         assertTreePathParameters(excepted, "/aa/b4/c1/d2/null");
 
-        //"/aa/b5/*/*/*/*"
+        // "/aa/b5/*/*/*/*"
         excepted.put("*", "null1");
         excepted.put("*2", "null2");
         excepted.put("*3", "null3");
@@ -209,7 +209,7 @@ public class PathTreeTest {
         Map<String, String> actual = new HashMap<>();
         tree.get(path, actual);
         assertEquals(excepted, actual);
-        //clear the excepted map at last
+        // clear the excepted map at last
         excepted.clear();
     }
 

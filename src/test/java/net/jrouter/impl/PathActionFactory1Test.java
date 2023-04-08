@@ -32,7 +32,7 @@ public class PathActionFactory1Test {
 
     private PathActionFactory.ColonString factory;
 
-    //public for javassist
+    // public for javassist
     public static class TestResult {
 
         private final String prefix;
@@ -57,7 +57,7 @@ public class PathActionFactory1Test {
         properties.setDefaultResultType(TestResult.DEMO);
         factory = new ColonString(properties);
 
-        //path action
+        // path action
         factory.addActions(net.jrouter.URLTestAction.class);
     }
 
@@ -69,7 +69,7 @@ public class PathActionFactory1Test {
     @Test
     public void test_invoke() {
         String prefix = "prefix:";
-        //result
+        // result
         factory.addResultTypes(new TestResult(prefix));
         assertEquals(prefix + "/test100", factory.invokeAction("/test100"));
         assertEquals(prefix + "/test101", factory.invokeAction("/test101"));

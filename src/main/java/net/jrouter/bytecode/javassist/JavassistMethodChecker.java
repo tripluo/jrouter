@@ -35,24 +35,39 @@ import org.slf4j.LoggerFactory;
  */
 public class JavassistMethodChecker {
 
-    /** LOG */
+    /**
+     * LOG.
+     */
     private static final Logger LOG = LoggerFactory.getLogger(JavassistMethodChecker.class);
 
-    private static final String OPCODES[] = Mnemonic.OPCODE;
+    /**
+     * OPCODES.
+     */
+    private static final String[] OPCODES = Mnemonic.OPCODE;
 
-    /** 方法名匹配器 */
+    /**
+     * 方法名匹配器。
+     */
     private final AntPathMatcher methodMatcher = new AntPathMatcher(".");
 
-    /** 方法参数匹配器 */
+    /**
+     * 方法参数匹配器。
+     */
     private final AntPathMatcher parameterMatcher = new AntPathMatcher(",");
 
-    /** source pattern */
+    /**
+     * Source pattern.
+     */
     private final String sourcePattern;
 
-    /** match all */
+    /**
+     * Match all.
+     */
     private final List<MethodInfo> allMatch;
 
-    /** at least match one */
+    /**
+     * At least match one.
+     */
     private final List<MethodInfo> anyMatch;
 
     /**
@@ -109,9 +124,9 @@ public class JavassistMethodChecker {
         }
 
         BitSet matchedAll = new BitSet(allMatch.size());
-        //pass true if any list size < 2
+        // pass true if any list size < 2
         boolean matchedAny = (anyMatch.size() < 2);
-        //match
+        // match
         for (MethodInfo bodyMethod : bodyMethods) {
             for (int i = 0; i < allMatch.size(); i++) {
                 if (!matchedAll.get(i) && matchMethod(bodyMethod, allMatch.get(i))) {
@@ -127,12 +142,12 @@ public class JavassistMethodChecker {
                 }
             }
         }
-        //match all
+        // match all
         if (matchedAll.cardinality() != allMatch.size()) {
             LOG.warn("Not match all for pattern [{}] in method [{}] ", sourcePattern, MethodUtil.getMethod(method));
             return false;
         }
-        //查无匹配
+        // 查无匹配
         if (!matchedAny) {
             LOG.warn("Not match at least one for pattern [{}] in methed [{}]", sourcePattern, MethodUtil.getMethod(method));
             return false;
@@ -140,7 +155,7 @@ public class JavassistMethodChecker {
         return true;
     }
 
-    //build MethodInfo from method's const pool
+    // build MethodInfo from method's const pool
     private static MethodInfo methodInfo(ConstPool pool, int index) {
         MethodInfo mi = new MethodInfo();
         mi.setMethodName(pool.getMethodrefClassName(index) + "." + pool.getMethodrefName(index));
@@ -148,7 +163,7 @@ public class JavassistMethodChecker {
         return mi;
     }
 
-    //build MethodInfo from method's const pool
+    // build MethodInfo from method's const pool
     private static MethodInfo interfaceMethodInfo(ConstPool pool, int index) {
         MethodInfo mi = new MethodInfo();
         mi.setMethodName(pool.getInterfaceMethodrefClassName(index) + "." + pool.getInterfaceMethodrefName(index));
@@ -177,16 +192,22 @@ public class JavassistMethodChecker {
      */
     private static final class MethodInfo {
 
-        //simplify name
+        /**
+         * simplify name.
+         */
         private static final String JAVA_LANG = "java.lang.";
 
-        //method name
+        /**
+         * method name.
+         */
         private String methodName;
 
-        //method parameters
+        /**
+         * method parameters.
+         */
         private String parametersDescription;
 
-        //parse net.jrouter.ActionInvocation.invoke(**) to name/parameters.
+        // parse net.jrouter.ActionInvocation.invoke(**) to name/parameters.
         static MethodInfo toMethodInfo(String des) {
             MethodInfo mi = null;
             if (StringUtil.isNotBlank(des)) {
@@ -203,7 +224,7 @@ public class JavassistMethodChecker {
             return mi;
         }
 
-        //parse parameters to String
+        // parse parameters to String
         static String toParametersDescription(Collection<String> params) {
             if (params == null || params.isEmpty()) {
                 return "";
@@ -220,7 +241,7 @@ public class JavassistMethodChecker {
             }
         }
 
-        //set method name
+        // set method name
         public void setMethodName(String methodName) {
             if (methodName.startsWith(JAVA_LANG)) {
                 methodName = methodName.substring(JAVA_LANG.length());
@@ -228,12 +249,12 @@ public class JavassistMethodChecker {
             this.methodName = methodName;
         }
 
-        //set parameters description, ',' as separator
+        // set parameters description, ',' as separator
         public void setParametersDescription(String parametersDescription) {
             if (parametersDescription.startsWith(JAVA_LANG)) {
                 parametersDescription = parametersDescription.substring(JAVA_LANG.length());
             }
-            //remove "java.lang."
+            // remove "java.lang."
             parametersDescription = parametersDescription.replaceAll("\\s*,\\s*(?:java.lang.)?", ",");
             this.parametersDescription = parametersDescription;
         }
@@ -245,12 +266,12 @@ public class JavassistMethodChecker {
 
     }
 
-    //parse &| as separator, no group
+    // parse &| as separator, no group
     private void parsePattern(String pattern) {
         pattern = StringUtil.trim(pattern, '&', '|');
         List<String> all = new ArrayList<>(4);
         List<String> any = new ArrayList<>(4);
-        //default & as first if no last
+        // default & as first if no last
         char before = Character.MIN_VALUE;
         int p = 0;
         int i = 0;
@@ -262,13 +283,13 @@ public class JavassistMethodChecker {
                 case '|':
                     name = StringUtil.trim(pattern.substring(p, i));
                     if (StringUtil.isNotEmpty(name)) {
-                        //handle first
+                        // handle first
                         if (before == Character.MIN_VALUE) {
                             before = c;
                         }
-                        if (before == '&') { //NOPMD
+                        if (before == '&') { // NOPMD
                             all.add(name);
-                        } else if (before == '|') { //NOPMD
+                        } else if (before == '|') { // NOPMD
                             any.add(name);
                         }
                     }
@@ -282,10 +303,10 @@ public class JavassistMethodChecker {
         if (p < i) {
             name = StringUtil.trim(pattern.substring(p, i));
             if (StringUtil.isNotEmpty(name)) {
-                //if no separator
-                if (before == Character.MIN_VALUE || before == '&') { //NOPMD
+                // if no separator
+                if (before == Character.MIN_VALUE || before == '&') { // NOPMD
                     all.add(name);
-                } else if (before == '|') { //NOPMD
+                } else if (before == '|') { // NOPMD
                     any.add(name);
                 }
             }
@@ -378,17 +399,17 @@ public class JavassistMethodChecker {
                     name = "boolean";
                     break;
                 }
-                //start
+                // start
                 case '(': {
                     break;
                 }
-                //end
+                // end
                 case ')': {
                     break out;
                 }
                 default: {
-                    //ignore
-                    //throw new RuntimeException("bad descriptor: " + descriptor);
+                    // ignore
+                    // throw new RuntimeException("bad descriptor: " + descriptor);
                     break;
                 }
             }

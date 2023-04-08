@@ -41,7 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = {"classpath:jrouter-spring_test.xml"})
 public class DefaultActionFactoryBeanTest {
 
-    //singleton ActionFactory
+    // singleton ActionFactory
     @Autowired
     @Qualifier("actionFactoryTest")
     private ActionFactory factory;

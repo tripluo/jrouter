@@ -17,6 +17,7 @@
 
 package net.jrouter.bytecode.javassist;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.*;
@@ -33,19 +34,29 @@ import net.jrouter.util.MethodUtil;
 @Slf4j
 public class JavassistProxyObjectFactory {
 
-    /** 原代理对象的{@code Class}名 */
+    /**
+     * 原代理对象的{@code Class}名。
+     */
     static final String PROXY_CLASS_TARGET_CLASS_FIELD_NAME = "_targetClass";
 
-    /** 原代理对象 */
+    /**
+     * 原代理对象。
+     */
     static final String PROXY_CLASS_TARGET_FIELD_NAME = "_target";
 
-    /** 生成的代理类包名 */
+    /**
+     * 生成的代理类包名。
+     */
     private static final String PROXY_CLASS_PACKAGE_NAME = JavassistProxyObjectFactory.class.getPackage().getName();
 
-    /** 接口代理类后缀 */
+    /**
+     * 接口代理类后缀。
+     */
     private static final String PROXY_CLASS_SUFFIX = "$$JR_Proxy$$";
 
-    /** 计数器 */
+    /**
+     * 计数器。
+     */
     private static final AtomicInteger COUNTER = new AtomicInteger(0x10000);
 
     static {
@@ -94,8 +105,10 @@ public class JavassistProxyObjectFactory {
                 log.debug("Creating proxy class from {} : {}", instanceClass, proxiedInterface);
             }
             Class<T> proxyClass = (Class) createInterfaceProxyClass(instanceClass, proxiedInterface)
-                    .toClass(proxiedInterface.getClassLoader(), proxiedInterface.getProtectionDomain());
-            T t = proxyClass.getDeclaredConstructor().newInstance();
+                    .toClass(Thread.currentThread().getContextClassLoader(), proxiedInterface.getProtectionDomain());
+            Constructor<T> constructor = proxyClass.getDeclaredConstructor();
+            constructor.setAccessible(true);
+            T t = constructor.newInstance();
             Field f = null;
             f = proxyClass.getDeclaredField(PROXY_CLASS_TARGET_CLASS_FIELD_NAME);
             f.setAccessible(true);
@@ -135,15 +148,15 @@ public class JavassistProxyObjectFactory {
         ClassPool classPool = ClassPool.getDefault();
         ClassClassPath classPath = new ClassClassPath(proxiedInterface);
         classPool.insertClassPath(classPath);
-        //import proxied interface package
+        // import proxied interface package
         classPool.importPackage(proxiedInterface.getPackage().getName());
 
-        //同包interface类前缀 + 16进制计数值
+        // 同包interface类前缀 + 16进制计数值
         CtClass proxyClass = classPool.makeClass(createProxyPackageName(instanceClass, proxiedInterface) + "." + proxiedInterface.getSimpleName() + PROXY_CLASS_SUFFIX + Integer.toHexString(COUNTER.getAndIncrement()));
         try {
-            //继承特定接口/抽象类/类
+            // 继承特定接口/抽象类/类
             proxyClass.addInterface(classPool.getCtClass(proxiedInterface.getName()));
-            //public for create new instance
+            // public for create new instance
             proxyClass.setModifiers(Modifier.PUBLIC);
             proxyClass.addField(CtField.make("private Class " + PROXY_CLASS_TARGET_CLASS_FIELD_NAME + ";", proxyClass));
             proxyClass.addMethod(createSetMethod(proxyClass, PROXY_CLASS_TARGET_CLASS_FIELD_NAME, Class.class));
@@ -173,8 +186,6 @@ public class JavassistProxyObjectFactory {
      * @param clazz 代理方法所在的 {@code CtClass} 类。
      * @param proxiedMethod 被代理的（抽象）方法。
      * @param target 代理对象的方法。
-     *
-     * @throws CannotCompileException when bytecode transformation has failed.
      */
     @SneakyThrows
     private void createMatchedProxyMethod(CtClass clazz, Method proxiedMethod, Method target) {
@@ -188,7 +199,7 @@ public class JavassistProxyObjectFactory {
                 voidMethod ? "void" : returnType.getCanonicalName(),
                 methodName
         ));
-        //proxy parameters begin
+        // proxy parameters begin
         if (parameterLength != 0) {
             for (int i = 0; i < parameterLength - 1; i++) {
                 body.append(proxyParameterTypes[i].getCanonicalName()).append(" p").append(i);
@@ -196,23 +207,23 @@ public class JavassistProxyObjectFactory {
             }
             body.append(proxyParameterTypes[parameterLength - 1].getCanonicalName()).append(" p").append(parameterLength - 1);
         }
-        //proxy parameters end
+        // proxy parameters end
         body.append("){");
 
         if (!voidMethod) {
-            //auto cast return type
+            // auto cast return type
             body.append("return ($r)");
         }
-        //_target.method(;
+        // _target.method(;
         body.append(String.format("%s.%s(", PROXY_CLASS_TARGET_FIELD_NAME, methodName));
         Class<?>[] targetParameterTypes = target.getParameterTypes();
         int targetParameterLength = targetParameterTypes.length;
         if (targetParameterLength != 0) {
             int[] idx = MethodUtil.match(target, proxyParameterTypes);
-            //p1,p2...pn
+            // p1,p2...pn
             for (int i = 0; i < targetParameterLength - 1; i++) {
                 if (idx[i] == -1) {
-                    //null
+                    // null
                     body.append(getReturnNull(targetParameterTypes[i]));
                 } else {
                     body.append(" p").append(idx[i]);
@@ -221,13 +232,13 @@ public class JavassistProxyObjectFactory {
             }
             int end = targetParameterLength - 1;
             if (idx[end] == -1) {
-                //null
+                // null
                 body.append(getReturnNull(targetParameterTypes[end]));
             } else {
                 body.append(" p").append(idx[end]);
             }
         }
-        //_target.method...);
+        // _target.method...);
         body.append(");}");
         clazz.addMethod(CtNewMethod.make(body.toString(), clazz));
     }
@@ -245,12 +256,10 @@ public class JavassistProxyObjectFactory {
         String methodName = proxiedMethod.getName();
         Class<?>[] proxyParameterTypes = proxiedMethod.getParameterTypes();
         int parameterLength = proxyParameterTypes.length;
-        StringBuilder body = new StringBuilder(String.format(
-                "public %s %s(",
-                voidMethod ? "void" : returnType.getCanonicalName(),
-                methodName
-        ));
-        //proxy parameters begin
+        StringBuilder body = new StringBuilder(
+                String.format("public %s %s(", voidMethod ? "void" : returnType.getCanonicalName(), methodName)
+        );
+        // proxy parameters begin
         if (parameterLength != 0) {
             for (int i = 0; i < parameterLength - 1; i++) {
                 body.append(proxyParameterTypes[i].getCanonicalName()).append(" p").append(i);
@@ -258,11 +267,11 @@ public class JavassistProxyObjectFactory {
             }
             body.append(proxyParameterTypes[parameterLength - 1].getCanonicalName()).append(" p").append(parameterLength - 1);
         }
-        //proxy parameters end
+        // proxy parameters end
         body.append("){");
         if (mismatchedMethodExceptionClass == null) {
             if (!voidMethod) {
-                //auto cast return type
+                // auto cast return type
                 body.append("return ($r)");
                 body.append(getReturnNull(returnType));
                 body.append(';');
@@ -282,11 +291,9 @@ public class JavassistProxyObjectFactory {
      * @param type 变量类型。
      *
      * @return CtMethod方法。
-     *
-     * @throws CannotCompileException when bytecode transformation has failed.
      */
     @SneakyThrows
-    private CtMethod createSetMethod(CtClass clazz, String varName, Class<?> type) throws CannotCompileException {
+    private CtMethod createSetMethod(CtClass clazz, String varName, Class<?> type) {
         char[] chars = varName.toCharArray();
         chars[0] = Character.toUpperCase(chars[0]);
         StringBuilder body = new StringBuilder("public void set").append(chars).append('(');
@@ -318,7 +325,7 @@ public class JavassistProxyObjectFactory {
      *
      * @return 代理对象的原实际类型。
      */
-    //@Override
+    // @Override
     public Class<?> getClass(Object obj) {
         if (obj != null) {
             try {
@@ -340,12 +347,12 @@ public class JavassistProxyObjectFactory {
         /**
          * Matched abstract method with target method.
          */
-        Map<Method, Method> matched = Collections.EMPTY_MAP;
+        Map<Method, Method> matched = Collections.emptyMap();
 
         /**
          * Mismatched method.
          */
-        Collection<Method> mismatched = Collections.EMPTY_LIST;
+        Collection<Method> mismatched = Collections.emptyList();
     }
 
     /**
@@ -360,14 +367,14 @@ public class JavassistProxyObjectFactory {
      */
     private static MethodComparison matchMethods(Class<?> proxiedClass, Class<?> targetClass) {
         Map<Method, Method> matched = new LinkedHashMap<>(8);
-        //all method
+        // all method
         Method[] abstractMethods = proxiedClass.getMethods();
         Set<Method> mismatched = new LinkedHashSet<>(Arrays.asList(abstractMethods));
         Method[] targetMethods = targetClass.getMethods();
         boolean[] flags = new boolean[targetMethods.length];
         for (Method abstractMethod : abstractMethods) {
             int mod = abstractMethod.getModifiers();
-            //public abstract
+            // public abstract
             if (Modifier.isPublic(mod)
                     && Modifier.isAbstract(mod)) {
                 for (int i = 0; i < targetMethods.length; i++) {

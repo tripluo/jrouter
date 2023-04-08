@@ -40,7 +40,7 @@ public @interface InterceptorStack {
      *
      * @return 父拦截栈名称。
      */
-    //String parent() default "";
+    // String parent() default "";
 
     /**
      * 包含的拦截器集合。

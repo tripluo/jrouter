@@ -52,7 +52,7 @@ public class DemoThreadActionContextInterceptor {
             THREAD_LOCAL.set(invocation);
             return invocation.invoke();
         } finally {
-            //just keep thread local ActionInvocation for test
+            // just keep thread local ActionInvocation for test
             if (removeActionInvocation)
                 THREAD_LOCAL.remove();
         }

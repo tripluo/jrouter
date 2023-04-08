@@ -36,7 +36,7 @@ public class DemoResult {
     /** result exception */
     public static final String DEMO_RESULT_EXCEPTION = "demoResultException";
 
-    //注入的属性
+    // 注入的属性
     private String value;
 
     /**

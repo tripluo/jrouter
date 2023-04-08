@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @Dynamic
 public class PathActionInvocation implements ActionInvocation<String> {
 
-    /** 日志 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(PathActionInvocation.class);
 
     /** Action是否已调用 */
@@ -101,7 +101,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
      * @param actionProxy Action代理对象。
      * @param originalParams Action代理对象中方法调用的原始参数。
      */
-    public PathActionInvocation(String realPath, ActionFactory actionFactory, PathActionProxy actionProxy,
+    public PathActionInvocation(String realPath, ActionFactory<String> actionFactory, PathActionProxy actionProxy,
                                 Object... originalParams) {
         this.actionPath = realPath;
         this.actionFactory = actionFactory;
@@ -114,7 +114,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
     @Override
     public Object invokeActionOnly(Object... params) throws InvocationProxyException {
         Object[] originalParams = this.originalParameters;
-        //additional parameters pass to Action
+        // additional parameters pass to Action
         if (CollectionUtil.isNotEmpty(params)) {
             originalParams = CollectionUtil.append(params, this); //TODO
         }
@@ -123,7 +123,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
             LOG.debug("Invoke Action [{}]; Parameters {} at : {}",
                     actionProxy.getPath(), java.util.Arrays.toString(originalParams), actionProxy.getMethodInfo());
         }
-        //set invokeResult
+        // set invokeResult
         invokeResult = MethodUtil.invoke(actionProxy, parameterConverter, originalParams, getConvertParameters());
         return invokeResult;
     }
@@ -136,13 +136,13 @@ public class PathActionInvocation implements ActionInvocation<String> {
         if (parameterConverter == null && actionFactory.getConverterFactory() != null) {
             parameterConverter = actionFactory.getConverterFactory().getParameterConverter();
         }
-        //recursive invoke
+        // recursive invoke
         if (interceptors != null && interceptorIndex < interceptors.size()) {
             final InterceptorProxy interceptor = interceptors.get(interceptorIndex++);
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
             }
-            //pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
+            // pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
             MethodUtil.invokeConvertParameters(interceptor, this);
         } else //action invoke
             if (!executed) {
@@ -161,17 +161,17 @@ public class PathActionInvocation implements ActionInvocation<String> {
      */
     public static class ResultProxy implements Result {
 
-        /*
+        /**
          * 结果对象的名称
          */
         private final String name;
 
-        /*
+        /**
          * 结果对象的类型
          */
         private final String type;
 
-        /*
+        /**
          * 结果对象对应的资源路径
          */
         private final String location;

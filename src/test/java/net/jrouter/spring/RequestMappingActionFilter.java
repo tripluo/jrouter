@@ -43,7 +43,7 @@ public class RequestMappingActionFilter implements ActionFilter {
         if (mapping == null) {
             return action;
         } else {
-            //use mapping's value/name, ignore action's value/name
+            // use mapping's value/name, ignore action's value/name
             String[] values = mapping.value();
             if (CollectionUtil.isEmpty(values)) {
                 values = mapping.path();

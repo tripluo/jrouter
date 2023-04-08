@@ -40,7 +40,7 @@ public class ClassScanner {
      * 包含的包或类。
      */
     @lombok.Setter
-    private Set<String> includePackages = Collections.EMPTY_SET;
+    private Set<String> includePackages = Collections.emptySet();
 
     /**
      * 包含匹配类的表达式。
@@ -60,13 +60,13 @@ public class ClassScanner {
      * @return 扫描结果的类集合。
      */
     public Set<Class<?>> getClasses() {
-        Set<Class<?>> includes = ClassUtil.getClasses(includePackages.toArray(new String[includePackages.size()]));
-        //filter the scan classes
+        Set<Class<?>> includes = ClassUtil.getClasses(includePackages.toArray(new String[0]));
+        // filter the scan classes
         Iterator<Class<?>> it = includes.iterator();
         out:
         while (it.hasNext()) {
             Class<?> cls = it.next();
-            //exclude interface, no public class and no default constructors
+            // exclude interface, no public class and no default constructors
             if (cls.isInterface()
                     || Modifier.isAbstract(cls.getModifiers())
                     || !Modifier.isPublic(cls.getModifiers())) {
@@ -74,7 +74,7 @@ public class ClassScanner {
                 continue out;
             } //去除无默认public空构造方法的类
             else {
-                //获取对象的public构造方法
+                // 获取对象的public构造方法
                 Constructor<?>[] cs = cls.getConstructors();
                 if (cs.length == 0) {
                     it.remove();
@@ -82,7 +82,7 @@ public class ClassScanner {
                 } else {
                     boolean hasEmptyConstructor = false;
                     for (Constructor<?> c : cs) {
-                        //空构造方法
+                        // 空构造方法
                         if (c.getParameterTypes().length == 0) {
                             hasEmptyConstructor = true;
                             break;
@@ -95,27 +95,27 @@ public class ClassScanner {
                 }
             }
 
-            //class name
+            // class name
             String clsName = cls.getName();
 
-            //only include matched expression, it means to exclude the classes not match the expression
+            // only include matched expression, it means to exclude the classes not match the expression
             if (CollectionUtil.isNotEmpty(includeExpressions)) {
                 boolean isInclude = false;
                 for (String includeExpression : includeExpressions) {
-                    //the include expression must a pattern
+                    // the include expression must a pattern
                     if (classMatcher.match(includeExpression, clsName)) {
                         isInclude = true;
                         break;
                     }
                 }
-                //不包含与include expressions中
+                // 不包含与include expressions中
                 if (!isInclude) {
                     it.remove();
                     continue out;
                 }
             }
 
-            //exclude matched expressions
+            // exclude matched expressions
             if (CollectionUtil.isNotEmpty(excludeExpressions)) {
                 for (String excludeExpression : excludeExpressions) {
                     if (classMatcher.match(excludeExpression, clsName)) {

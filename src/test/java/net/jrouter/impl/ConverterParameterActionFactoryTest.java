@@ -35,11 +35,11 @@ public class ConverterParameterActionFactoryTest {
     @Before
     public void init() {
         Map<String, Object> props = new HashMap<>();
-        //manually set converterFactory
+        // manually set converterFactory
         props.put("converterFactory", net.jrouter.impl.MultiParameterConverterFactory.class);
 //        props.put("bytecode", "default");
         factory = new ConverterParameterActionFactory(new PathActionFactory.Properties().properties(props));
-        //add test Action
+        // add test Action
         factory.addActions(ConverterParameterAction.class);
     }
 

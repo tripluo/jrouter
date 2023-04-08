@@ -104,7 +104,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
         public Object[] convert(Method method, Object obj, Object[] originalParams, Object[] convertParams) throws
                 JRouterException {
             int paramSize = method.getParameterTypes().length;
-            //无参数的方法
+            // 无参数的方法
             if (paramSize == 0) {
                 return CollectionUtil.EMPTY_OBJECT_ARRAY;
             }
@@ -135,7 +135,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
         private int[] match(Method method, Object[] parameters) {
             int[] idx = null;
             if (fixedOrder) {
-                //get from cache
+                // get from cache
                 idx = methodParametersCache.get(method);
                 if (idx != null) {
                     return idx;
@@ -143,7 +143,7 @@ public class MultiParameterConverterFactory implements ConverterFactory {
             }
             idx = MethodUtil.match(method, parameters);
             if (fixedOrder) {
-                //put in cache
+                // put in cache
                 methodParametersCache.put(method, idx);
             }
             return idx;

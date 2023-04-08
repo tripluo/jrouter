@@ -19,22 +19,25 @@
 
 ![outline](https://raw.githubusercontent.com/tripluo/jrouter/master/outline.png)
 
-● require [jdk 1.7+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
+● require [jdk 1.8+](http://www.oracle.com/technetwork/java/javase/downloads/index.html)
 
 ● require [slf4j](http://www.slf4j.org/download.html)
 
 ◇ [changelog](https://github.com/tripluo/jrouter/blob/master/src/main/resources/changelog.txt)
 
 ### Maven: ###
+
 ```xml
+
 <dependency>
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
-    <version>1.8.5</version>
+    <version>1.8.7</version>
 </dependency>
 ```
 
-###  JavaConfig: ###
+### JavaConfig: ###
+
 ```
 import net.jrouter.ActionFactory;
 import net.jrouter.bytecode.javassist.JavassistMethodChecker;
@@ -93,11 +96,12 @@ import org.springframework.context.annotation.Bean;
 ```
 
 ### Springframework Integration: ###
+
 ```xml
 <!-- JRouter ActionFactory -->
 <bean id="actionFactory" class="net.jrouter.spring.DefaultActionFactoryBean">
     <!-- optional default:null -->
-    <property name="configLocation" value="classpath:jrouter.xml" />
+    <property name="configLocation" value="classpath:jrouter.xml"/>
     <!-- optional default -->
     <property name="actionFactoryClass" value="net.jrouter.impl.PathActionFactory"/>
     <!-- optional default -->

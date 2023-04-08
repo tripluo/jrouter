@@ -40,19 +40,19 @@ public class ActionFactory2Test {
     public void init() {
         factory = new PathActionFactory.ColonString(new PathActionFactory.ColonString.Properties());
 
-        //interceptor
+        // interceptor
         factory.addInterceptors(SampleInterceptor.class);
 
-        //interceptor stack
+        // interceptor stack
         factory.addInterceptorStacks(DefaultInterceptorStack.class);
 
-        //result
+        // result
         factory.addResultTypes(DefaultResult.class);
 
-        //action
-        //class
+        // action
+        // class
         factory.addActions(net.jrouter.URLTestAction.class);
-        //object
+        // object
         factory.addActions(new net.jrouter.URLTestAction2());
     }
 

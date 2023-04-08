@@ -17,6 +17,7 @@
 
 package net.jrouter.impl;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -122,13 +123,13 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      */
     public AbstractActionFactory(Properties prop) {
         prop.afterPropertiesSet();
-        //pass properties
+        // pass properties
         this.objectFactory = prop.objectFactory;
         this.converterFactory = prop.converterFactory;
         this.actionFilter = prop.actionFilter;
         this.methodInvokerFactory = prop.methodInvokerFactory;
         this.methodChecker = prop.methodChecker;
-        //initiate
+        // initiate
         this.interceptors = new HashMap<>();
         this.interceptorStacks = new LinkedHashMap<>();
         this.resultTypes = new HashMap<>();
@@ -206,12 +207,12 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
     public void addInterceptors(Object obj) {
         invokeAwareInterfaces(obj);
         boolean isCls = obj instanceof Class;
-        Class<?> cls = isCls ? (Class) obj : objectFactory.getClass(obj);
+        Class<?> cls = isCls ? (Class<?>) obj : objectFactory.getClass(obj);
         Object invoker = isCls ? null : obj;
         Method[] ms = cls.getDeclaredMethods();
         for (Method m : ms) {
             int mod = m.getModifiers();
-            //带@Interceptor的public/protected方法
+            // 带@Interceptor的public/protected方法
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(Interceptor.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
@@ -221,16 +222,16 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     continue;
                 }
                 m.setAccessible(true);
-                //static method
+                // static method
                 if (Modifier.isStatic(mod)) {
                     addInterceptor(createInterceptorProxy(m, null));
                 } else {
-                    //为类对象且调用者为 null
+                    // 为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
                         invokeAwareInterfaces(invoker);
                     }
-                    //the same object
+                    // the same object
                     addInterceptor(createInterceptorProxy(m, invoker));
                 }
             }
@@ -270,34 +271,34 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         Class<?> cls = isCls ? (Class) obj : objectFactory.getClass(obj);
         Object invoker = isCls ? null : obj;
         Field[] fs = cls.getDeclaredFields();
-        //低到高（相等排后）排序
+        // 低到高（相等排后）排序
         SortedSet<InterceptorStackProxy> sortedSet = new TreeSet<>(new Comparator<InterceptorStackProxy>() {
 
             @Override
             public int compare(InterceptorStackProxy newOne, InterceptorStackProxy exist) {
                 int x = newOne.getInterceptorStack().order();
                 int y = exist.getInterceptorStack().order();
-                //low -> high
+                // low -> high
                 return (x < y) ? -1 : 1;
             }
         });
-        //TODO 是否成员变量
+        // TODO 是否成员变量
         for (Field f : fs) {
             int mod = f.getModifiers();
-            //带@InterceptorStack的public属性
+            // 带@InterceptorStack的public属性
             if (Modifier.isPublic(mod) && f.isAnnotationPresent(InterceptorStack.class)) {
                 f.setAccessible(true);
                 try {
-                    //static field
+                    // static field
                     if (Modifier.isStatic(mod)) {
                         sortedSet.add(createInterceptorStackProxy(f, null));
                     } else {
-                        //为类对象且调用者为 null
+                        // 为类对象且调用者为 null
                         if (isCls && invoker == null) {
                             invoker = objectFactory.newInstance(cls);
                             invokeAwareInterfaces(invoker);
                         }
-                        //the same object
+                        // the same object
                         sortedSet.add(createInterceptorStackProxy(f, invoker));
                     }
                 } catch (IllegalAccessException e) {
@@ -347,7 +348,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         Method[] ms = cls.getDeclaredMethods();
         for (Method m : ms) {
             int mod = m.getModifiers();
-            //带@ResultType的public/protected方法
+            // 带@ResultType的public/protected方法
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(ResultType.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
@@ -357,16 +358,16 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     continue;
                 }
                 m.setAccessible(true);
-                //static method
+                // static method
                 if (Modifier.isStatic(mod)) {
                     addResultType(createResultTypeProxy(m, null));
                 } else {
-                    //为类对象且调用者为 null
+                    // 为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
                         invokeAwareInterfaces(invoker);
                     }
-                    //the same object
+                    // the same object
                     addResultType(createResultTypeProxy(m, invoker));
                 }
             }
@@ -408,7 +409,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         Method[] ms = cls.getDeclaredMethods();
         for (Method m : ms) {
             int mod = m.getModifiers();
-            //带@Result的public/protected方法
+            // 带@Result的public/protected方法
             if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
                     && m.isAnnotationPresent(Result.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
@@ -418,16 +419,16 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     continue;
                 }
                 m.setAccessible(true);
-                //static method
+                // static method
                 if (Modifier.isStatic(mod)) {
                     addResult(createResultProxy(m, null));
                 } else {
-                    //为类对象且调用者为 null
+                    // 为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
                         invokeAwareInterfaces(invoker);
                     }
-                    //the same object
+                    // the same object
                     addResult(createResultProxy(m, invoker));
                 }
             }
@@ -445,7 +446,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      * @return Interceptor代理对象。
      */
     private InterceptorProxy createInterceptorProxy(Method method, Object obj) {
-        //do interceptor method check
+        // do interceptor method check
         if (methodChecker != null) {
             methodChecker.check(method);
         }
@@ -466,25 +467,25 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
     private InterceptorStackProxy createInterceptorStackProxy(Field field, Object obj) throws IllegalAccessException {
         InterceptorStack interceptorStack = field.getAnnotation(InterceptorStack.class);
         String stackName = interceptorStack.name().trim();
-        //interceptorStack name
-        //未指定拦截栈名称则取字符串的值为名称
+        // interceptorStack name
+        // 未指定拦截栈名称则取字符串的值为名称
         if (StringUtil.isEmpty(stackName)) {
             stackName = field.get(obj).toString();
-            //空命名异常
+            // 空命名异常
             if (StringUtil.isEmpty(stackName)) {
                 throw new IllegalArgumentException("Null name of InterceptorStack : " + field.getName() + " at " + objectFactory.getClass(obj));
             }
         }
-        //interceptors
+        // interceptors
         InterceptorStack.Interceptor[] interceptors = interceptorStack.interceptors();
         List<InterceptorStackProxy.InterceptorDelegate> list = null;
         if (interceptors != null) {
             list = new ArrayList<>(interceptors.length);
-            //add interceptorStack
-            //for (int i = names.length - 1; i >= 0; i--) {
+            // add interceptorStack
+            // for (int i = names.length - 1; i >= 0; i--) {
             for (InterceptorStack.Interceptor interceptor : interceptors) {
                 InterceptorProxy ip = this.interceptors.get(interceptor.value());
-                //if null
+                // if null
                 if (ip == null) {
                     LOG.warn("No such Interceptor [{}] for : {}", interceptor, field);
                 } else {
@@ -582,7 +583,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
          */
         @Deprecated
         protected Properties properties(Map<String, Object> properties) {
-            //load objectFactory first
+            // load objectFactory first
             Object value = properties.get("objectFactory");
             if (value != null) {
                 String strValue = value.toString().trim();
@@ -595,12 +596,12 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 } else if (value instanceof Class) {
                     this.objectFactory = (ObjectFactory) (DefaultObjectFactory.newInstance0((Class) value));
                 } else {
-                    //设置创建对象的工厂对象
+                    // 设置创建对象的工厂对象
                     this.objectFactory = (ObjectFactory) value; //throw exception if not matched
                 }
                 LOG.info("Set objectFactory : {}", this.objectFactory);
             }
-            //all properties
+            // all properties
             for (Map.Entry<String, Object> e : properties.entrySet()) {
                 String name = e.getKey();
                 Object val = e.getValue();
@@ -608,11 +609,11 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     LOG.warn("Ignore null value Property [{}].", name);
                     continue;
                 }
-                //string value
+                // string value
                 String strValue = val.toString().trim();
                 if ("bytecode".equalsIgnoreCase(name)) {
                     if (val instanceof String && StringUtil.isNotBlank(strValue)) {
-                        //default to use java reflect directly
+                        // default to use java reflect directly
                         if ("default".equalsIgnoreCase(strValue)) {
                             methodInvokerFactory = null;
                             LOG.info("Set methodInvokerFactory : {}", strValue);
@@ -623,7 +624,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                             LOG.warn("Unknown bytecode property : {}", strValue);
                         }
                     } else {
-                        //throw exception if not matched
+                        // throw exception if not matched
                         methodInvokerFactory = (MethodInvokerFactory) val;
                         LOG.info("Set methodInvokerFactory : {}", this.methodInvokerFactory);
                     }
@@ -631,7 +632,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     converterFactory = loadComponent(ConverterFactory.class, val);
                     LOG.info("Set converterFactory : {}", this.converterFactory);
                 } else if ("interceptorMethodChecker".equalsIgnoreCase(name)) {
-                    //create interceptorMethodChecker
+                    // create interceptorMethodChecker
                     if (ClassUtil.isJavassistSupported() && StringUtil.isNotBlank(strValue)) {
                         methodChecker = new JavassistMethodChecker(strValue);
                         LOG.info("Set methodChecker : {}", this.methodChecker);
@@ -667,7 +668,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
             } else if (value instanceof Class) {
                 return objectFactory.newInstance((Class<T>) value);
             } else {
-                //throw exception if not matched
+                // throw exception if not matched
                 return (T) value;
             }
         }
@@ -694,7 +695,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 actionFilter = new DefaultActionFilter();
             }
             if (methodInvokerFactory == null) {
-                //check if javassist is supported
+                // check if javassist is supported
                 if (ClassUtil.isJavassistSupported()) {
                     methodInvokerFactory = new JavassistMethodInvokerFactory();
                 }
@@ -723,11 +724,13 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
             return newInstance0(clazz);
         }
 
-        //default new object with empty construction method
-        private static <T> T newInstance0(Class<T> clazz) { //NOPMD MethodNamingConventions
+        // default new object with empty construction method
+        private static <T> T newInstance0(Class<T> clazz) { // NOPMD MethodNamingConventions
             try {
-                return clazz.newInstance();
-            } catch (IllegalAccessException | InstantiationException e) {
+                Constructor<T> constructor = clazz.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                return constructor.newInstance();
+            } catch (ReflectiveOperationException e) {
                 throw new JRouterException(e);
             }
         }

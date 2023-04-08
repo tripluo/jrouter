@@ -69,7 +69,7 @@ public class ClassUtil {
      * @param packageNames 指定的包的名称。
      */
     private static void loadClasses(Collection<Class<?>> classes, String... packageNames) {
-        //recursive
+        // recursive
         boolean recursive = true;
         for (String packageName : packageNames) {
             if (StringUtil.isEmpty(packageName)) {
@@ -81,42 +81,42 @@ public class ClassUtil {
                 dirs = Thread.currentThread().getContextClassLoader().getResources(packageDirName);
                 while (dirs.hasMoreElements()) {
                     URL url = dirs.nextElement();
-                    //protocol
+                    // protocol
                     String protocol = url.getProtocol();
-                    //if file
+                    // if file
                     if ("file".equals(protocol)) {
                         String filePath = URLDecoder.decode(url.getFile(), DECODING);
-                        //以文件的方式扫描整个包下的文件 并添加到集合中
+                        // 以文件的方式扫描整个包下的文件 并添加到集合中
                         loadClassesByPackageFile(packageName, filePath, recursive, classes);
                     } //if jar
                     else if ("jar".equals(protocol)) {
                         try (JarFile jar = ((JarURLConnection) url.openConnection()).getJarFile()) {
                             Enumeration<JarEntry> entries = jar.entries();
                             while (entries.hasMoreElements()) {
-                                //获取jar里的一个实体 可以是目录 和一些jar包里的其他文件 如META-INF等文件
+                                // 获取jar里的一个实体 可以是目录 和一些jar包里的其他文件 如META-INF等文件
                                 JarEntry entry = entries.nextElement();
                                 String name = entry.getName();
                                 char slash = '/';
-                                //如果是以/开头的
+                                // 如果是以/开头的
                                 if (name.charAt(0) == slash) {
                                     name = name.substring(1);
                                 }
-                                //如果前半部分和定义的包名相同
+                                // 如果前半部分和定义的包名相同
                                 if (name.startsWith(packageDirName)) {
                                     int idx = name.lastIndexOf(slash);
-                                    //如果以"/"结尾，是一个包
+                                    // 如果以"/"结尾，是一个包
                                     if (idx != -1) {
-                                        //获取包名，把"/"替换成"."
+                                        // 获取包名，把"/"替换成"."
                                         packageName = name.substring(0, idx).replace(slash, '.');
                                     }
-                                    //如果可以迭代下去 并且是一个包
+                                    // 如果可以迭代下去 并且是一个包
                                     if ((idx != -1) || recursive) {
-                                        //如果是一个.class文件，而且不是目录
+                                        // 如果是一个.class文件，而且不是目录
                                         if (name.endsWith(JAVA_CLASS_SUFFIX) && !entry.isDirectory()) {
-                                            //去掉后面的".class" 获取真正的类名
+                                            // 去掉后面的".class" 获取真正的类名
                                             String className = name.substring(packageName.length() + 1, name.length() - 6);
                                             Class<?> cls = loadClassQuietly(packageName + '.' + className);
-                                            if (cls != null) { //NOPMD AvoidDeeplyNestedIfStmts
+                                            if (cls != null) { // NOPMD AvoidDeeplyNestedIfStmts
                                                 classes.add(cls);
                                             }
                                         }
@@ -144,28 +144,28 @@ public class ClassUtil {
      */
     private static void loadClassesByPackageFile(String packageName, String packagePath, final boolean recursive,
                                                  Collection<Class<?>> classes) {
-        //package directory
+        // package directory
         File dir = new File(packagePath);
-        //not exists or not directory
+        // not exists or not directory
         if (!dir.exists() || !dir.isDirectory()) {
             return;
         }
         File[] dirfiles = dir.listFiles(new FileFilter() {
 
             @Override
-            //file filter for .class files
+            // file filter for .class files
             public boolean accept(File file) {
                 return (recursive && file.isDirectory())
                         || (file.getName().endsWith(JAVA_CLASS_SUFFIX));
             }
         });
         for (File file : dirfiles) {
-            //if directory
+            // if directory
             if (file.isDirectory()) {
                 loadClassesByPackageFile(packageName + '.' + file.getName(),
                         file.getAbsolutePath(), recursive, classes);
             } else {
-                //remove .class suffix
+                // remove .class suffix
                 String className = file.getName().substring(0, file.getName().length() - 6);
                 Class<?> cls = loadClassQuietly(packageName + '.' + className);
                 if (cls != null) {
@@ -185,8 +185,8 @@ public class ClassUtil {
     public static Class<?> loadClassQuietly(String className) {
         try {
             return loadClass(className);
-        } catch (Throwable thr) { //NOPMD AvoidCatchingThrowable
-            //ignore
+        } catch (Throwable thr) { // NOPMD AvoidCatchingThrowable
+            // ignore
         }
         return null;
     }
@@ -202,7 +202,7 @@ public class ClassUtil {
      */
     public static Class<?> loadClass(String className) throws ClassNotFoundException {
         ClassLoader contextCL = Thread.currentThread().getContextClassLoader();
-        ClassLoader loader = contextCL == null ? ClassUtil.class.getClassLoader() : contextCL; //NOPMD UseProperClassLoader
+        ClassLoader loader = contextCL == null ? ClassUtil.class.getClassLoader() : contextCL; // NOPMD UseProperClassLoader
         return loader.loadClass(className);
     }
 

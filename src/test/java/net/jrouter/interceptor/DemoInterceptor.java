@@ -36,10 +36,10 @@ public class DemoInterceptor {
     /** spring inject interceptor */
     public static final String SPRING_DEMO = "springInject";
 
-    //注入的属性
+    // 注入的属性
     private String value;
 
-    //注入的属性
+    // 注入的属性
     private Integer number;
 
     @Autowired

@@ -45,7 +45,7 @@ public final class ResultProxy extends DefaultProxy {
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public ResultProxy(ActionFactory actionFactory, Result result, Method method, Object object) {
+    public ResultProxy(ActionFactory<?> actionFactory, Result result, Method method, Object object) {
         super(method, object, actionFactory);
         this.result = result;
     }

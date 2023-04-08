@@ -77,7 +77,7 @@ public class AopAction implements Serializable {
          */
         OVERRIDE("override");
 
-        //aop类型所表征的字符串代码
+        // aop类型所表征的字符串代码
         @lombok.Getter
         private final String code;
 

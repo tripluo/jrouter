@@ -26,7 +26,7 @@ import java.lang.reflect.Method;
  *
  * @since 1.7.7
  */
-//@FunctionalInterface
+// @FunctionalInterface
 public interface PathGenerator<P> {
 
     /**

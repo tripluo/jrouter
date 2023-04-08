@@ -139,7 +139,7 @@ public class SimpleAction {
     @Action(name = "exception", interceptorStack = DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK)
     public void exception() {
 
-        //throw exception
+        // throw exception
         System.out.println(1 / 0);
     }
 
@@ -184,10 +184,10 @@ public class SimpleAction {
         return type;
     }
 
-    //测试注入的字符串
+    // 测试注入的字符串
     private String string;
 
-    //测试注入的数字
+    // 测试注入的数字
     private int number;
 
     /**

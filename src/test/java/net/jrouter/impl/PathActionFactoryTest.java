@@ -43,16 +43,16 @@ public class PathActionFactoryTest {
         prop.setDefaultResultType(DefaultResult.EMPTY);
         factory = new PathActionFactory(prop);
         assertEquals(factory, prop.getActionFactory());
-        //interceptor
+        // interceptor
         factory.addInterceptors(new DemoThreadActionContextInterceptor(false));
 
-        //interceptor stack
+        // interceptor stack
         factory.addInterceptorStacks(DemoThreadActionContextInterceptor.class);
 
-        //result
+        // result
         factory.addResultTypes(DefaultResult.class);
 
-        //path action
+        // path action
         factory.addActions(net.jrouter.PathTestAction.class);
 
     }
@@ -118,34 +118,34 @@ public class PathActionFactoryTest {
             factory.invokeAction("/aa/zzz/c1/d1/e1/null/null/null");
             fail("no exception");
         } catch (JRouterException e) {
-            //no such Action
+            // no such Action
             assertNotNull(e);
         }
 
         excepted.put("k1", "zzz");
-        //"/*"
+        // "/*"
         assertPathParameters(excepted, "/zzz");
 
         excepted.put("k1", "zzzzz");
         assertPathParameters(excepted, "/zzzzz");
 
-        //"/aa/b3/*/d1"
+        // "/aa/b3/*/d1"
         excepted.put("*", "c1");
         assertPathParameters(excepted, "/aa/b3/c1/d1");
         excepted.put("*", "null");
         assertPathParameters(excepted, "/aa/b3/null/d1");
 
-        //"/aa/b3/*/d1/{k2}"
+        // "/aa/b3/*/d1/{k2}"
         excepted.put("*", "null1");
         excepted.put("k2", "null2");
         assertPathParameters(excepted, "/aa/b3/null1/d1/null2");
 
-        //"/aa/b4/c1/d2/null"
+        // "/aa/b4/c1/d2/null"
         excepted.put("k1", "c1");
         excepted.put("k2", "null");
         assertPathParameters(excepted, "/aa/b4/c1/d2/null");
 
-        //"/aa/b5/*/*/*/*"
+        // "/aa/b5/*/*/*/*"
         excepted.put("*", "null1");
         excepted.put("*2", "null2");
         excepted.put("*3", "null3");
@@ -173,7 +173,7 @@ public class PathActionFactoryTest {
         factory.invokeAction(path);
         Map<String, String> actual = getPathParameters();
         assertEquals(excepted, actual);
-        //clear the excepted map at last
+        // clear the excepted map at last
         excepted.clear();
     }
 }

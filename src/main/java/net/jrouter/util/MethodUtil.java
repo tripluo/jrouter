@@ -139,7 +139,7 @@ public class MethodUtil {
                     sb.append("[]");
                 }
                 return sb.toString();
-            } catch (Throwable e) { //NOPMD AvoidCatchingThrowable
+            } catch (Throwable e) { // NOPMD AvoidCatchingThrowable
                 /*FALLTHRU*/
             }
         }
@@ -234,13 +234,13 @@ public class MethodUtil {
     public static int[] match(Method method, Class<?>[] actualParameterTypes, boolean... excludes) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         int[] idx = new int[parameterTypes.length];
-        //flags
+        // flags
         boolean[] convertMatched = null;
         if (actualParameterTypes != null) {
             convertMatched = new boolean[actualParameterTypes.length];
         }
         for (int i = 0; i < idx.length; i++) {
-            //初始值-1, 无匹配
+            // 初始值-1, 无匹配
             idx[i] = -1;
             if (excludes != null && i < excludes.length && excludes[i] == true) {
                 continue;
@@ -248,7 +248,7 @@ public class MethodUtil {
             if (actualParameterTypes != null) {
                 Class<?> parameterType = getObjectClass(parameterTypes[i]);
                 for (int j = 0; j < actualParameterTypes.length; j++) {
-                    //不考虑父子优先级，参数按顺序优先匹配。
+                    // 不考虑父子优先级，参数按顺序优先匹配。
                     if (!convertMatched[j] && parameterType.isAssignableFrom(actualParameterTypes[j])) {
                         idx[i] = j;
                         convertMatched[j] = true;
@@ -273,13 +273,13 @@ public class MethodUtil {
     public static int[] match(Method method, Object[] parameters, boolean... excludes) {
         Class<?>[] parameterTypes = method.getParameterTypes();
         int[] idx = new int[parameterTypes.length];
-        //flags
+        // flags
         boolean[] parameterMatched = null;
         if (parameters != null) {
             parameterMatched = new boolean[parameters.length];
         }
         for (int i = 0; i < idx.length; i++) {
-            //初始值-1, 无匹配
+            // 初始值-1, 无匹配
             idx[i] = -1;
             if (excludes != null && i < excludes.length && excludes[i] == true) {
                 continue;
@@ -287,7 +287,7 @@ public class MethodUtil {
             if (parameters != null) {
                 Class<?> parameterType = getObjectClass(parameterTypes[i]);
                 for (int j = 0; j < parameters.length; j++) {
-                    //不考虑父子优先级，参数按顺序优先匹配。
+                    // 不考虑父子优先级，参数按顺序优先匹配。
                     if (!parameterMatched[j] && parameterType.isInstance(parameters[j])) {
                         idx[i] = j;
                         parameterMatched[j] = true;

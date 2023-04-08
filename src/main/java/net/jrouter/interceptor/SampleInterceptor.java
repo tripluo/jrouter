@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  */
 public class SampleInterceptor {
 
-    /** 日志 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(SampleInterceptor.class);
 
     /** 计时拦截器 */
@@ -49,7 +49,7 @@ public class SampleInterceptor {
         long startTime = System.currentTimeMillis();
         Object result = null;
         try {
-            //invoke
+            // invoke
             result = invocation.invoke();
         } finally {
             if (LOG.isInfoEnabled()) {
@@ -72,10 +72,14 @@ public class SampleInterceptor {
      */
     @Interceptor(name = LOGGING)
     public static Object logging(ActionInvocation invocation) {
-        LOG.info("Starting action [{}] at {}.", invocation.getActionPath(), new Date());
-        //invoke
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Starting action [{}] at {}.", invocation.getActionPath(), new Date());
+        }
+        // invoke
         Object result = invocation.invoke();
-        LOG.info("Finishing action [{}] at {}.", invocation.getActionPath(), new Date());
+        if (LOG.isInfoEnabled()) {
+            LOG.info("Finishing action [{}] at {}.", invocation.getActionPath(), new Date());
+        }
         return result;
     }
 }

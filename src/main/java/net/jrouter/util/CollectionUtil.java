@@ -353,9 +353,9 @@ public class CollectionUtil {
         int point = 0;
         int end = 0;
         for (; i < source.length(); i++) {
-            //if separate
+            // if separate
             if (contains(source.charAt(i), sep)) {
-                //blank
+                // blank
                 end = i - 1;
                 while (Character.isWhitespace(source.charAt(point))) {
                     point++;
@@ -369,7 +369,7 @@ public class CollectionUtil {
                 point = i + 1;
             }
         }
-        //尾串
+        // 尾串
         if (i != point) {
             end = i - 1;
             while (point < i && Character.isWhitespace(source.charAt(point))) {
@@ -414,7 +414,7 @@ public class CollectionUtil {
         int point = 0;
         int end = 0;
         for (; i < source.length(); i++) {
-            //if separate
+            // if separate
             if (contains(source.charAt(i), sep)) {
                 end = i - 1;
                 while (Character.isWhitespace(source.charAt(point))) {
@@ -430,7 +430,7 @@ public class CollectionUtil {
                 point = i + 1;
             }
         }
-        //尾串
+        // 尾串
         if (i != point) {
             end = i - 1;
             while (point < i && Character.isWhitespace(source.charAt(point))) {

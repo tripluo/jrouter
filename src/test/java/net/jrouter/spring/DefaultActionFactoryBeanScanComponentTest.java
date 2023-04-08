@@ -40,7 +40,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations = {"classpath:jrouter-spring_autoscan.xml"})
 public class DefaultActionFactoryBeanScanComponentTest {
 
-    //singleton ActionFactory
+    // singleton ActionFactory
     @Autowired
     @Qualifier("actionFactoryTest")
     private ActionFactory factory;
@@ -74,15 +74,15 @@ public class DefaultActionFactoryBeanScanComponentTest {
         assertNotNull(factory.getResultTypes().get(DefaultResult.EMPTY));
         assertNotNull(factory.getResultTypes().get(DefaultResult.FORWARD));
 
-        //exculde net.jrouter.result
+        // exculde net.jrouter.result
         assertNull(factory.getResultTypes().get(DemoResult.DEMO_RESULT_TYPE));
         assertNull(factory.getResults().get(DefaultResult.RESULT_NOT_FOUND));
         assertNull(factory.getResults().get(DemoResult.DEMO_RESULT_NOT_FOUND));
         assertNull(factory.getResults().get(DemoResult.DEMO_RESULT_EXCEPTION));
 
-        //see @Component in SimpleAction
+        // see @Component in SimpleAction
         assertNotNull(factory.getActions().get("/test/simple"));
-        //see @Component PathTestAction
+        // see @Component PathTestAction
         assertNull(factory.getActions().get("/xx/yy/zz"));
     }
 }

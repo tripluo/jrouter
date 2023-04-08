@@ -30,9 +30,9 @@ import org.slf4j.LoggerFactory;
 /**
  * Bean注入工具类。
  */
-public class Injector { //NOPMD ClassNamingConventions
+public final class Injector {
 
-    /* 日志记录 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(Injector.class);
 
     /** 对象类型与其注入属性的映射 */
@@ -46,9 +46,9 @@ public class Injector { //NOPMD ClassNamingConventions
      */
     private static final Set<Class<?>> SUPPORT_TYPES = new HashSet<>(18);
 
-    //初始化所支持的对象类型。
+    // 初始化所支持的对象类型。
     static {
-        //String to Class
+        // String to Class
         SUPPORT_TYPES.add(Class.class);
         SUPPORT_TYPES.add(String.class);
         SUPPORT_TYPES.add(boolean.class);
@@ -119,7 +119,7 @@ public class Injector { //NOPMD ClassNamingConventions
      */
     private static Injection[] convertToInjections(Class<?> cls, Map<String, Object> properties) throws
             IntrospectionException {
-        //common class properties
+        // common class properties
         Map<String, PropertyDescriptor> supports = Injector.getSupportedProperties(cls);
         List<Injection> injections = new ArrayList<>(properties.size());
         for (Map.Entry<String, Object> prop : properties.entrySet()) {
@@ -132,7 +132,7 @@ public class Injector { //NOPMD ClassNamingConventions
                 if (value instanceof String) {
                     Object convertedValue = Injector.stringToObject((String) value, pd.getPropertyType());
                     if (convertedValue == null) {
-                        LOG.warn("Not supported property [{}] for type [{}] in " + cls, pName, pd.getPropertyType());
+                        LOG.warn("Not supported property [{}] for type [{}] in {}.", pName, pd.getPropertyType(), cls);
                     } else {
                         injections.add(new Injection(pd.getWriteMethod(), convertedValue));
                     }
@@ -141,7 +141,7 @@ public class Injector { //NOPMD ClassNamingConventions
                 }
             }
         }
-        return injections.toArray(new Injection[injections.size()]);
+        return injections.toArray(new Injection[0]);
     }
 
     /*
@@ -155,7 +155,7 @@ public class Injector { //NOPMD ClassNamingConventions
      */
     static void injectAction(String actionPath, Object invoker) throws IllegalAccessException, InvocationTargetException {
         Injection[] injects = ACTION_INJECTION.get(actionPath);
-        //如果指定的Action中无注入属性，则查找其对象类型的注入属性
+        // 如果指定的Action中无注入属性，则查找其对象类型的注入属性
 //        if (injects == null) {
 //            injects = classInjection.get(invoker.getClass());
 //        }
@@ -203,7 +203,7 @@ public class Injector { //NOPMD ClassNamingConventions
     public static Map<String, PropertyDescriptor> getSupportedProperties(Class<?> cls) throws IntrospectionException {
         PropertyDescriptor[] propds = Introspector.getBeanInfo(cls).getPropertyDescriptors();
         Map<String, PropertyDescriptor> support = new HashMap<>(propds.length);
-        //getPropertyDescriptors返回的PropertyDescriptor[]已经过滤了重复的属性名。
+        // getPropertyDescriptors返回的PropertyDescriptor[]已经过滤了重复的属性名。
         for (PropertyDescriptor p : propds) {
             if (SUPPORT_TYPES.contains(p.getPropertyType())) {
                 support.put(p.getName(), p);

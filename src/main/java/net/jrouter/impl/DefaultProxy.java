@@ -39,7 +39,7 @@ public class DefaultProxy extends AbstractProxy {
      * @param object 指定的对象。
      * @param actionFactory 指定的ActionFactory。
      */
-    public DefaultProxy(Method method, Object object, ActionFactory actionFactory) {
+    public DefaultProxy(Method method, Object object, ActionFactory<?> actionFactory) {
         super(method, object);
         if (actionFactory != null && actionFactory.getMethodInvokerFactory() != null) {
             Class<?> targetClass = ((object == null || actionFactory.getObjectFactory() == null)
@@ -68,9 +68,9 @@ public class DefaultProxy extends AbstractProxy {
         } catch (IllegalAccessException e) {
             throw new InvocationProxyException(e, this);
         } catch (InvocationTargetException e) {
-            throw new InvocationProxyException(e.getTargetException(), this);//NOPMD PreserveStackTrace
+            throw new InvocationProxyException(e.getTargetException(), this);// NOPMD PreserveStackTrace
         } //convert Exception to InvocationProxyException
-        catch (Exception e) { //NOPMD IdenticalCatchBranches
+        catch (Exception e) { // NOPMD IdenticalCatchBranches
             throw new InvocationProxyException(e, this);
         }
     }

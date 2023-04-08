@@ -78,16 +78,16 @@ public class ActionFactoryTest {
         prop.setExtension(".do");
         factory = new PathActionFactory(prop);
 
-        //interceptor
+        // interceptor
         factory.addInterceptors(SampleInterceptor.class);
 
-        //interceptor stack
+        // interceptor stack
         factory.addInterceptorStacks(DefaultInterceptorStack.class);
 
-        //result
+        // result
         factory.addResultTypes(DefaultResult.class);
 
-        //action
+        // action
         factory.addActions(net.jrouter.SimpleAction.class);
 
         assertSame(null, factory.getDefaultInterceptorStack());
@@ -170,7 +170,7 @@ public class ActionFactoryTest {
      */
     @Test
     public void test_simple() {
-        //简单调用
+        // 简单调用
         String url1 = "/test/simple";
 
         PathActionProxy ap = factory.getActions().get(url1);
@@ -183,7 +183,7 @@ public class ActionFactoryTest {
 
         ap.invoke();
 
-        //带参数调用
+        // 带参数调用
         String url2 = "/test/param";
         ap = factory.getActions().get(url2);
         assertNotNull(ap);
@@ -195,7 +195,7 @@ public class ActionFactoryTest {
         assertEquals("test100", factory.invokeAction(url2, "test", 100));
         assertEquals("test100100", factory.invokeAction(url2, "test100", 100));
 
-        //调用发生异常
+        // 调用发生异常
         String url3 = "/test/exception";
         ap = factory.getActions().get(url3);
 
@@ -208,7 +208,7 @@ public class ActionFactoryTest {
         assertNotNull(ap.getResults());
 
         try {
-            //测试调用时抛出异常
+            // 测试调用时抛出异常
             ap.invoke();
             fail("no exception");
         } catch (InvocationProxyException e) {
@@ -216,12 +216,12 @@ public class ActionFactoryTest {
             assertSame(ap, e.getTarget());
         }
         try {
-            //测试调用时抛出异常
+            // 测试调用时抛出异常
             factory.invokeAction(url3);
             fail("no exception");
         } catch (InvocationProxyException e) {
             assertNotNull(e);
-            //ActionFactory调用抛出异常，测试消除拦截器的递归调用对异常信息的扰乱。
+            // ActionFactory调用抛出异常，测试消除拦截器的递归调用对异常信息的扰乱。
             assertFalse(e.getCause() instanceof InvocationProxyException);
             assertSame(ap, e.getTarget());
         }
@@ -229,12 +229,12 @@ public class ActionFactoryTest {
         String url4 = "/test/singleVarArgsArray";
         ap = factory.getActions().get(url4);
         assertNotNull(ap);
-        //singleVarArgsArray
+        // singleVarArgsArray
         assertEquals("null", factory.invokeAction(url4));
         assertEquals("null", factory.invokeAction(url4, (Object) null));
         assertEquals("null", factory.invokeAction(url4, (Object[]) null));
         assertEquals("null", factory.invokeAction(url4, new Object[]{null}));
-        //assertEquals("null", factory.invokeAction(url4, new Object[0]));
+        // assertEquals("null", factory.invokeAction(url4, new Object[0]));
         assertEquals("null", factory.invokeAction(url4, new Object[0]));
         assertEquals("[]", factory.invokeAction(url4, new Object[]{new String[]{}}));
         assertEquals("[null, null, null]", factory.invokeAction(url4, new Object[]{new String[]{null, null, null}}));
@@ -249,7 +249,7 @@ public class ActionFactoryTest {
         String url5 = "/test/varArgsArray";
         ap = factory.getActions().get(url5);
         assertNotNull(ap);
-        //varArgsArray
+        // varArgsArray
         assertEquals("100null", factory.invokeAction(url5, 100));
         assertEquals("100null", factory.invokeAction(url5, 100, null));
         assertEquals("100null", factory.invokeAction(url5, 100, null, null, null));
@@ -264,7 +264,7 @@ public class ActionFactoryTest {
         assertEquals("100null", factory.invokeAction(url5, new Object[]{100, null}));
         assertEquals("100null", factory.invokeAction(url5, 100, "1"));
         assertEquals("100null", factory.invokeAction(url5, 100, "1", "2"));
-        //set first parameter null
+        // set first parameter null
         assertEquals("nullnull", factory.invokeAction(url5, (Object) null));
         assertEquals("nullnull", factory.invokeAction(url5, (Object[]) null));
 
@@ -283,7 +283,7 @@ public class ActionFactoryTest {
         assertEquals("100200null", factory.invokeAction(url6, new Object[]{100, 200, null}));
         assertEquals("100200null", factory.invokeAction(url6, 100, 200, "1"));
         assertEquals("100200null", factory.invokeAction(url6, 100, 200, "1", "2"));
-        //set previous parameter null
+        // set previous parameter null
         assertEquals("100nullnull", factory.invokeAction(url6, 100, (Object) null));
         assertEquals("100nullnull", factory.invokeAction(url6, 100, (Object[]) null));
     }
@@ -310,14 +310,14 @@ public class ActionFactoryTest {
     @Test
     public void test_autoRender() {
         Map<String, Object> props = new HashMap<>();
-        //默认结果处理直接返回调用结果
+        // 默认结果处理直接返回调用结果
         props.put("defaultStringResultType", DefaultResult.EMPTY);
 
         String url1 = "/test/autoRender.do";
-        //rebuild factory
+        // rebuild factory
         factory = initiateConfiguration().addActionFactoryProperties(props).buildActionFactory();
 
-        //full match
+        // full match
         assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, "test"));
 
         assertEquals(DefaultResult.EMPTY + ":abc", factory.invokeAction(url1, DefaultResult.EMPTY + ":abc"));
@@ -326,9 +326,9 @@ public class ActionFactoryTest {
         assertEquals("  :abcd", factory.invokeAction(url1, "  :abcd"));
         assertEquals(" :   abcde", factory.invokeAction(url1, " :   abcde"));
 
-        //forward
+        // forward
         props.put("defaultStringResultType", DefaultResult.FORWARD);
-        //rebuild factory
+        // rebuild factory
         factory = initiateConfiguration().addActionFactoryProperties(props).buildActionFactory();
         assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, ":/test/simple2"));
         assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, "  : /test/simple2"));
@@ -355,7 +355,7 @@ public class ActionFactoryTest {
     @Test
     public void test_inject() {
         String url1 = "/test/inject";
-        //Action的scope为"PROTOTYPE"，进行多次测试
+        // Action的scope为"PROTOTYPE"，进行多次测试
         assertEquals("admin100", factory.invokeAction(url1));
         assertEquals("admin100", factory.invokeAction(url1));
         assertEquals("admin100", factory.invokeAction(url1));

@@ -54,13 +54,13 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     @lombok.Setter
     private Resource configLocation;
 
-    /* ActionFactory对象 */
+    /** ActionFactory对象 */
     private T actionFactory;
 
-    /* ActionFactory的类型 */
+    /** ActionFactory的类型 */
     private Class<T> actionFactoryClass = null;
 
-    /* 指定的Configuration */
+    /** 指定的Configuration */
     @lombok.Setter
     private Configuration configuration;
 
@@ -106,23 +106,24 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     private Properties actionFactoryProperties = new Properties();
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
-    /* 拦截器的bean名称和类名称的集合 */
+
+    /** 拦截器的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> interceptors = null;
 
-    /* 拦截栈的bean名称和类名称的集合 */
+    /** 拦截栈的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> interceptorStacks = null;
 
-    /* 结果类型的bean名称和类名称的集合 */
+    /** 结果类型的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> resultTypes = null;
 
-    /* 结果对象的bean名称和类名称的集合 */
+    /** 结果对象的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> results = null;
 
-    /* Action的bean名称和类名称的集合 */
+    /** Action的bean名称和类名称的集合 */
     @lombok.Setter
     private List<Object> actions = null;
 
@@ -165,19 +166,23 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      *
      * @throws Exception 如果发生异常。
      */
-    protected ActionFactory buildActionFactory() throws Exception { //NOPMD SignatureDeclareThrowsException
+    protected ActionFactory buildActionFactory() throws Exception { // NOPMD SignatureDeclareThrowsException
         LOG.info("Initiating JRouter ActionFactory at : {}", new java.util.Date());
         if (configuration == null) {
             configuration = createDefaultConfiguration();
         }
-        //不保证ActionFactory属性的重复加载
+        // 不保证ActionFactory属性的重复加载
         if (configLocation != null) {
-            LOG.debug("Load configuration : {}", configLocation.getURL());
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Load configuration : {}", configLocation.getURL());
+            }
             configuration.load(configLocation.getURL());
         }
 
         if (actionFactoryClass != null) {
-            LOG.debug("Set actionFactoryClass : {}", actionFactoryClass);
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("Set actionFactoryClass : {}", actionFactoryClass);
+            }
             configuration.setActionFactoryClass(actionFactoryClass);
         } else {
             setDefaultActionFactoryClass(configuration);
@@ -195,27 +200,27 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         }
         configuration.addActionFactoryProperties((Map) actionFactoryProperties);
 
-        //添加扫描工具属性
+        // 添加扫描工具属性
         if (componentClassScanProperties != null) {
-            configuration.addComponentClassScanProperties(componentClassScanProperties.toArray(new Map[componentClassScanProperties.size()]));
+            configuration.addComponentClassScanProperties(componentClassScanProperties.toArray(new Map[0]));
         }
-        //convert string to class
+        // convert string to class
         convertList(interceptors, interceptorStacks, resultTypes, results, actions);
 
         if (CollectionUtil.isNotEmpty(componentBeanScanProperties)) {
             char[] sep = {',', ';'};
-            //匹配包含bean名称的表达式
+            // 匹配包含bean名称的表达式
             List<String> includeComponentBeanExpressions = new ArrayList<>(2);
             CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentBeanExpression"), includeComponentBeanExpressions, sep);
-            //匹配排除bean名称的表达式
+            // 匹配排除bean名称的表达式
             List<String> excludeComponentBeanExpressions = new ArrayList<>(2);
             CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentBeanExpression"), excludeComponentBeanExpressions, sep);
 
-            //匹配包含class的表达式
+            // 匹配包含class的表达式
             List<String> includeComponentClassExpressions = new ArrayList<>(2);
             CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentClassExpression"), includeComponentClassExpressions, sep);
 
-            //匹配排除class名称的表达式
+            // 匹配排除class名称的表达式
             List<String> excludeComponentClassExpressions = new ArrayList<>(2);
             CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentClassExpression"), excludeComponentClassExpressions, sep);
 
@@ -235,14 +240,14 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
                     }
                 }
             }
-            //add include beans
+            // add include beans
             out:
             for (String includeName : includes) {
                 try {
                     Object bean = applicationContext.getBean(includeName);
                     String clsName = bean.getClass().getName();
                     for (String excludeComponentClassExpression : excludeComponentClassExpressions) {
-                        //exclude class
+                        // exclude class
                         if (matcher.match(excludeComponentClassExpression, clsName)) {
                             continue out;
                         }
@@ -250,23 +255,23 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
                     if (CollectionUtil.isNotEmpty(includeComponentClassExpressions)) {
                         for (String includeComponentClassExpression : includeComponentClassExpressions) {
                             if (matcher.match(includeComponentClassExpression, clsName)) {
-                                //only add matched-class bean
+                                // only add matched-class bean
                                 addComponentToList(bean, interceptors, interceptorStacks, resultTypes, results, actions);
                                 continue out;
                             }
                         }
                     } else {
-                        //if no includeComponentClassExpression, means allow all
+                        // if no includeComponentClassExpression, means allow all
                         addComponentToList(bean, interceptors, interceptorStacks, resultTypes, results, actions);
                     }
                 } catch (BeansException e) {
-                    //ignore
+                    // ignore
                     LOG.warn("Can't get bean : {}", includeName);
                 }
             }
         }
 
-        //set configuration
+        // set configuration
         if (CollectionUtil.isNotEmpty(interceptors)) {
             configuration.addInterceptors(interceptors);
         }
@@ -282,9 +287,9 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         if (CollectionUtil.isNotEmpty(actions)) {
             configuration.addActions(actions);
         }
-        //TODO
-        //configuration.setPathProperties(null);
-        //actions' aop
+        // TODO
+        // configuration.setPathProperties(null);
+        // actions' aop
         if (CollectionUtil.isNotEmpty(aopActions)) {
             configuration.addAopActions(aopActions);
         }
@@ -297,7 +302,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      * @return {@code SpringConfiguration}对象。
      */
     protected Configuration createDefaultConfiguration() {
-        //create SpringObjectFactory
+        // create SpringObjectFactory
         return new SpringConfiguration(applicationContext);
     }
 
@@ -320,7 +325,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      * @return {@code SpringObjectFactory}对象。
      */
     protected ObjectFactory createDefaultObjectFactory(Configuration config) {
-        //create SpringObjectFactory
+        // create SpringObjectFactory
         return new SpringObjectFactory(applicationContext);
     }
 

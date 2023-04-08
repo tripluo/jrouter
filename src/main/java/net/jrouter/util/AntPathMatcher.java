@@ -66,6 +66,7 @@ import java.util.regex.Pattern;
  * @author Sam Brannen
  * @since 16.07.2003
  */
+@SuppressWarnings("PMD")
 public class AntPathMatcher {
 
     private static final Pattern VARIABLE_PATTERN = Pattern.compile("\\{[^/]+?\\}");

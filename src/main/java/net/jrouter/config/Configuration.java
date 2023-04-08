@@ -22,7 +22,6 @@ import java.beans.PropertyDescriptor;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
@@ -66,11 +65,9 @@ import org.xml.sax.*;
  *
  * @see #buildActionFactory()
  */
-public class Configuration implements Serializable {
+public class Configuration {
 
-    private static final long serialVersionUID = 1L;
-
-    /* 日志记录 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -169,7 +166,7 @@ public class Configuration implements Serializable {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /* ActionFactory的类型，默热为PathActionFactory类型 */
+    /** ActionFactory的类型，默热为PathActionFactory类型 */
     private Class<? extends ActionFactory> actionFactoryClass = PathActionFactory.class;
 
     /** ActionFactory的属性 */
@@ -317,7 +314,7 @@ public class Configuration implements Serializable {
             url = Configuration.class.getResource(resource);
         }
         if (url == null) {
-            url = Configuration.class.getClassLoader().getResource(name); //NOPMD UseProperClassLoader
+            url = Configuration.class.getClassLoader().getResource(name); // NOPMD UseProperClassLoader
         }
         if (url == null) {
             throw new IllegalArgumentException(resource + " not found");
@@ -333,7 +330,7 @@ public class Configuration implements Serializable {
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
     private static void printSeparator(boolean bool) {
         if (bool) {
-            System.out.println("--------------------------------------------------------------------------------");//NOPMD
+            System.out.println("--------------------------------------------------------------------------------");// NOPMD
         }
     }
 
@@ -342,7 +339,7 @@ public class Configuration implements Serializable {
      */
     private static class DocumentLoader {
 
-        /* SAX 错误处理对象 */
+        /** SAX 错误处理对象 */
         static final ErrorHandler ERROR_HANDLER = new ErrorHandler() {
 
             @Override
@@ -361,7 +358,7 @@ public class Configuration implements Serializable {
             }
         };
 
-        /* 用于解析实体的对象 */
+        /** 用于解析实体的对象 */
         static final EntityResolver ENTITY_RESOLVER = new EntityResolver() {
 
             @Override
@@ -418,13 +415,13 @@ public class Configuration implements Serializable {
     protected Configuration load(InputStream stream, String resourceName) throws ConfigurationException {
         try {
             Document doc = DocumentLoader.loadDocument(stream);
-            //root node : <jrouter>
+            // root node : <jrouter>
             Element root = doc.getDocumentElement();
 
             List<Element> list = null;
             int length = 0;
 
-            //action-factory tag
+            // action-factory tag
             list = getChildNodesByTagName(root, ACTION_FACTORY);
             if ((length = list.size()) == 1) {
                 Element e = list.get(0);
@@ -433,32 +430,32 @@ public class Configuration implements Serializable {
                     actionFactoryClass = (Class<? extends ActionFactory>) ClassUtil.loadClass(cls);
                 }
                 LOG.info("Configured SessionFactory : {}", cls);
-                //ActionFactory's properties
+                // ActionFactory's properties
                 list = getChildNodesByTagName(e, PROPERTY);
-                //parse ActionFactory's properties
+                // parse ActionFactory's properties
                 actionFactoryProperties = parseProperties(actionFactoryClass, list);
             } else if (length > 1) {
                 throw new ConfigurationException("More than one <" + ACTION_FACTORY + "> tag in : " + resourceName, null);
             }
 
-            //parse "<component-scan>"
+            // parse "<component-scan>"
             parseScanComponentClasses(root);
 
             printSeparator(!list.isEmpty());
 
-            //依次添加interceptor、interceptorStack、result-type、result、action。
+            // 依次添加interceptor、interceptorStack、result-type、result、action。
             parseActionFactoryElements(root);
 
-            //include
+            // include
             list = getChildNodesByTagName(root, INCLUDE);
-            //length = list.size();
+            // length = list.size();
             Map<String, String> record = new HashMap<>();
             for (Element e : list) {
-                //add included files, use a hash set to avoid circular reference
+                // add included files, use a hash set to avoid circular reference
                 parseInclude(resourceName, e.getAttribute(FILE), record);
             }
 
-            //parse "<aop-config>"
+            // parse "<aop-config>"
             parseAop(root);
 
         } catch (ConfigurationException e) {
@@ -510,7 +507,7 @@ public class Configuration implements Serializable {
             throw new ConfigurationException("IOException occurred in included file : " + include, e);
         }
 
-        //if circular reference
+        // if circular reference
         if (record.containsKey(includeFile)) {
             throw new ConfigurationException("Load circular reference file, "
                     + "[" + includeFile + "] included in [" + from + "] and [" + record.get(includeFile) + "]", null);
@@ -521,10 +518,10 @@ public class Configuration implements Serializable {
             Document doc = DocumentLoader.loadDocument(stream);
             Element root = doc.getDocumentElement();
 
-            //add properties
+            // add properties
             parseActionFactoryElements(root);
 
-            //add include
+            // add include
             List<Element> list = getChildNodesByTagName(root, INCLUDE);
             for (Element e : list) {
                 parseInclude(includeFile, e.getAttribute(FILE), record);
@@ -558,16 +555,16 @@ public class Configuration implements Serializable {
     private void parseActionFactoryElements(Element root) throws ClassNotFoundException, IllegalAccessException,
             IntrospectionException, InvocationTargetException {
         List<Element> list = null;
-        //interceptor
+        // interceptor
         list = getChildNodesByTagName(root, INTERCEPTOR);
         for (Element e : list) {
             Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load Interceptor class : {}", cls);
-            //add interceptors
+            // add interceptors
             if (!interceptors.add(cls)) {
                 LOG.warn("Duplicate interceptor class : {}, Override the configuration and properties.", cls);
             }
-            //set property nodes
+            // set property nodes
             Map<String, Object> props = parseProperties(cls, getChildNodesByTagName(e, PROPERTY));
             if (!props.isEmpty()) {
                 interceptorProperties.put(cls, props);
@@ -576,17 +573,17 @@ public class Configuration implements Serializable {
 
         printSeparator(!list.isEmpty());
 
-        //interceptor-stack
+        // interceptor-stack
         list = getChildNodesByTagName(root, INTERCEPTOR_STACK);
         for (Element e : list) {
             Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load InterceptorStack class : {}", cls);
-            //add interceptor stacks
+            // add interceptor stacks
             if (!interceptorStacks.add(cls)) {
                 LOG.warn("Duplicate InterceptorStack class : {}, Override the configuration and properties.", cls);
             }
 
-            //set property nodes
+            // set property nodes
             Map<String, Object> props = parseProperties(cls, getChildNodesByTagName(e, PROPERTY));
             if (!props.isEmpty()) {
                 interceptorStackProperties.put(cls, props);
@@ -595,16 +592,16 @@ public class Configuration implements Serializable {
 
         printSeparator(!list.isEmpty());
 
-        //result-type
+        // result-type
         list = getChildNodesByTagName(root, RESULT_TYPE);
         for (Element e : list) {
             Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load ResultType class : {}", cls);
-            //add result types
+            // add result types
             if (!resultTypes.add(cls)) {
                 LOG.warn("Duplicate ResultType class : {}, Override the configuration and properties.", cls);
             }
-            //set property nodes
+            // set property nodes
             Map<String, Object> props = parseProperties(cls, getChildNodesByTagName(e, PROPERTY));
             if (!props.isEmpty()) {
                 resultTypeProperties.put(cls, props);
@@ -613,16 +610,16 @@ public class Configuration implements Serializable {
 
         printSeparator(!list.isEmpty());
 
-        //result
+        // result
         list = getChildNodesByTagName(root, RESULT);
         for (Element e : list) {
             Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load Result class : {}", cls);
-            //add results
+            // add results
             if (!results.add(cls)) {
                 LOG.warn("Duplicate Result class : {}, Override the configuration and properties.", cls);
             }
-            //set property nodes
+            // set property nodes
             Map<String, Object> props = parseProperties(cls, getChildNodesByTagName(e, PROPERTY));
             if (!props.isEmpty()) {
                 resultProperties.put(cls, props);
@@ -631,32 +628,32 @@ public class Configuration implements Serializable {
 
         printSeparator(!list.isEmpty());
 
-        //action
+        // action
         list = getChildNodesByTagName(root, ACTION);
         for (Element e : list) {
-            //action <property> nodes
+            // action <property> nodes
             List<Element> propnodes = getChildNodesByTagName(e, PROPERTY);
 
             Class<?> cls = ClassUtil.loadClass(e.getAttribute(CLASS));
             LOG.debug("Load Action class : {}", cls);
-            //add results
+            // add results
             if (!actions.add(cls)) {
                 LOG.warn("Duplicate Action class : {}, Override the configuration and properties.", cls);
             }
 
-            //set property nodes
+            // set property nodes
             Map<String, Object> props = parseProperties(cls, propnodes);
             if (!props.isEmpty()) {
                 actionProperties.put(cls, props);
             }
-            //<path> nodes
+            // <path> nodes
             List<Element> pathnodes = getChildNodesByTagName(e, PATH);
             for (Element path : pathnodes) {
                 String pathName = path.getAttribute(NAME);
-                //记录path对应的Action
+                // 记录path对应的Action
                 pathActions.put(pathName, cls);
                 LOG.debug("Load path properties : {}", pathName);
-                //path <property> nodes
+                // path <property> nodes
                 List<Element> pathpropnodes = getChildNodesByTagName(path, PROPERTY);
                 Map<String, Object> pathProps = new LinkedHashMap<>();
                 for (Element p : pathpropnodes) {
@@ -700,7 +697,7 @@ public class Configuration implements Serializable {
                 if (StringUtil.isNotBlank(exclude)) {
                     props.put(EXCLUDE_EXPRESSION, exclude);
                 }
-                //add a new ClassScanner for each <component-scan>
+                // add a new ClassScanner for each <component-scan>
                 classScanners.add(parsecComponentClassScanner(props));
             } else {
                 LOG.warn("Property [{}] can't be empty for <component-scan>.", PACKAGE);
@@ -728,15 +725,15 @@ public class Configuration implements Serializable {
             Set<String> set = new LinkedHashSet<>();
             if (PACKAGE.equalsIgnoreCase(name)) {
                 CollectionUtil.stringToCollection(value, set, sep);
-                //packages
+                // packages
                 scanner.setIncludePackages(set);
             } else if (INCLUDE_EXPRESSION.equalsIgnoreCase(name)) {
                 CollectionUtil.stringToCollection(value, set, sep);
-                //include expression
+                // include expression
                 scanner.setIncludeExpressions(set);
             } else if (EXCLUDE_EXPRESSION.equalsIgnoreCase(name)) {
                 CollectionUtil.stringToCollection(value, set, sep);
-                //exclude expression
+                // exclude expression
                 scanner.setExcludeExpressions(set);
             } else {
                 LOG.warn("Unknown property [{}] : [{}]", name, value);
@@ -792,7 +789,7 @@ public class Configuration implements Serializable {
     private static List<Element> getChildNodesByTagName(Element parent, String name) {
         List<Element> eles = new ArrayList<>();
         for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
-            //System.out.println(child.getNodeName() + "," + child.getNodeType());
+            // System.out.println(child.getNodeName() + "," + child.getNodeType());
             if (Node.ELEMENT_NODE == child.getNodeType() && name.equals(child.getNodeName())) {
                 eles.add((Element) child);
             }
@@ -842,7 +839,7 @@ public class Configuration implements Serializable {
                 }
             } else {
                 Object value = e.getValue();
-                //convert string to specific object
+                // convert string to specific object
                 if (value instanceof String) {
                     value = Injector.stringToObject((String) value, pd.getPropertyType());
                 }
@@ -881,19 +878,19 @@ public class Configuration implements Serializable {
      * @throws ConfigurationException 如果发生无效的配置。
      */
     public <T extends ActionFactory> T buildActionFactory() throws ConfigurationException {
-        //create ActionFactory
+        // create ActionFactory
         ActionFactory factory = createActionFactory(actionFactoryClass, actionFactoryProperties);
         printSeparator(!actionFactoryProperties.isEmpty());
         try {
-            //扫描类集合
+            // 扫描类集合
             Set<Class<?>> scanComponents = new LinkedHashSet<>();
-            //计算扫描类集合
+            // 计算扫描类集合
             if (!classScanners.isEmpty()) {
                 for (ClassScanner scanner : classScanners) {
                     LOG.info("Add classes scanner : {}", scanner);
                     scanComponents.addAll(scanner.getClasses());
                 }
-                //just for debug log
+                // just for debug log
                 if (LOG.isDebugEnabled()) {
                     if (!scanComponents.isEmpty()) {
                         LOG.debug("Checking auto scan classes as follows :");
@@ -904,7 +901,7 @@ public class Configuration implements Serializable {
                         }
                         LOG.debug("Finish check auto scan classes : {}", scanComponents.size());
                     } else {
-                        LOG.debug("No auto scan classes");
+                        LOG.debug("No auto scan classes.");
                     }
                 }
             }
@@ -913,140 +910,140 @@ public class Configuration implements Serializable {
             if (factory instanceof PathActionFactory) {
                 PathActionFactory pathActionFactory = (PathActionFactory) factory;
 
-                //先加载指定配置的类，再加载自动搜索的类
-                //排除指定配置的类
+                // 先加载指定配置的类，再加载自动搜索的类
+                // 排除指定配置的类
                 Set<Class<?>> specified = new HashSet<>();
 
                 Object newObj = null;
-                //interceptor
+                // interceptor
                 for (Object obj : interceptors) {
                     newObj = newInstance(factory, obj);
                     Map<String, Object> props = interceptorProperties.get(newObj.getClass());
                     if (props != null) {
                         injectProperties(newObj, props, true);
                     }
-                    //add interceptor
+                    // add interceptor
                     pathActionFactory.addInterceptors(newObj);
                     specified.add(newObj.getClass());
                 }
-                //auto-scan interceptors
+                // auto-scan interceptors
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls)) {
                         pathActionFactory.addInterceptors(cls);
                     }
                 }
-                //clear
+                // clear
                 specified.clear();
                 printSeparator(!pathActionFactory.getInterceptors().isEmpty());
 
-                //interceptor-stack
+                // interceptor-stack
                 for (Object obj : interceptorStacks) {
                     newObj = newInstance(factory, obj);
                     Map<String, Object> props = interceptorStackProperties.get(newObj.getClass());
                     if (props != null) {
                         injectProperties(newObj, props, true);
                     }
-                    //add interceptor stacks
+                    // add interceptor stacks
                     pathActionFactory.addInterceptorStacks(newObj);
                     specified.add(newObj.getClass());
                 }
-                //scan interceptorStacks
+                // scan interceptorStacks
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls)) {
                         pathActionFactory.addInterceptorStacks(cls);
                     }
                 }
-                //clear
+                // clear
                 specified.clear();
                 printSeparator(!pathActionFactory.getInterceptorStacks().isEmpty());
 
-                //result-type
+                // result-type
                 for (Object obj : resultTypes) {
                     newObj = newInstance(factory, obj);
                     Map<String, Object> props = resultTypeProperties.get(newObj.getClass());
                     if (props != null) {
                         injectProperties(newObj, props, true);
                     }
-                    //add result types
+                    // add result types
                     pathActionFactory.addResultTypes(newObj);
                     specified.add(newObj.getClass());
                 }
-                //scan resultTypes
+                // scan resultTypes
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls)) {
                         pathActionFactory.addResultTypes(cls);
                     }
                 }
-                //clear
+                // clear
                 specified.clear();
                 printSeparator(!pathActionFactory.getResultTypes().isEmpty());
 
-                //result
+                // result
                 for (Object obj : results) {
                     newObj = newInstance(factory, obj);
                     Map<String, Object> props = resultProperties.get(newObj.getClass());
                     if (props != null) {
                         injectProperties(newObj, props, true);
                     }
-                    //add result types
+                    // add result types
                     pathActionFactory.addResults(newObj);
                     specified.add(newObj.getClass());
                 }
-                //scan results
+                // scan results
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls)) {
                         pathActionFactory.addResults(cls);
                     }
                 }
-                //clear
+                // clear
                 specified.clear();
                 printSeparator(!pathActionFactory.getResults().isEmpty());
 
-                //action
+                // action
                 for (Object obj : actions) {
                     newObj = newInstance(factory, obj);
                     Map<String, Object> props = actionProperties.get(newObj.getClass());
                     if (props != null) {
                         injectProperties(newObj, props, true);
-                        //store the class properties for new instance of prototype action
+                        // store the class properties for new instance of prototype action
                         Injector.putClassProperties(newObj.getClass(), props);
                     }
 
-                    //add result types
+                    // add result types
                     pathActionFactory.addActions(newObj);
                     specified.add(newObj.getClass());
                 }
 
-                //scan actions
+                // scan actions
                 for (Class<?> cls : scanComponents) {
                     if (!specified.contains(cls)) {
                         pathActionFactory.addActions(cls);
                     }
                 }
-                //clear
+                // clear
                 specified.clear();
                 printSeparator(!pathActionFactory.getActions().isEmpty());
 
-                //specified path action
+                // specified path action
                 for (Map.Entry<String, Map<String, Object>> e : pathProperties.entrySet()) {
                     String pathName = e.getKey();
                     Class<?> pathActionClass = pathActions.get(pathName);
                     Map<String, Object> allProps = new LinkedHashMap<>();
-                    //class properties
+                    // class properties
                     allProps.putAll(actionProperties.get(pathActionClass));
-                    //path properties
+                    // path properties
                     allProps.putAll(e.getValue());
-                    //store the path properties for new instance of prototype action
+                    // store the path properties for new instance of prototype action
                     Injector.putActionProperties(pathActionClass, pathName, allProps);
                 }
 
-                //actions' aop
+                // actions' aop
                 if (!aopActions.isEmpty()) {
                     LOG.info("Starting Aop Action");
                     AntPathMatcher matcher = new AntPathMatcher(String.valueOf(pathActionFactory.getPathSeparator()));
-                    //已经匹配的路径
+                    // 已经匹配的路径
                     Set<String> existMatchPaths = new HashSet<>();
-                    //倒序，最后匹配的路径优先
+                    // 倒序，最后匹配的路径优先
                     for (int i = aopActions.size() - 1; i > -1; i--) {
                         in:
                         for (Map.Entry<String, PathActionProxy> e : pathActionFactory.getActions().entrySet()) {
@@ -1057,10 +1054,10 @@ public class Configuration implements Serializable {
                                     continue in;
                                 }
                                 existMatchPaths.add(path);
-                                //exist can't be null by PathActionFactory
+                                // exist can't be null by PathActionFactory
                                 List<InterceptorProxy> exist = e.getValue().getInterceptorProxies();
                                 List<InterceptorProxy> news = new ArrayList<>();
-                                //TODO
+                                // TODO
                                 if (CollectionUtil.isNotEmpty(aa.getInterceptorStacks())) {
                                     for (String stackName : aa.getInterceptorStacks()) {
                                         if (pathActionFactory.getInterceptorStacks().containsKey(stackName)) {
@@ -1108,7 +1105,7 @@ public class Configuration implements Serializable {
                     }
                 }
             }
-            //give subclasses a chance to prepare factory
+            // give subclasses a chance to prepare factory
             afterActionFactoryBuild(factory);
         } catch (ConfigurationException e) {
             throw e;
@@ -1135,18 +1132,22 @@ public class Configuration implements Serializable {
         ActionFactory factory = null;
         Constructor<? extends ActionFactory> con = null;
         try {
-            //look up for (Map) constructor first
+            // look up for (Map) constructor first
             con = actionFactoryClass.getDeclaredConstructor(Map.class);
         } catch (NoSuchMethodException ex) {
             LOG.info("No constructor {}, use {}.<init>(). ",
                     ex.getLocalizedMessage(), actionFactoryClass.getName());
         }
-
         try {
-            factory = con == null
-                    ? actionFactoryClass.newInstance()
-                    : con.newInstance(actionFactoryProperties);
-            //give subclasses a chance to prepare factory
+            if (con == null) {
+                con = actionFactoryClass.getDeclaredConstructor();
+                con.setAccessible(true);
+                factory = con.newInstance();
+            } else {
+                con.setAccessible(true);
+                factory = con.newInstance(actionFactoryProperties);
+            }
+            // give subclasses a chance to prepare factory
             afterActionFactoryCreation(factory);
         } catch (ConfigurationException e) {
             throw e;

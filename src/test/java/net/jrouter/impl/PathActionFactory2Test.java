@@ -45,7 +45,7 @@ public class PathActionFactory2Test {
             @Override
             protected String buildActionPath(String namespace, String aname, Method method) {
                 try {
-                    //提供定制化
+                    // 提供定制化
                     namespace = String.format(namespace, "test");
                 } catch (Exception e) {
                     log.error("Exception occurred when building action's path.", e);
@@ -56,10 +56,10 @@ public class PathActionFactory2Test {
         factory = new PathActionFactory(prop);
         assertEquals(factory, prop.getActionFactory());
 
-        //result
+        // result
         factory.addResultTypes(DefaultResult.class);
 
-        //path action
+        // path action
         factory.addActions(net.jrouter.PathTestAction2.class);
 
     }

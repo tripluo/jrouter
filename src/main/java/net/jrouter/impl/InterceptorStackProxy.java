@@ -69,7 +69,7 @@ public final class InterceptorStackProxy {
             }
             return interceptors;
         }
-        return Collections.EMPTY_LIST;
+        return Collections.emptyList();
     }
 
     /**

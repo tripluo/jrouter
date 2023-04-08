@@ -34,11 +34,11 @@ import org.slf4j.LoggerFactory;
  */
 public final class PathActionProxy extends DefaultProxy implements ActionProxy<String>, Cloneable {
 
-    /** 日志 */
+    /** LOG */
     private static final Logger LOG = LoggerFactory.getLogger(PathActionProxy.class);
 
     /** ActionFactory */
-    private final ActionFactory actionFactory;
+    private final ActionFactory<String> actionFactory;
 
     /** 命名空间 */
     @lombok.Getter
@@ -78,8 +78,8 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public PathActionProxy(ActionFactory actionFactory, String namespace, String path,
-                           Action action, Method method, Object object) {//SUPPRESS CHECKSTYLE NOPMD ExcessiveParameterList
+    public PathActionProxy(ActionFactory<String> actionFactory, String namespace, String path,
+                           Action action, Method method, Object object) {
         super(method, object, actionFactory);
         this.actionFactory = actionFactory;
         this.namespace = namespace;
@@ -104,7 +104,7 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
                     if (object != null) {
                         try {
                             Object invoker = actionFactory.getObjectFactory().newInstance(object.getClass());
-                            //inject properties
+                            // inject properties
                             Injector.injectAction(path, invoker);
                             PathActionProxy ap = this.clone();
                             ap.object = invoker;
@@ -115,7 +115,7 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
                         } catch (IllegalAccessException | CloneNotSupportedException ex) {
                             throw new InvocationProxyException(ex, this);
                         } catch (InvocationTargetException ex) {
-                            throw new InvocationProxyException(ex.getTargetException(), this);//NOPMD PreserveStackTrace
+                            throw new InvocationProxyException(ex.getTargetException(), this);// NOPMD PreserveStackTrace
                         }
                     }
                     break;
@@ -140,7 +140,7 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
         }
         if (params.length > 1) {
             LOG.warn("ActionParameter '{}' is [Ljava.lang.String[{}]; return the first value; use method \"getActionParameterValues\" instead", name, params.length);
-            //throw new ClassCastException("ActionParameter '" + name + "' is [Ljava.lang.String[" + params.length + "]; cannot be cast to java.lang.String");
+            // throw new ClassCastException("ActionParameter '" + name + "' is [Ljava.lang.String[" + params.length + "]; cannot be cast to java.lang.String");
         }
         return params[0];
     }

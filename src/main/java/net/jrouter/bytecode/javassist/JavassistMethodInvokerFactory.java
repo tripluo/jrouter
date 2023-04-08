@@ -17,6 +17,7 @@
 
 package net.jrouter.bytecode.javassist;
 
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Method;
 import java.util.concurrent.atomic.AtomicInteger;
 import javassist.*;
@@ -42,26 +43,34 @@ import org.slf4j.LoggerFactory;
  */
 public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
 
-    /** LOG */
+    /**
+     * LOG.
+     */
     private static final Logger LOG = LoggerFactory.getLogger(JavassistMethodInvokerFactory.class);
 
-    /** 调用对象的类名称前缀 */
+    /**
+     * 调用对象的类名称前缀。
+     */
     private static final String PROXY_CLASS_PREFIX = JavassistMethodInvokerFactory.class.getPackage().getName() + ".";
 
-    /** 调用对象的类名称后缀 */
+    /**
+     * 调用对象的类名称后缀。
+     */
     private static final String PROXY_CLASS_SUFFIX = "$$JR_Invoker$$";
 
-    /** 计数器 */
+    /**
+     * 计数器。
+     */
     private static final AtomicInteger COUNTER = new AtomicInteger(0x10000);
 
     static {
-        //CtClass.debugDump = System.getProperty("user.home") + "/Desktop" + "/javaDebug";
+        // CtClass.debugDump = System.getProperty("user.home") + "/Desktop" + "/javaDebug";
         ClassPool.getDefault().insertClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
     }
 
     @Override
     public JavassistInvoker newInstance(Class<?> targetClass, Method method) {
-        //only public method can be proxied
+        // only public method can be proxied
         if (!Modifier.isPublic(method.getModifiers())) {
             LOG.warn("Only public method can be proxied, no proxy at : {}", MethodUtil.getFullMethod(method));
             return null;
@@ -70,8 +79,11 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Create JavassistInvoker at : {}", MethodUtil.getMethod(method));
             }
-            JavassistInvoker invoker = (JavassistInvoker) (createInvokeClass(targetClass, method).
-                    toClass(targetClass.getClassLoader(), targetClass.getProtectionDomain()).newInstance());
+            Constructor<?> constructor = createInvokeClass(targetClass, method)
+                    .toClass(Thread.currentThread().getContextClassLoader(), targetClass.getProtectionDomain())
+                    .getDeclaredConstructor();
+            constructor.setAccessible(true);
+            JavassistInvoker invoker = (JavassistInvoker) (constructor.newInstance());
             return invoker;
         } catch (Exception e) {
             throw new JRouterException(e);
@@ -93,17 +105,17 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
         ClassPool classPool = ClassPool.getDefault();
         ClassClassPath classPath = new ClassClassPath(targetClass);
         classPool.insertClassPath(classPath);
-        //import target class package
+        // import target class package
         classPool.importPackage(targetClass.getPackage().getName());
 
-        //类前缀 + 16进制计数值
+        // 类前缀 + 16进制计数值
         CtClass clazz = classPool.makeClass(PROXY_CLASS_PREFIX + targetClass.getSimpleName() + PROXY_CLASS_SUFFIX + Integer.toHexString(COUNTER.getAndIncrement()));
         try {
-            //特定接口/抽象类/类的调用
+            // 特定接口/抽象类/类的调用
             clazz.setSuperclass(classPool.getCtClass(JavassistInvoker.class.getName()));
-            //final
+            // final
             clazz.setModifiers(Modifier.FINAL);
-            //invoke method
+            // invoke method
             clazz.addMethod(createInvokeMethod(clazz, targetClass, method));
         } finally {
             classPool.removeClassPath(classPath);
@@ -132,20 +144,20 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
         if (!voidMethod) {
             body.append("return ($w)");
         }
-        //static method needs to import class package to invoke by simple class name
+        // static method needs to import class package to invoke by simple class name
         if (Modifier.isStatic(method.getModifiers())) {
             body.append(targetClass.getName());
         } else {
             body.append("((").append(targetClass.getName()).append(")obj)");
         }
-        //invoke begin
+        // invoke begin
         body.append('.');
         Class<?>[] parameterTypes = method.getParameterTypes();
-        //no parameters method
+        // no parameters method
         if (parameterTypes.length == 0) {
             body.append(method.getName()).append("()");
         } else {
-            //can't use ($$) here because of "Object[] params"
+            // can't use ($$) here because of "Object[] params"
             body.append(method.getName()).append('(');
             for (int i = 0; i < parameterTypes.length - 1; i++) {
                 body.append(getClassName(parameterTypes[i], "params[" + i + "]"));

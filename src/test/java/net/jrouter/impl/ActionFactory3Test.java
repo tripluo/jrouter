@@ -31,16 +31,16 @@ import org.junit.Test;
  */
 public class ActionFactory3Test {
 
-    //factory1
+    // factory1
     private PathActionFactory factory1;
 
-    //factory2
+    // factory2
     private PathActionFactory factory2;
 
-    //extension for factory1
+    // extension for factory1
     private final String extension1 = ".do";
 
-    //extension for factory2
+    // extension for factory2
     private final String extension2 = ".action";
 
     @Before
@@ -49,16 +49,16 @@ public class ActionFactory3Test {
         prop.setExtension(".");
         factory1 = new PathActionFactory(prop);
 
-        //interceptor
+        // interceptor
         factory1.addInterceptors(SampleInterceptor.class);
 
-        //interceptor stack
+        // interceptor stack
         factory1.addInterceptorStacks(DefaultInterceptorStack.class);
 
-        //result
+        // result
         factory1.addResultTypes(DefaultResult.class);
 
-        //action
+        // action
         factory1.addActions(net.jrouter.URLTestAction.class);
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -66,16 +66,16 @@ public class ActionFactory3Test {
         prop2.setExtension(extension2);
         factory2 = new PathActionFactory(prop2);
 
-        //interceptor
+        // interceptor
         factory2.addInterceptors(SampleInterceptor.class);
 
-        //interceptor stack
+        // interceptor stack
         factory2.addInterceptorStacks(DefaultInterceptorStack.class);
 
-        //result
+        // result
         factory2.addResultTypes(DefaultResult.class);
 
-        //action
+        // action
         factory2.addActions(net.jrouter.URLTestAction2.class);
     }
 
