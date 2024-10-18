@@ -33,7 +33,7 @@
     </description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>5.3.31</spring.version>
+        <spring.version>6.1.14</spring.version>
         <checkstyle.config.file></checkstyle.config.file>
         <pmd.rule.file></pmd.rule.file>
     </properties>
