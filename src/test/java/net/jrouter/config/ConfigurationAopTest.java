@@ -17,12 +17,13 @@
 
 package net.jrouter.config;
 
-import java.util.List;
 import net.jrouter.impl.InterceptorProxy;
 import net.jrouter.impl.PathActionFactory;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.List;
 
 /**
  * ConfigurationAopTest。
@@ -63,7 +64,8 @@ public class ConfigurationAopTest extends Assert {
      * 测试指定path的action的拦截器集合。
      */
     private void assertInterceptorProxies(String actionPath, String interceptorProxies) {
-        assertEquals(interceptorsToString(factory.getActions().get(actionPath).getInterceptorProxies()), interceptorProxies);
+        assertEquals(interceptorsToString(factory.getActions().get(actionPath).getInterceptorProxies()),
+                interceptorProxies);
     }
 
     /**
@@ -77,11 +79,12 @@ public class ConfigurationAopTest extends Assert {
             return "[]";
         StringBuilder msg = new StringBuilder();
         msg.append('[');
-        for (int i = 0; ; i++) {
+        for (int i = 0;; i++) {
             msg.append(interceptors.get(i).getName());
             if (i == iMax)
                 return msg.append(']').toString();
             msg.append(", ");
         }
     }
+
 }

@@ -24,7 +24,6 @@ import net.jrouter.interceptor.DemoInterceptor;
 import net.jrouter.interceptor.SampleInterceptor;
 import net.jrouter.result.DefaultResult;
 import net.jrouter.result.DemoResult;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -33,11 +32,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.*;
+
 /**
  * 测试与 springframework 集成自动扫描类并添加组件。
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jrouter-spring_autoscan.xml"})
+@ContextConfiguration(locations = { "classpath:jrouter-spring_autoscan.xml" })
 public class DefaultActionFactoryBeanScanComponentTest {
 
     // singleton ActionFactory
@@ -85,4 +86,5 @@ public class DefaultActionFactoryBeanScanComponentTest {
         // see @Component PathTestAction
         assertNull(factory.getActions().get("/xx/yy/zz"));
     }
+
 }

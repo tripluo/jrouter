@@ -17,9 +17,10 @@
 
 package net.jrouter;
 
-import java.lang.reflect.Method;
 import net.jrouter.annotation.Action;
 import net.jrouter.annotation.Namespace;
+
+import java.lang.reflect.Method;
 
 /**
  * ActionFilter接口。提供过滤{@code Method}和转换自定义注解类至{@link Action}。
@@ -30,31 +31,26 @@ public interface ActionFilter {
 
     /**
      * 是否接受指定的方法。
-     *
      * @param obj 调用方法的对象。
      * @param method 指定的方法。
-     *
      * @return 是否接受指定的方法。
      */
     boolean accept(Object obj, Method method);
 
     /**
      * 根据指定的方法获取{@code Action}对象。
-     *
      * @param obj 调用方法的对象。
      * @param method 指定的方法。
-     *
      * @return {@code Action}对象。
      */
     Action getAction(Object obj, Method method);
 
     /**
      * 根据指定的方法获取{@code Namespace}对象。
-     *
      * @param obj 调用方法的对象。
      * @param method 指定的方法。
-     *
      * @return {@code Namespace}对象。
      */
     Namespace getNamespace(Object obj, Method method);
+
 }

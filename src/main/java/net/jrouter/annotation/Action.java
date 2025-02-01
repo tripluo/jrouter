@@ -22,7 +22,8 @@ import java.lang.annotation.*;
 /**
  * Action，定义于方法上的注解。
  * <p>
- * Action上拦截器集合：</p>
+ * Action上拦截器集合：
+ * </p>
  * <p>
  * Action指定的拦截器集合 = 存在Action指定的拦截栈 ? 指定拦截栈的拦截器集合 + 指定的拦截器集合 : 指定的拦截器集合。
  * </p>
@@ -31,7 +32,8 @@ import java.lang.annotation.*;
  * </p>
  *
  * <p>
- * Action上拦截栈优先级：</p>
+ * Action上拦截栈优先级：
+ * </p>
  * <p>
  * Action指定拦截栈 > 命名空间拦截栈 > 路径匹配拦截栈 > 全局默认拦截栈。
  * </p>
@@ -48,36 +50,28 @@ public @interface Action {
     /**
      * Action名称，可多个路径映射同一个Action。
      * 等同于{@link #name()}，name属性非空时优先选取name值，当仅需要name属性时提供便捷的注解方式。
-     *
      * @return Action名称。
-     *
      * @see #name()
      * @since 1.7.1
      */
     String[] value() default {};
 
     /**
-     * Action名称，可多个路径映射同一个Aciton，需保证其最终生成路径的唯一性。
-     * Action名称为空时，默认取其所在的方法名称（区分大小写）。
-     *
+     * Action名称，可多个路径映射同一个Aciton，需保证其最终生成路径的唯一性。 Action名称为空时，默认取其所在的方法名称（区分大小写）。
      * @return Action名称。
-     *
      * @see #value()
      */
     String[] name() default {};
 
     /**
      * Action指定的拦截栈名称。
-     *
      * @return Action指定的拦截栈名称。
      */
     String interceptorStack() default "";
 
     /**
      * Action指定的拦截器集合的名称集合，指定空集合无效。
-     *
      * @return Action指定的拦截器集合的名称集合。
-     *
      * @deprecated 1.8.1
      */
     @Deprecated
@@ -85,9 +79,7 @@ public @interface Action {
 
     /**
      * 结果对象集合。
-     *
      * @return 结果对象集合。
-     *
      * @deprecated
      */
     @Deprecated
@@ -95,15 +87,14 @@ public @interface Action {
 
     /**
      * 调用的范围，Action默认为单例。
-     *
      * @return Action单例或非单例。
      */
     Scope scope() default Scope.SINGLETON;
 
     /**
      * Action初始化参数的键/值（多值）集合。
-     *
      * @return Action初始化参数的键/值（多值）集合。
      */
     Parameter[] parameters() default {};
+
 }

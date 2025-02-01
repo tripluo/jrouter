@@ -24,8 +24,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 /**
- * 类扫描的工具。通过设置扫描的包名及包含的表达式、排除类的表达式（排除优先于包含），计算并返回扫描结果的类的集合。
- * 默认排除接口、抽象类、非公共类及无公共无参数构造函数的类。
+ * 类扫描的工具。通过设置扫描的包名及包含的表达式、排除类的表达式（排除优先于包含），计算并返回扫描结果的类的集合。 默认排除接口、抽象类、非公共类及无公共无参数构造函数的类。
  *
  * @see #getClasses()
  */
@@ -56,30 +55,28 @@ public class ClassScanner {
 
     /**
      * 计算最终扫描结果的类集合，排除接口、抽象类、非公共类及无公共无参数构造函数的类。
-     *
      * @return 扫描结果的类集合。
      */
     public Set<Class<?>> getClasses() {
         Set<Class<?>> includes = ClassUtil.getClasses(includePackages.toArray(new String[0]));
         // filter the scan classes
         Iterator<Class<?>> it = includes.iterator();
-        out:
-        while (it.hasNext()) {
+        out: while (it.hasNext()) {
             Class<?> cls = it.next();
             // exclude interface, no public class and no default constructors
-            if (cls.isInterface()
-                    || Modifier.isAbstract(cls.getModifiers())
+            if (cls.isInterface() || Modifier.isAbstract(cls.getModifiers())
                     || !Modifier.isPublic(cls.getModifiers())) {
                 it.remove();
                 continue out;
-            } //去除无默认public空构造方法的类
+            } // 去除无默认public空构造方法的类
             else {
                 // 获取对象的public构造方法
                 Constructor<?>[] cs = cls.getConstructors();
                 if (cs.length == 0) {
                     it.remove();
                     continue out;
-                } else {
+                }
+                else {
                     boolean hasEmptyConstructor = false;
                     for (Constructor<?> c : cs) {
                         // 空构造方法
@@ -98,7 +95,8 @@ public class ClassScanner {
             // class name
             String clsName = cls.getName();
 
-            // only include matched expression, it means to exclude the classes not match the expression
+            // only include matched expression, it means to exclude the classes not match
+            // the expression
             if (CollectionUtil.isNotEmpty(includeExpressions)) {
                 boolean isInclude = false;
                 for (String includeExpression : includeExpressions) {
@@ -130,6 +128,8 @@ public class ClassScanner {
 
     @Override
     public String toString() {
-        return "ClassScanner{" + "includePackages=" + includePackages + ", includeExpressions=" + includeExpressions + ", excludeExpressions=" + excludeExpressions + '}';
+        return "ClassScanner{" + "includePackages=" + includePackages + ", includeExpressions=" + includeExpressions
+                + ", excludeExpressions=" + excludeExpressions + '}';
     }
+
 }

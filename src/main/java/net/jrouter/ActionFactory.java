@@ -17,8 +17,9 @@
 
 package net.jrouter;
 
-import java.util.Map;
 import net.jrouter.annotation.Action;
+
+import java.util.Map;
 
 /**
  * ActionFactory接口。
@@ -29,105 +30,90 @@ public interface ActionFactory<P> {
 
     /**
      * 返回Action过滤器。
-     *
      * @return Action过滤器。
      */
     ActionFilter getActionFilter();
 
     /**
      * 返回创建对象的工厂对象。
-     *
      * @return 创建对象的工厂对象。
      */
     ObjectFactory getObjectFactory();
 
     /**
      * 返回创建方法调用对象的工厂对象。
-     *
      * @return 创建方法调用对象的工厂对象。
      */
     MethodInvokerFactory getMethodInvokerFactory();
 
     /**
      * 返回路径生成器。
-     *
      * @return 路径生成器。
      */
     PathGenerator<P> getPathGenerator();
 
     /**
      * 返回创建方法转换器的工厂对象。
-     *
      * @return 创建方法转换器的工厂对象。
      */
     ConverterFactory getConverterFactory();
 
     /**
      * 通过路径调用相应的Action，可以传递Action代理方法相应的参数。
-     *
      * @param <T> 调用Action的结果类型。
      * @param path Action的映射标识。
      * @param params 用于Action的调用参数。
-     *
      * @return 调用后的结果。
-     *
      * @throws JRouterException 如果发生调用错误。
      */
     <T> T invokeAction(P path, Object... params) throws JRouterException;
 
     /**
      * 移除ActionFactory中所有关联关系。
-     *
      * @throws JRouterException 如果发生错误。
      */
     void clear() throws JRouterException;
 
     /**
      * 返回Action集合。
-     *
      * @return Action集合。
      */
     Map<String, ?> getActions();
 
     /**
      * 返回拦截器集合。
-     *
      * @return 拦截器集合。
      */
     Map<String, ? extends AbstractProxy> getInterceptors();
 
     /**
      * 返回拦截栈集合。
-     *
      * @return 拦截栈集合。
      */
     Map<String, ?> getInterceptorStacks();
 
     /**
      * 返回结果类型集合。
-     *
      * @return 结果类型集合。
      */
     Map<String, ? extends AbstractProxy> getResultTypes();
 
     /**
      * 返回结果对象集合。
-     *
      * @return 结果对象集合。
      */
     Map<String, ? extends AbstractProxy> getResults();
 
     /**
      * 返回默认拦截栈名称。
-     *
      * @return 默认拦截栈名称。
      */
     String getDefaultInterceptorStack();
 
     /**
      * 设置默认视图类型。
-     *
      * @return 默认视图类型。
      */
     String getDefaultResultType();
+
 }

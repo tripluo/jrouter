@@ -17,10 +17,6 @@
 
 package net.jrouter.impl;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.Map;
 import net.jrouter.ActionFactory;
 import net.jrouter.ActionProxy;
 import net.jrouter.annotation.Action;
@@ -29,26 +25,41 @@ import net.jrouter.annotation.Result;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Action代理类，包含了Action的命名空间、全路径、所对应的拦截器集合、结果对象集合等信息。
  */
 public final class PathActionProxy extends DefaultProxy implements ActionProxy<String>, Cloneable {
 
-    /** LOG */
+    /**
+     * LOG
+     */
     private static final Logger LOG = LoggerFactory.getLogger(PathActionProxy.class);
 
-    /** ActionFactory */
+    /**
+     * ActionFactory
+     */
     private final ActionFactory<String> actionFactory;
 
-    /** 命名空间 */
+    /**
+     * 命名空间
+     */
     @lombok.Getter
     private final String namespace;
 
-    /** 全路径 */
+    /**
+     * 全路径
+     */
     @lombok.Getter
     private final String path;
 
-    /** Action */
+    /**
+     * Action
+     */
     @lombok.Getter
     private final Action action;
 
@@ -59,18 +70,21 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
     @lombok.Getter
     private Map<String, String[]> actionParameters;
 
-    /** Action所配置的拦截器集合 */
+    /**
+     * Action所配置的拦截器集合
+     */
     @lombok.Setter(lombok.AccessLevel.PACKAGE)
     private List<InterceptorProxy> interceptors;
 
-    /** 结果对象的映射集合 */
+    /**
+     * 结果对象的映射集合
+     */
     @lombok.Setter(lombok.AccessLevel.PACKAGE)
     @lombok.Getter
     private Map<String, Result> results;
 
     /**
      * 构造一个Action的代理类，包含指定的ActionFactory、命名空间、全路径、所代理的Action、代理的方法及方法的对象。
-     *
      * @param actionFactory 指定的ActionFactory。
      * @param namespace 命名空间。
      * @param path 全路径。
@@ -78,8 +92,8 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
      * @param method 代理的方法。
      * @param object 代理的方法的对象。
      */
-    public PathActionProxy(ActionFactory<String> actionFactory, String namespace, String path,
-                           Action action, Method method, Object object) {
+    public PathActionProxy(ActionFactory<String> actionFactory, String namespace, String path, Action action,
+            Method method, Object object) {
         super(method, object, actionFactory);
         this.actionFactory = actionFactory;
         this.namespace = namespace;
@@ -89,7 +103,6 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
 
     /**
      * 根据Action状态（是否单例）返回代理对象。
-     *
      * @return 如果Action为单例则返回其代理对象，否则创建并返回新的代理对象。
      */
     public PathActionProxy getInstance() {
@@ -112,10 +125,13 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
                                 LOG.debug("Get prototype ActionProxy [{}] at : {}", ap, getMethodInfo());
                             }
                             return ap;
-                        } catch (IllegalAccessException | CloneNotSupportedException ex) {
+                        }
+                        catch (IllegalAccessException | CloneNotSupportedException ex) {
                             throw new InvocationProxyException(ex, this);
-                        } catch (InvocationTargetException ex) {
-                            throw new InvocationProxyException(ex.getTargetException(), this);// NOPMD PreserveStackTrace
+                        }
+                        catch (InvocationTargetException ex) {
+                            throw new InvocationProxyException(ex.getTargetException(), this);// NOPMD
+                            // PreserveStackTrace
                         }
                     }
                     break;
@@ -139,8 +155,12 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
             return null;
         }
         if (params.length > 1) {
-            LOG.warn("ActionParameter '{}' is [Ljava.lang.String[{}]; return the first value; use method \"getActionParameterValues\" instead", name, params.length);
-            // throw new ClassCastException("ActionParameter '" + name + "' is [Ljava.lang.String[" + params.length + "]; cannot be cast to java.lang.String");
+            LOG.warn(
+                    "ActionParameter '{}' is [Ljava.lang.String[{}]; return the first value; use method \"getActionParameterValues\" instead",
+                    name, params.length);
+            // throw new ClassCastException("ActionParameter '" + name + "' is
+            // [Ljava.lang.String[" + params.length + "]; cannot be cast to
+            // java.lang.String");
         }
         return params[0];
     }
@@ -161,7 +181,6 @@ public final class PathActionProxy extends DefaultProxy implements ActionProxy<S
 
     /**
      * 返回Action所配置的拦截器集合，不包含任何拦截器则返回长度为 0 的集合。
-     *
      * @return Action所配置的拦截器集合。
      */
     public List<InterceptorProxy> getInterceptorProxies() {

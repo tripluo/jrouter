@@ -44,13 +44,14 @@ public class ConverterParameterActionFactory extends PathActionFactory {
     public static interface DemoActionInvocation extends ActionInvocation<String> {
 
         String getName();
+
     }
 
     /**
      * 代理ActionInvocation，并添加自定义的属性和实现接口。
      */
-    public static class DefaultDemoActionInvocation extends ActionInvocationDelegate<String> implements
-            DemoActionInvocation {
+    public static class DefaultDemoActionInvocation extends ActionInvocationDelegate<String>
+            implements DemoActionInvocation {
 
         /* name */
         private final String name;
@@ -67,4 +68,5 @@ public class ConverterParameterActionFactory extends PathActionFactory {
         }
 
     }
+
 }

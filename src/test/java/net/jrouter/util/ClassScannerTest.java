@@ -17,17 +17,19 @@
 
 package net.jrouter.util;
 
+import net.jrouter.interceptor.*;
+import net.jrouter.result.DefaultResult;
+import net.jrouter.result.DemoResult;
+import org.junit.Before;
+import org.junit.Test;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
-import net.jrouter.interceptor.*;
-import net.jrouter.result.DefaultResult;
-import net.jrouter.result.DemoResult;
+
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.junit.Before;
-import org.junit.Test;
 
 /**
  * 基于类扫描工具的测试。
@@ -36,6 +38,40 @@ public class ClassScannerTest {
 
     // 类扫描工具
     private ClassScanner classScanner;
+
+    /**
+     * 匹配集合元素完全相等，无视顺序。
+     */
+    private static <T> void assertCollectionEqualContains(T[] expected, Collection<? extends T> actual) {
+        if (expected.length != actual.size())
+            fail("expected Collection size:<[" + expected.length + "]> but was:<[" + actual.size() + "]>");
+
+        for (T t : expected) {
+            if (!actual.contains(t)) {
+                fail("expected Collection element:<[" + t + "]>");
+            }
+        }
+    }
+
+    /**
+     * 匹配集合元素完全相等，无视顺序。
+     */
+    private static <T> void assertCollectionEqualContains(Collection<? extends T> expected,
+            Collection<? extends T> actual) {
+        if (expected.size() != actual.size())
+            fail("expected Collection size:<[" + expected.size() + "]> but was:<[" + actual.size() + "]>");
+
+        for (T t : expected) {
+            if (!actual.contains(t)) {
+                fail("expected Collection element:<[" + t + "]>");
+            }
+        }
+    }
+
+    // convert String to LinkedHashSet
+    private static Set<String> stringToSet(String strings) {
+        return CollectionUtil.stringToCollection(strings, new LinkedHashSet<String>(), ',');
+    }
 
     @Before
     public void setUp() {
@@ -62,53 +98,32 @@ public class ClassScannerTest {
 
         // include packages
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
-        assertCollectionEqualContains(new Class<?>[]{
-                        DefaultInterceptorStack.class,
-                        DemoInterceptorStack.class,
-                        SampleInterceptor.class,
-                        DefaultResult.class,
-                        DemoInterceptor.class,
-                        DemoThreadActionContextInterceptor.class,
-                        DemoResult.class
-                },
-                classScanner.getClasses());
+        assertCollectionEqualContains(new Class<?>[] { DefaultInterceptorStack.class, DemoInterceptorStack.class,
+                SampleInterceptor.class, DefaultResult.class, DemoInterceptor.class,
+                DemoThreadActionContextInterceptor.class, DemoResult.class }, classScanner.getClasses());
         clear();
 
         // include expressions
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
-        assertCollectionEqualContains(new Class<?>[]{
-                        DefaultInterceptorStack.class,
-                        DemoInterceptorStack.class,
-                        DemoThreadActionContextInterceptor.class,
-                        DefaultResult.class,
-                        DemoInterceptor.class,
-                        DemoResult.class
-                },
-                classScanner.getClasses());
+        assertCollectionEqualContains(new Class<?>[] { DefaultInterceptorStack.class, DemoInterceptorStack.class,
+                DemoThreadActionContextInterceptor.class, DefaultResult.class, DemoInterceptor.class,
+                DemoResult.class }, classScanner.getClasses());
 
         clear();
 
         // include expressions
         classScanner.setIncludePackages(stringToSet("net.jrouter"));
         classScanner.setIncludeExpressions(stringToSet("net.jrouter.interceptor.DefaultInterceptorStack"));
-        assertCollectionEqualContains(new Class<?>[]{
-                        DefaultInterceptorStack.class,},
-                classScanner.getClasses());
+        assertCollectionEqualContains(new Class<?>[] { DefaultInterceptorStack.class, }, classScanner.getClasses());
         clear();
 
         // include expressions
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
-        assertCollectionEqualContains(new Class<?>[]{
-                        DefaultInterceptorStack.class,
-                        DemoInterceptorStack.class,
-                        DemoThreadActionContextInterceptor.class,
-                        DefaultResult.class,
-                        DemoInterceptor.class,
-                        DemoResult.class
-                },
-                classScanner.getClasses());
+        assertCollectionEqualContains(new Class<?>[] { DefaultInterceptorStack.class, DemoInterceptorStack.class,
+                DemoThreadActionContextInterceptor.class, DefaultResult.class, DemoInterceptor.class,
+                DemoResult.class }, classScanner.getClasses());
 
         clear();
 
@@ -126,34 +141,24 @@ public class ClassScannerTest {
         // exclude expressions
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
         classScanner.setExcludeExpressions(stringToSet("net.jrouter.interceptor.*"));
-        assertCollectionEqualContains(new Class<?>[]{
-                        DefaultResult.class,
-                        DemoResult.class
-                },
+        assertCollectionEqualContains(new Class<?>[] { DefaultResult.class, DemoResult.class },
                 classScanner.getClasses());
         clear();
 
         // exclude expressions
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
         classScanner.setExcludeExpressions(stringToSet("net.jrouter.interceptor.DefaultInterceptorStack"));
-        assertCollectionEqualContains(new Class<?>[]{
-                        DemoInterceptorStack.class,
-                        SampleInterceptor.class,
-                        DefaultResult.class,
-                        DemoInterceptor.class,
-                        DemoThreadActionContextInterceptor.class,
-                        DemoResult.class
-                },
+        assertCollectionEqualContains(
+                new Class<?>[] { DemoInterceptorStack.class, SampleInterceptor.class, DefaultResult.class,
+                        DemoInterceptor.class, DemoThreadActionContextInterceptor.class, DemoResult.class },
                 classScanner.getClasses());
         clear();
 
         // exclude expressions
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
         classScanner.setExcludeExpressions(stringToSet("**.Demo*"));
-        assertCollectionEqualContains(new Class<?>[]{
-                        DefaultInterceptorStack.class,
-                        SampleInterceptor.class,
-                        DefaultResult.class,},
+        assertCollectionEqualContains(
+                new Class<?>[] { DefaultInterceptorStack.class, SampleInterceptor.class, DefaultResult.class, },
                 classScanner.getClasses());
         clear();
 
@@ -161,45 +166,8 @@ public class ClassScannerTest {
         classScanner.setIncludePackages(stringToSet("net.jrouter.result, net.jrouter.interceptor"));
         classScanner.setIncludeExpressions(stringToSet("**.Demo*, **.Default*"));
         classScanner.setExcludeExpressions(stringToSet("**.Demo*, net.jrouter.interceptor.DefaultInterceptorStack"));
-        assertCollectionEqualContains(new Class<?>[]{
-                        DefaultResult.class
-                },
-                classScanner.getClasses());
+        assertCollectionEqualContains(new Class<?>[] { DefaultResult.class }, classScanner.getClasses());
         clear();
     }
 
-    /**
-     * 匹配集合元素完全相等，无视顺序。
-     */
-    private static <T> void assertCollectionEqualContains(T[] expected,
-                                                          Collection<? extends T> actual) {
-        if (expected.length != actual.size())
-            fail("expected Collection size:<[" + expected.length + "]> but was:<[" + actual.size() + "]>");
-
-        for (T t : expected) {
-            if (!actual.contains(t)) {
-                fail("expected Collection element:<[" + t + "]>");
-            }
-        }
-    }
-
-    /**
-     * 匹配集合元素完全相等，无视顺序。
-     */
-    private static <T> void assertCollectionEqualContains(Collection<? extends T> expected,
-                                                          Collection<? extends T> actual) {
-        if (expected.size() != actual.size())
-            fail("expected Collection size:<[" + expected.size() + "]> but was:<[" + actual.size() + "]>");
-
-        for (T t : expected) {
-            if (!actual.contains(t)) {
-                fail("expected Collection element:<[" + t + "]>");
-            }
-        }
-    }
-
-    // convert String to LinkedHashSet
-    private static Set<String> stringToSet(String strings) {
-        return CollectionUtil.stringToCollection(strings, new LinkedHashSet<String>(), ',');
-    }
 }

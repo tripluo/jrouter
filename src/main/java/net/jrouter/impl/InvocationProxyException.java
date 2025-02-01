@@ -16,25 +16,26 @@
 
 package net.jrouter.impl;
 
+import lombok.Getter;
 import net.jrouter.JRouterException;
 
 /**
- * 标识代理的方法调用发生错误时的异常。
- * 此异常类型限制外部构造生成，避免用户直接抛出此异常引发错误的异常吞噬。
+ * 标识代理的方法调用发生错误时的异常。 此异常类型限制外部构造生成，避免用户直接抛出此异常引发错误的异常吞噬。
  */
+@Getter
 public class InvocationProxyException extends JRouterException {
 
     private static final long serialVersionUID = 1L;
 
-    /** 定位异常发生对象 */
+    /**
+     * 异常发生的对象。
+     */
     private final Object target;
 
     /**
      * 构造一个包含指定原因和异常发生对象的InvocationException。
-     *
      * @param cause 异常原因。
      * @param target 异常发生的对象。
-     *
      * @see #getSource()
      */
     InvocationProxyException(Throwable cause, Object target) {
@@ -44,10 +45,8 @@ public class InvocationProxyException extends JRouterException {
 
     /**
      * 构造一个包含指定详细消息、原因和异常发生对象的InvocationException。
-     *
      * @param cause 异常原因。
      * @param target 异常发生的对象。
-     *
      * @see #getSource()
      */
     InvocationProxyException(String message, Throwable cause, Object target) {
@@ -57,19 +56,19 @@ public class InvocationProxyException extends JRouterException {
 
     /**
      * 返回首个非InvocationException类型的cause。
-     *
      * @return 首个非InvocationException的cause，如果 cause 不存在或是未知的，则返回 null。
      */
     public Throwable getSource() {
         Throwable cur = this.getCause();
-        while (cur instanceof InvocationProxyException && (cur = cur.getCause()) != null) { // NOPMD for EmptyControlStatement
+        while (cur instanceof InvocationProxyException && (cur = cur.getCause()) != null) { // NOPMD
+            // for
+            // EmptyControlStatement
         }
         return cur;
     }
 
     /**
      * 返回最初抛出的InvocationException。
-     *
      * @return 最初抛出的InvocationException。
      */
     public InvocationProxyException getSourceInvocationException() {
@@ -81,12 +80,4 @@ public class InvocationProxyException extends JRouterException {
         return (InvocationProxyException) cur;
     }
 
-    /**
-     * 返回异常发生的对象。
-     *
-     * @return 异常发生的对象，未知或不存在则返回null。
-     */
-    public Object getTarget() {
-        return target;
-    }
 }

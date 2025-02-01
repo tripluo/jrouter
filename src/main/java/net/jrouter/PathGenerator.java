@@ -23,7 +23,6 @@ import java.lang.reflect.Method;
  * Path generator.
  *
  * @param <P> path type.
- *
  * @since 1.7.7
  */
 // @FunctionalInterface
@@ -31,11 +30,10 @@ public interface PathGenerator<P> {
 
     /**
      * Generate the path(s).
-     *
      * @param targetClass 底层方法所表示的 {@code Class} 对象。
      * @param method 底层方法。
-     *
      * @return the generated Path(s).
      */
     P[] generatePath(Class<?> targetClass, Method method);
+
 }

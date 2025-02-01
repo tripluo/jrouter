@@ -20,8 +20,9 @@ package net.jrouter;
 import net.jrouter.annotation.Action;
 import net.jrouter.annotation.Namespace;
 import net.jrouter.impl.PathTreeTest;
-import static net.jrouter.impl.PathTreeTest.PATHS;
 import org.springframework.stereotype.Component;
+
+import static net.jrouter.impl.PathTreeTest.PATHS;
 
 /**
  * PathTestAction2。
@@ -106,4 +107,5 @@ public class PathTestAction2 {
     public String test14() {
         return PATHS[14];
     }
+
 }

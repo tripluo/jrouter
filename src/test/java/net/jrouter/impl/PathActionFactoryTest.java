@@ -17,16 +17,18 @@
 
 package net.jrouter.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.jrouter.JRouterException;
-import static net.jrouter.impl.PathTreeTest.PATHS;
 import net.jrouter.interceptor.DemoThreadActionContextInterceptor;
 import net.jrouter.result.DefaultResult;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static net.jrouter.impl.PathTreeTest.PATHS;
+import static org.junit.Assert.*;
 
 /**
  * 测试路径匹配的Action。
@@ -117,7 +119,8 @@ public class PathActionFactoryTest {
         try {
             factory.invokeAction("/aa/zzz/c1/d1/e1/null/null/null");
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             // no such Action
             assertNotNull(e);
         }
@@ -156,7 +159,6 @@ public class PathActionFactoryTest {
 
     /**
      * 从线程变量中返回Action路径匹配的键值映射。
-     *
      * @return 返回Action路径匹配的键值映射。
      */
     private Map<String, String> getPathParameters() {
@@ -165,7 +167,6 @@ public class PathActionFactoryTest {
 
     /**
      * 测试期望的键值映射是否与调用Action路径后的路径匹配的键值映射一致。
-     *
      * @param excepted 期望的键值映射。
      * @param path Action路径。
      */
@@ -176,4 +177,5 @@ public class PathActionFactoryTest {
         // clear the excepted map at last
         excepted.clear();
     }
+
 }

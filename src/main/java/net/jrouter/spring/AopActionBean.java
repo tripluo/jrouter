@@ -17,10 +17,11 @@
 
 package net.jrouter.spring;
 
-import java.util.ArrayList;
-import java.util.List;
 import net.jrouter.config.AopAction;
 import net.jrouter.util.CollectionUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Actions' aop for springframework's bean.
@@ -29,12 +30,13 @@ public class AopActionBean extends AopAction {
 
     private static final long serialVersionUID = 1L;
 
-    /** 分隔符 */
-    private final char[] sep = {',', ';'};
+    /**
+     * 分隔符
+     */
+    private final char[] sep = { ',', ';' };
 
     /**
      * 设置指定的拦截栈集合。
-     *
      * @param interceptorNames 拦截栈集合的字符串名称，支持','或';'分隔。
      */
     public void setInterceptorNames(String interceptorNames) {
@@ -45,7 +47,6 @@ public class AopActionBean extends AopAction {
 
     /**
      * 设置指定的拦截栈集合。
-     *
      * @param interceptorStackNames 拦截栈集合，支持','或';'分隔。
      */
     public void setInterceptorStackNames(String interceptorStackNames) {
@@ -56,12 +57,11 @@ public class AopActionBean extends AopAction {
 
     /**
      * 设置aop的类型。
-     *
      * @param typeName aop的类型名称。
-     *
      * @see Type
      */
     public void setTypeName(String typeName) {
         setType(Type.parseCode(typeName));
     }
+
 }

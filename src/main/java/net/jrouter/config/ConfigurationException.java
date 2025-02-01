@@ -26,7 +26,6 @@ public class ConfigurationException extends RuntimeException {
 
     /**
      * 构造一个包含指定原因的ConfigurationException。
-     *
      * @param cause 异常原因。
      */
     public ConfigurationException(Throwable cause) {
@@ -35,11 +34,11 @@ public class ConfigurationException extends RuntimeException {
 
     /**
      * 构造一个包含指定详细消息和原因的ConfigurationException。
-     *
      * @param message 详细消息。
      * @param cause 异常原因。
      */
     public ConfigurationException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

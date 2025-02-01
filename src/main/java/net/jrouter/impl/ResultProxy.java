@@ -17,10 +17,11 @@
 
 package net.jrouter.impl;
 
-import java.lang.reflect.Method;
 import net.jrouter.ActionFactory;
 import net.jrouter.annotation.Result;
 import net.jrouter.annotation.ResultType;
+
+import java.lang.reflect.Method;
 
 /**
  * 结果对象的代理类，包括了结果对象及调用参数的状态。
@@ -30,16 +31,19 @@ import net.jrouter.annotation.ResultType;
 @Deprecated
 public final class ResultProxy extends DefaultProxy {
 
-    /** 结果对象 */
+    /**
+     * 结果对象
+     */
     @lombok.Getter
     private final Result result;
 
-    /** 结果对象相应的结果类型 未完成 */
+    /**
+     * 结果对象相应的结果类型 未完成
+     */
     private ResultType resultType;
 
     /**
      * 构造一个结果对象的代理类，包含指定的结果对象及其调用参数的状态。
-     *
      * @param actionFactory 指定的ActionFactory。
      * @param result 代理的结果对象。
      * @param method 代理的方法。
@@ -49,4 +53,5 @@ public final class ResultProxy extends DefaultProxy {
         super(method, object, actionFactory);
         this.result = result;
     }
+
 }

@@ -17,27 +17,31 @@
 
 package net.jrouter.impl;
 
-import java.lang.reflect.Method;
+import lombok.Getter;
 import net.jrouter.ActionFactory;
 import net.jrouter.annotation.Action;
 import net.jrouter.annotation.ResultType;
 
+import java.lang.reflect.Method;
+
 /**
  * 结果类型的代理类，包括了结果类型的名称及在对{@link Action}做结果调用时是否将{@link Action}的运行时状态作为参数传递。
  */
+@Getter
 public final class ResultTypeProxy extends DefaultProxy {
 
-    /** 结果类型的名称 */
-    @lombok.Getter
+    /**
+     * 结果类型的名称
+     */
     private final String type;
 
-    /** 结果类型 */
-    @lombok.Getter
+    /**
+     * 结果类型
+     */
     private final ResultType resultType;
 
     /**
      * 构造一个结果类型的代理类，包含指定的结果类型、代理的方法及方法的对象。
-     *
      * @param actionFactory 指定的ActionFactory。
      * @param resultType 所代理的结果类型。
      * @param method 代理的方法。
@@ -48,4 +52,5 @@ public final class ResultTypeProxy extends DefaultProxy {
         this.resultType = resultType;
         this.type = resultType.type().trim();
     }
+
 }

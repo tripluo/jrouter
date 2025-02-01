@@ -5,20 +5,17 @@
     <groupId>net.jrouter</groupId>
     <artifactId>jrouter</artifactId>
     <packaging>jar</packaging>
-    <version>1.8.7</version>
+    <version>1.8.8</version>
     <name>JRouter</name>
     <inceptionYear>2010</inceptionYear>
     <url>https://jrouter.net/</url>
     <licenses>
         <license>
-            <name>The Apache Software License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-            <distribution>repo</distribution>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
         </license>
     </licenses>
     <scm>
-        <connection>scm:git:git@github.com:tripluo/jrouter.git</connection>
-        <developerConnection>scm:git:git@github.com:tripluo/jrouter.git</developerConnection>
         <url>https://github.com/tripluo/jrouter</url>
     </scm>
     <developers>
@@ -33,9 +30,9 @@
     </description>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>5.3.31</spring.version>
         <checkstyle.config.file></checkstyle.config.file>
-        <pmd.rule.file></pmd.rule.file>
+        <pmd.config.file></pmd.config.file>
+        <spring.version>5.3.39</spring.version>
     </properties>
     <dependencies>
         <!-- slf4j -->
@@ -49,6 +46,12 @@
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
             <version>1.2.13</version>
+            <exclusions>
+                <exclusion>
+                    <artifactId>slf4j-api</artifactId>
+                    <groupId>org.slf4j</groupId>
+                </exclusion>
+            </exclusions>
             <optional>true</optional>
         </dependency>
         <!-- springframework integration -->
@@ -81,7 +84,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <version>1.18.36</version>
             <scope>provided</scope>
         </dependency>
         <!-- junit -->
@@ -110,7 +113,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.12.1</version>
+                <version>3.13.0</version>
                 <configuration>
                     <source>1.8</source>
                     <target>1.8</target>
@@ -130,7 +133,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.4.2</version>
                 <configuration>
                     <excludes>
                         <exclude>changelog.txt</exclude>
@@ -141,7 +144,7 @@
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.11</version>
+                <version>0.8.12</version>
                 <executions>
                     <!--
                     <execution>
@@ -209,17 +212,17 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-pmd-plugin</artifactId>
-                        <version>3.21.2</version>
+                        <version>3.26.0</version>
                         <dependencies>
                             <dependency>
                                 <groupId>net.sourceforge.pmd</groupId>
                                 <artifactId>pmd-core</artifactId>
-                                <version>6.55.0</version>
+                                <version>7.9.0</version>
                             </dependency>
                             <dependency>
                                 <groupId>net.sourceforge.pmd</groupId>
                                 <artifactId>pmd-java</artifactId>
-                                <version>6.55.0</version>
+                                <version>7.9.0</version>
                             </dependency>
                         </dependencies>
                         <executions>
@@ -233,11 +236,11 @@
                         <configuration>
                             <linkXRef>false</linkXRef>
                             <inputEncoding>${project.build.sourceEncoding}</inputEncoding>
-                            <!-- pmd代码校验并打印错误 -Dpmd.skip=true -->
+                            <!-- pmd validation -Dpmd.skip=true -->
                             <failOnViolation>false</failOnViolation>
                             <printFailingErrors>true</printFailingErrors>
                             <rulesets>
-                                <ruleset>${pmd.rule.file}</ruleset>
+                                <ruleset>${pmd.config.file}</ruleset>
                             </rulesets>
                             <excludes>
                             </excludes>
@@ -324,6 +327,30 @@
                     <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
                 </repository>
             </distributionManagement>
+        </profile>
+        <profile>
+            <id>spring-java-format</id>
+            <activation>
+                <activeByDefault>false</activeByDefault>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>io.spring.javaformat</groupId>
+                        <artifactId>spring-javaformat-maven-plugin</artifactId>
+                        <version>0.0.43</version>
+                        <executions>
+                            <execution>
+                                <phase>validate</phase>
+                                <inherited>true</inherited>
+                                <goals>
+                                    <goal>validate</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
     </profiles>
 </project>

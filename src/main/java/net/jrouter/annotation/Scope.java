@@ -18,8 +18,7 @@
 package net.jrouter.annotation;
 
 /**
- * Scope表示了{@link Action}的调用范围。
- * Action调用可为单例(每次都调用同一对象的方法)或非单例(每次都调用新对象的方法)。
+ * Scope表示了{@link Action}的调用范围。 Action调用可为单例(每次都调用同一对象的方法)或非单例(每次都调用新对象的方法)。
  *
  * @see Action#scope()
  */

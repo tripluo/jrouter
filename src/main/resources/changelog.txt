@@ -2,6 +2,13 @@
 JROUTER CHANGELOG
 ==========================
 https://jrouter.net/
+Changes in version 1.8.8 (2025-02-02)
+* 更新依赖组件spring至 5.3.39.
+* 引入spring-javaformat-maven-plugin格式化代码.
+* 简化AntPathMatcher.
+* 完善代码格式、注释及文档。
+
+
 Changes in version 1.8.7 (2024-01-28)
 * 完善代码格式、注释及文档。
 * 更新依赖组件spring至 5.3.31.

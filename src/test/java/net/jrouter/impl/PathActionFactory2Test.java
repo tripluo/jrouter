@@ -17,15 +17,17 @@
 
 package net.jrouter.impl;
 
-import java.lang.reflect.Method;
 import lombok.extern.slf4j.Slf4j;
-import static net.jrouter.impl.PathTreeTest.PATHS;
 import net.jrouter.result.DefaultResult;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.lang.reflect.Method;
+
+import static net.jrouter.impl.PathTreeTest.PATHS;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 /**
  * 测试路径匹配的Action。
@@ -47,7 +49,8 @@ public class PathActionFactory2Test {
                 try {
                     // 提供定制化
                     namespace = String.format(namespace, "test");
-                } catch (Exception e) {
+                }
+                catch (Exception e) {
                     log.error("Exception occurred when building action's path.", e);
                 }
                 return super.buildActionPath(namespace, aname, method);
@@ -101,8 +104,10 @@ public class PathActionFactory2Test {
         assertEquals("/aa/*/c1/d1/e1", factory.invokeAction(String.format("%s/%s", prefix, "/aa/b4/c1/d1/e1")));
         assertEquals("/aa/b4/{k1}/d2/e1", factory.invokeAction(String.format("%s/%s", prefix, "/aa/b4/c1/d2/e1")));
         assertEquals("/aa/b4/{k1}/d2/{k2}", factory.invokeAction(String.format("%s/%s", prefix, "/aa/b4/c1/d2/null")));
-        assertEquals("/aa/b4/{k1}/d2/{k2}", factory.invokeAction(String.format("%s/%s", prefix, "/aa/b4/null/d2/null")));
+        assertEquals("/aa/b4/{k1}/d2/{k2}",
+                factory.invokeAction(String.format("%s/%s", prefix, "/aa/b4/null/d2/null")));
 
         assertEquals("/aa/*/c1/d1/e1", factory.invokeAction(String.format("%s/%s", prefix, "/aa/null/c1/d1/e1")));
     }
+
 }

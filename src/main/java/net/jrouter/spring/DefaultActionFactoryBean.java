@@ -17,7 +17,6 @@
 
 package net.jrouter.spring;
 
-import java.util.*;
 import net.jrouter.*;
 import net.jrouter.annotation.Action;
 import net.jrouter.config.AopAction;
@@ -37,15 +36,19 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.io.Resource;
 
+import java.util.*;
+
 /**
  * 提供与springframework集成的ActionFactory。Action指定path属性的注入由指定springframework的bean完成。
  *
  * @param <T> ActionFactory特定类型。
  */
-public class DefaultActionFactoryBean<T extends ActionFactory> implements FactoryBean<T>, InitializingBean,
-        DisposableBean, ApplicationContextAware {
+public class DefaultActionFactoryBean<T extends ActionFactory>
+        implements FactoryBean<T>, InitializingBean, DisposableBean, ApplicationContextAware {
 
-    /** LOG */
+    /**
+     * LOG
+     */
     private static final Logger LOG = LoggerFactory.getLogger(DefaultActionFactoryBean.class);
 
     /**
@@ -54,19 +57,24 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     @lombok.Setter
     private Resource configLocation;
 
-    /** ActionFactory对象 */
+    /**
+     * ActionFactory对象
+     */
     private T actionFactory;
 
-    /** ActionFactory的类型 */
+    /**
+     * ActionFactory的类型
+     */
     private Class<T> actionFactoryClass = null;
 
-    /** 指定的Configuration */
+    /**
+     * 指定的Configuration
+     */
     @lombok.Setter
     private Configuration configuration;
 
     /**
      * Configuration对象类型
-     *
      * @deprecated since 1.6.4
      */
     @Deprecated
@@ -107,23 +115,33 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /** 拦截器的bean名称和类名称的集合 */
+    /**
+     * 拦截器的bean名称和类名称的集合
+     */
     @lombok.Setter
     private List<Object> interceptors = null;
 
-    /** 拦截栈的bean名称和类名称的集合 */
+    /**
+     * 拦截栈的bean名称和类名称的集合
+     */
     @lombok.Setter
     private List<Object> interceptorStacks = null;
 
-    /** 结果类型的bean名称和类名称的集合 */
+    /**
+     * 结果类型的bean名称和类名称的集合
+     */
     @lombok.Setter
     private List<Object> resultTypes = null;
 
-    /** 结果对象的bean名称和类名称的集合 */
+    /**
+     * 结果对象的bean名称和类名称的集合
+     */
     @lombok.Setter
     private List<Object> results = null;
 
-    /** Action的bean名称和类名称的集合 */
+    /**
+     * Action的bean名称和类名称的集合
+     */
     @lombok.Setter
     private List<Object> actions = null;
 
@@ -135,17 +153,42 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     @lombok.Setter
     private List<Properties> componentClassScanProperties;
 
-    /** actions' aop */
+    /**
+     * actions' aop
+     */
     @lombok.Setter
     private List<? extends AopAction> aopActions;
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /** 根据匹配的name自动加载Bean，依次配置匹配(包含/排除)的beans' name属性。 */
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    /**
+     * 根据匹配的name自动加载Bean，依次配置匹配(包含/排除)的beans' name属性。
+     */
     @lombok.Setter
     private Properties componentBeanScanProperties;
 
-    /** ApplicationContext */
+    /**
+     * ApplicationContext
+     */
     private ApplicationContext applicationContext;
+
+    /**
+     * Convert the {@code String} element of the list into {@code Class}.
+     * @param listArray the array of list.
+     * @throws ClassNotFoundException If the class was not found.
+     */
+    private static void convertList(List... listArray) throws ClassNotFoundException {
+        for (List componentList : listArray) {
+            if (CollectionUtil.isNotEmpty(componentList)) {
+                for (int i = 0; i < componentList.size(); i++) {
+                    Object obj = componentList.get(i);
+                    if (obj instanceof String) {
+                        componentList.set(i, ClassUtil.loadClass((String) obj));
+                    }
+                }
+            }
+        }
+    }
 
     /**
      * 初始化ActionFactory。
@@ -161,12 +204,11 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /**
      * 由注入的属性创建ActionFactory。
-     *
      * @return ActionFactory
-     *
      * @throws Exception 如果发生异常。
      */
-    protected ActionFactory buildActionFactory() throws Exception { // NOPMD SignatureDeclareThrowsException
+    protected ActionFactory buildActionFactory() throws Exception { // NOPMD
+        // SignatureDeclareThrowsException
         LOG.info("Initiating JRouter ActionFactory at : {}", new java.util.Date());
         if (configuration == null) {
             configuration = createDefaultConfiguration();
@@ -184,7 +226,8 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
                 LOG.debug("Set actionFactoryClass : {}", actionFactoryClass);
             }
             configuration.setActionFactoryClass(actionFactoryClass);
-        } else {
+        }
+        else {
             setDefaultActionFactoryClass(configuration);
         }
         if (objectFactory == null) {
@@ -208,27 +251,32 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         convertList(interceptors, interceptorStacks, resultTypes, results, actions);
 
         if (CollectionUtil.isNotEmpty(componentBeanScanProperties)) {
-            char[] sep = {',', ';'};
+            char[] sep = { ',', ';' };
             // 匹配包含bean名称的表达式
             List<String> includeComponentBeanExpressions = new ArrayList<>(2);
-            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentBeanExpression"), includeComponentBeanExpressions, sep);
+            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentBeanExpression"),
+                    includeComponentBeanExpressions, sep);
             // 匹配排除bean名称的表达式
             List<String> excludeComponentBeanExpressions = new ArrayList<>(2);
-            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentBeanExpression"), excludeComponentBeanExpressions, sep);
+            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentBeanExpression"),
+                    excludeComponentBeanExpressions, sep);
 
             // 匹配包含class的表达式
             List<String> includeComponentClassExpressions = new ArrayList<>(2);
-            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("includeComponentClassExpression"), includeComponentClassExpressions, sep);
+            CollectionUtil.stringToCollection(
+                    componentBeanScanProperties.getProperty("includeComponentClassExpression"),
+                    includeComponentClassExpressions, sep);
 
             // 匹配排除class名称的表达式
             List<String> excludeComponentClassExpressions = new ArrayList<>(2);
-            CollectionUtil.stringToCollection(componentBeanScanProperties.getProperty("excludeComponentClassExpression"), excludeComponentClassExpressions, sep);
+            CollectionUtil.stringToCollection(
+                    componentBeanScanProperties.getProperty("excludeComponentClassExpression"),
+                    excludeComponentClassExpressions, sep);
 
             AntPathMatcher matcher = new AntPathMatcher(".");
             String[] beanNames = applicationContext.getBeanDefinitionNames();
             Set<String> includes = new LinkedHashSet<>();
-            out:
-            for (String name : beanNames) {
+            out: for (String name : beanNames) {
                 for (String excludeComponentBeanExpression : excludeComponentBeanExpressions) {
                     if (matcher.match(excludeComponentBeanExpression, name)) {
                         continue out;
@@ -241,8 +289,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
                 }
             }
             // add include beans
-            out:
-            for (String includeName : includes) {
+            out: for (String includeName : includes) {
                 try {
                     Object bean = applicationContext.getBean(includeName);
                     String clsName = bean.getClass().getName();
@@ -256,15 +303,18 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
                         for (String includeComponentClassExpression : includeComponentClassExpressions) {
                             if (matcher.match(includeComponentClassExpression, clsName)) {
                                 // only add matched-class bean
-                                addComponentToList(bean, interceptors, interceptorStacks, resultTypes, results, actions);
+                                addComponentToList(bean, interceptors, interceptorStacks, resultTypes, results,
+                                        actions);
                                 continue out;
                             }
                         }
-                    } else {
+                    }
+                    else {
                         // if no includeComponentClassExpression, means allow all
                         addComponentToList(bean, interceptors, interceptorStacks, resultTypes, results, actions);
                     }
-                } catch (BeansException e) {
+                }
+                catch (BeansException e) {
                     // ignore
                     LOG.warn("Can't get bean : {}", includeName);
                 }
@@ -298,7 +348,6 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /**
      * 未直接设置{@link #configuration}对象时，提供默认的{@code SpringConfiguration}对象实现。
-     *
      * @return {@code SpringConfiguration}对象。
      */
     protected Configuration createDefaultConfiguration() {
@@ -308,20 +357,18 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /**
      * 未设置actionFactoryClass属性时，提供默认的{@code PathActionFactory.class}属性。
-     *
      * @param config Configuration对象。
-     *
      * @see #setActionFactoryClass(java.lang.Class)
      */
     protected void setDefaultActionFactoryClass(Configuration config) {
         config.setActionFactoryClass(PathActionFactory.class);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+
     /**
      * 未设置{@link #objectFactory}属性时，提供默认的{@code SpringObjectFactory}对象实现。
-     *
      * @param config Configuration对象。
-     *
      * @return {@code SpringObjectFactory}对象。
      */
     protected ObjectFactory createDefaultObjectFactory(Configuration config) {
@@ -329,17 +376,13 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         return new SpringObjectFactory(applicationContext);
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
     /**
      * Add matched bean.
-     *
      * @param bean matched bean.
      * @param listArray the array of list.
      */
     private void addComponentToList(Object bean, List... listArray) {
-        out:
-        for (List<Object> componentList : listArray) {
+        out: for (List<Object> componentList : listArray) {
             if (CollectionUtil.isNotEmpty(componentList)) {
                 for (Object exist : componentList) {
                     if (bean.getClass() == (exist instanceof Class ? exist : exist.getClass())) {
@@ -352,28 +395,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * Convert the {@code String} element of the list into {@code Class}.
-     *
-     * @param listArray the array of list.
-     *
-     * @throws ClassNotFoundException If the class was not found.
-     */
-    private static void convertList(List... listArray) throws ClassNotFoundException {
-        for (List componentList : listArray) {
-            if (CollectionUtil.isNotEmpty(componentList)) {
-                for (int i = 0; i < componentList.size(); i++) {
-                    Object obj = componentList.get(i);
-                    if (obj instanceof String) {
-                        componentList.set(i, ClassUtil.loadClass((String) obj));
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * 在bean工厂关闭时移除ActionFactory中所有关联关系。
-     *
      * @throws JRouterException 如果发生错误。
      */
     @Override
@@ -381,7 +403,8 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         LOG.info("Closing JRouter ActionFactory : {}", actionFactory);
         try {
             beforeActionFactoryDestruction();
-        } finally {
+        }
+        finally {
             if (actionFactory != null) {
                 this.actionFactory.clear();
             }
@@ -393,7 +416,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      */
     @Override
     public T getObject() {
-        return (T) this.actionFactory;
+        return this.actionFactory;
     }
 
     @Override
@@ -407,21 +430,20 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
     }
 
     /**
-     * Hook that allows post-processing after the ActionFactory has been successfully created.
-     * The ActionFactory is already available through {@code getActionFactory()} at this point.
+     * Hook that allows post-processing after the ActionFactory has been successfully
+     * created. The ActionFactory is already available through {@code getActionFactory()}
+     * at this point.
      * <p>
      * This implementation is empty.
-     *
      * @param actionFactory ActionFactory。
-     *
      * @see #buildActionFactory()
      */
     protected void afterActionFactoryCreation(T actionFactory) {
     }
 
     /**
-     * Hook that allows shutdown processing before the ActionFactory will be closed.
-     * The ActionFactory is still available through {@code getActionFactory()} at this point.
+     * Hook that allows shutdown processing before the ActionFactory will be closed. The
+     * ActionFactory is still available through {@code getActionFactory()} at this point.
      * <p>
      * This implementation is empty.
      *
@@ -429,7 +451,8 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      */
     protected void beforeActionFactoryDestruction() {
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -438,9 +461,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /**
      * 指定的{@link #configuration}类型。
-     *
      * @param configurationClass 指定的{@link #configuration}类型。
-     *
      * @deprecated since 1.6.4
      */
     @Deprecated
@@ -449,12 +470,11 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
             throw new IllegalArgumentException(
                     "'configurationClass' must be assignable to [net.jrouter.config.Configuration]");
         }
-        this.configurationClass = (Class<? extends Configuration>) configurationClass;
+        this.configurationClass = configurationClass;
     }
 
     /**
      * Get the JRouter Configuration object used to build the ActionFactory.
-     *
      * @return the JRouter Configuration object used to build the ActionFactory.
      */
     public final Configuration getConfiguration() {
@@ -466,9 +486,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
     /**
      * 设置ActionFactory的类型。
-     *
      * @param actionFactoryClass 指定的ActionFactory类型。
-     *
      * @see Configuration#setActionFactoryClass(java.lang.Class)
      */
     public void setActionFactoryClass(Class<T> actionFactoryClass) {
@@ -479,7 +497,7 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
         this.actionFactoryClass = actionFactoryClass;
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * @see #componentClassScanProperties
@@ -495,12 +513,13 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
      */
     private static class SpringConfiguration extends Configuration {
 
-        /** ApplicationContext */
+        /**
+         * ApplicationContext
+         */
         private final ApplicationContext applicationContext;
 
         /**
          * 构造一个指定ApplicationContext的对象。
-         *
          * @param applicationContext ApplicationContext对象。
          */
         public SpringConfiguration(ApplicationContext applicationContext) {
@@ -510,12 +529,15 @@ public class DefaultActionFactoryBean<T extends ActionFactory> implements Factor
 
         @Override
         public void afterActionFactoryCreation(ActionFactory actionFactory) {
-            applicationContext.getAutowireCapableBeanFactory().autowireBeanProperties(actionFactory, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
+            applicationContext.getAutowireCapableBeanFactory()
+                .autowireBeanProperties(actionFactory, AutowireCapableBeanFactory.AUTOWIRE_BY_NAME, false);
         }
 
         @Override
         protected void afterActionFactoryBuild(ActionFactory actionFactory) {
             applicationContext.getAutowireCapableBeanFactory().initializeBean(actionFactory, null);
         }
+
     }
+
 }

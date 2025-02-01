@@ -26,7 +26,6 @@ public class NotFoundException extends JRouterException {
 
     /**
      * 构造一个包含指定详细消息的NotFoundException。
-     *
      * @param message 详细消息。
      */
     public NotFoundException(String message) {
@@ -35,7 +34,6 @@ public class NotFoundException extends JRouterException {
 
     /**
      * 构造一个包含指定原因的的NotFoundException。
-     *
      * @param cause 异常原因。
      */
     public NotFoundException(Throwable cause) {
@@ -44,7 +42,6 @@ public class NotFoundException extends JRouterException {
 
     /**
      * 构造一个包含指定详细消息和原因的NotFoundException。
-     *
      * @param message 详细消息。
      * @param cause 异常原因。
      */

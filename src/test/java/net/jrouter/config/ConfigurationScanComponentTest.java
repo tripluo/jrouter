@@ -67,4 +67,5 @@ public class ConfigurationScanComponentTest extends Assert {
         assertNotNull(factory.getInterceptors().get(SampleInterceptor.TIMER));
         assertNotNull(factory.getInterceptors().get(DemoInterceptor.SPRING_DEMO));
     }
+
 }

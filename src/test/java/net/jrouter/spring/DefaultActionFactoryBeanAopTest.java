@@ -17,10 +17,8 @@
 
 package net.jrouter.spring;
 
-import java.util.List;
 import net.jrouter.impl.InterceptorProxy;
 import net.jrouter.impl.PathActionFactory;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,11 +27,15 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import java.util.List;
+
+import static org.junit.Assert.*;
+
 /**
  * 测试与 springframework 集成自动扫描类并添加组件。
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jrouter-spring_aop.xml"})
+@ContextConfiguration(locations = { "classpath:jrouter-spring_aop.xml" })
 public class DefaultActionFactoryBeanAopTest {
 
     // singleton ActionFactory
@@ -73,7 +75,8 @@ public class DefaultActionFactoryBeanAopTest {
      * 测试指定path的action的拦截器集合。
      */
     private void assertInterceptorProxies(String actionPath, String interceptorProxies) {
-        assertEquals(interceptorsToString(factory.getActions().get(actionPath).getInterceptorProxies()), interceptorProxies);
+        assertEquals(interceptorsToString(factory.getActions().get(actionPath).getInterceptorProxies()),
+                interceptorProxies);
     }
 
     /**
@@ -87,11 +90,12 @@ public class DefaultActionFactoryBeanAopTest {
             return "[]";
         StringBuilder msg = new StringBuilder();
         msg.append('[');
-        for (int i = 0; ; i++) {
+        for (int i = 0;; i++) {
             msg.append(interceptors.get(i).getName());
             if (i == iMax)
                 return msg.append(']').toString();
             msg.append(", ");
         }
     }
+
 }

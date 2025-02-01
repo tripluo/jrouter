@@ -17,15 +17,18 @@
 
 package net.jrouter.util;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * StringUtilTest。
  */
 public class StringUtilTest {
 
-    /** 路径分隔符 */
+    /**
+     * 路径分隔符
+     */
     public static final char PATH = '/';
 
     /**
@@ -86,4 +89,5 @@ public class StringUtilTest {
         assertEquals("test", StringUtil.trim(" test/   ", PATH));
         assertEquals("test/123", StringUtil.trim(" /test/123////   ", PATH));
     }
+
 }

@@ -29,8 +29,8 @@ public @interface Interceptor {
 
     /**
      * 拦截器名称。
-     *
      * @return 拦截器名称。
      */
     String name();
+
 }

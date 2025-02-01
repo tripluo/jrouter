@@ -23,7 +23,6 @@ import net.jrouter.URLTestAction2;
 import net.jrouter.impl.PathActionFactory;
 import net.jrouter.interceptor.DemoInterceptor;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,11 +30,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.AbstractJUnit4SpringContextTests;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.*;
+
 /**
  * SpringObjectFactoryTest。
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jrouter-spring_test.xml"})
+@ContextConfiguration(locations = { "classpath:jrouter-spring_test.xml" })
 public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
 
     // PathActionFactory
@@ -92,10 +93,12 @@ public class SpringObjectFactoryTest extends AbstractJUnit4SpringContextTests {
         // check interceptors
         assertEquals(1, factory.getActions().get(url).getInterceptorProxies().size());
         assertEquals(1, factory.getActions().get(url).getInterceptors().size());
-        assertEquals(DemoInterceptor.SPRING_DEMO, factory.getActions().get(url).getInterceptorProxies().get(0).getName());
+        assertEquals(DemoInterceptor.SPRING_DEMO,
+                factory.getActions().get(url).getInterceptorProxies().get(0).getName());
         assertEquals(DemoInterceptor.SPRING_DEMO, factory.getActions().get(url).getInterceptors().get(0).name());
 
         assertTrue(factory.invokeAction(url) instanceof URLTestAction2);
         assertSame(factory.invokeAction(url), factory.invokeAction(url));
     }
+
 }

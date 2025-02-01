@@ -17,39 +17,48 @@
 
 package net.jrouter.impl;
 
-import java.lang.reflect.Field;
-import java.util.*;
 import net.jrouter.annotation.InterceptorStack;
 import net.jrouter.util.CollectionUtil;
+
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * 拦截栈的代理类，包括了拦截栈的名称、字段来源及其所包含的拦截器集合。
  */
 public final class InterceptorStackProxy {
 
-    /** 拦截栈名称 */
+    /**
+     * 拦截栈名称
+     */
     @lombok.Getter
     private final String name;
 
-    /** 拦截栈取名字段 */
+    /**
+     * 拦截栈取名字段
+     */
     private final Field field;
 
-    /** 拦截栈 */
+    /**
+     * 拦截栈
+     */
     @lombok.Getter
     private final InterceptorStack interceptorStack;
 
-    /** 包含的拦截器集合 */
+    /**
+     * 包含的拦截器集合
+     */
     @lombok.Getter(lombok.AccessLevel.PACKAGE)
     private final List<InterceptorDelegate> interceptorDelegates;
 
     /**
      * 构造一个拦截栈的代理类，包含拦截栈的名称、字段来源及其所包含的拦截器集合。
-     *
      * @param name 拦截栈的名称。
      * @param field 拦截栈字段来源。
      * @param interceptorDelegates 包含的拦截器集合。
      */
-    public InterceptorStackProxy(String name, Field field, InterceptorStack interceptorStack, List<InterceptorDelegate> interceptorDelegates) {
+    public InterceptorStackProxy(String name, Field field, InterceptorStack interceptorStack,
+            List<InterceptorDelegate> interceptorDelegates) {
         this.name = name;
         this.field = field;
         this.interceptorStack = interceptorStack;
@@ -58,7 +67,6 @@ public final class InterceptorStackProxy {
 
     /**
      * 返回拦截栈所包含的拦截器的代理集合。
-     *
      * @return 拦截栈所包含的拦截器的代理集合。
      */
     public List<InterceptorProxy> getInterceptors() {
@@ -74,7 +82,6 @@ public final class InterceptorStackProxy {
 
     /**
      * 返回拦截栈取名字段的信息。
-     *
      * @return 拦截栈取名字段的信息。
      */
     public String getFieldName() {
@@ -123,5 +130,7 @@ public final class InterceptorStackProxy {
             this.interceptor = interceptor;
             this.interceptorProxy = interceptorProxy;
         }
+
     }
+
 }

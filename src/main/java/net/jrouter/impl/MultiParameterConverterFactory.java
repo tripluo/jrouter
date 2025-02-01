@@ -17,9 +17,6 @@
 
 package net.jrouter.impl;
 
-import java.lang.reflect.Method;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import net.jrouter.ActionInvocation;
 import net.jrouter.ConverterFactory;
 import net.jrouter.JRouterException;
@@ -27,15 +24,14 @@ import net.jrouter.ParameterConverter;
 import net.jrouter.util.CollectionUtil;
 import net.jrouter.util.MethodUtil;
 
+import java.lang.reflect.Method;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 /**
  * 创建多参数自动映射转换器的工厂类。
  */
 public class MultiParameterConverterFactory implements ConverterFactory {
-
-    /**
-     * 缓存转换参数匹配的位置
-     */
-    private Map<Method, int[]> methodParametersCache;
 
     /**
      * 转换参数类型是否固定顺序，默认固定参数。
@@ -51,8 +47,40 @@ public class MultiParameterConverterFactory implements ConverterFactory {
     private final ParameterConverter parameterConverter;
 
     /**
-     * 不缓存转换参数位置的工厂类。提供一个便捷的无参数构造类。
-     * MultiParameterConverterFactory.NoFixedOrder()即 MultiParameterConverterFactory(false)。
+     * 缓存转换参数匹配的位置
+     */
+    private Map<Method, int[]> methodParametersCache;
+
+    /**
+     * 创建固定参数自动映射转换器的工厂类。
+     */
+    public MultiParameterConverterFactory() {
+        this(true);
+    }
+
+    /**
+     * 创建多参数自动映射转换器的工厂类。
+     * @param fixedOrder 参数类型是否固定顺序。
+     */
+    public MultiParameterConverterFactory(boolean fixedOrder) {
+        this.fixedOrder = fixedOrder;
+        if (fixedOrder) {
+            methodParametersCache = new ConcurrentHashMap<>();
+        }
+        parameterConverter = new MultiParameterConverter();
+    }
+
+    /**
+     * 返回线程安全的多参数自动映射转换器。 此参数转换器可能需要ActionFactory支持，在创建ActionInvocation时区分处理原始参数和转换参数。
+     */
+    @Override
+    public ParameterConverter getParameterConverter() {
+        return parameterConverter;
+    }
+
+    /**
+     * 不缓存转换参数位置的工厂类。提供一个便捷的无参数构造类。 MultiParameterConverterFactory.NoFixedOrder()即
+     * MultiParameterConverterFactory(false)。
      */
     public static class NoFixedOrder extends MultiParameterConverterFactory {
 
@@ -66,43 +94,13 @@ public class MultiParameterConverterFactory implements ConverterFactory {
     }
 
     /**
-     * 创建固定参数自动映射转换器的工厂类。
-     */
-    public MultiParameterConverterFactory() {
-        this(true);
-    }
-
-    /**
-     * 创建多参数自动映射转换器的工厂类。
-     *
-     * @param fixedOrder 参数类型是否固定顺序。
-     */
-    public MultiParameterConverterFactory(boolean fixedOrder) {
-        this.fixedOrder = fixedOrder;
-        if (fixedOrder) {
-            methodParametersCache = new ConcurrentHashMap<>();
-        }
-        parameterConverter = new MultiParameterConverter();
-    }
-
-    /**
-     * 返回线程安全的多参数自动映射转换器。
-     * 此参数转换器可能需要ActionFactory支持，在创建ActionInvocation时区分处理原始参数和转换参数。
-     */
-    @Override
-    public ParameterConverter getParameterConverter() {
-        return parameterConverter;
-    }
-
-    /**
-     * 提供多参数自动映射的转换器。不包含任何成员对象，线程安全。
-     * 注入并自动映射调用的参数（无类型匹配的参数映射为{@code null}）。
+     * 提供多参数自动映射的转换器。不包含任何成员对象，线程安全。 注入并自动映射调用的参数（无类型匹配的参数映射为{@code null}）。
      */
     public class MultiParameterConverter implements ParameterConverter {
 
         @Override
-        public Object[] convert(Method method, Object obj, Object[] originalParams, Object[] convertParams) throws
-                JRouterException {
+        public Object[] convert(Method method, Object obj, Object[] originalParams, Object[] convertParams)
+                throws JRouterException {
             int paramSize = method.getParameterTypes().length;
             // 无参数的方法
             if (paramSize == 0) {
@@ -121,15 +119,11 @@ public class MultiParameterConverterFactory implements ConverterFactory {
         }
 
         /**
-         * 匹配追加注入的参数相对于方法参数类型中的映射；
-         * 匹配顺序不考虑父子优先级，追加的参数按顺序优先匹配；{@code null}不匹配任何参数类型。
+         * 匹配追加注入的参数相对于方法参数类型中的映射； 匹配顺序不考虑父子优先级，追加的参数按顺序优先匹配；{@code null}不匹配任何参数类型。
          * 如果追加注入的参数类型固定，则会缓存记录。
-         *
          * @param method 指定的方法。
          * @param parameters 注入的参数。
-         *
          * @return 注入的参数相对于方法参数类型中的映射。
-         *
          * @see #methodParametersCache
          */
         private int[] match(Method method, Object[] parameters) {
@@ -150,4 +144,5 @@ public class MultiParameterConverterFactory implements ConverterFactory {
         }
 
     }
+
 }

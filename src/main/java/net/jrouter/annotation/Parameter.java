@@ -34,15 +34,14 @@ public @interface Parameter {
 
     /**
      * 参数名称。
-     *
      * @return 参数名称。
      */
     String name();
 
     /**
      * 参数名称对应的值/多值。
-     *
      * @return 参数名称对应的值/多值。
      */
     String[] value();
+
 }

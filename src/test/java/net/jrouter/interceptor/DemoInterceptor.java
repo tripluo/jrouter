@@ -24,16 +24,22 @@ import org.junit.Assert;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 
+import static org.junit.Assert.assertEquals;
+
 /**
  * DemoInterceptor。
  */
 public class DemoInterceptor {
 
-    /** demo interceptor & interceptor stack */
-    @InterceptorStack(interceptors = {@InterceptorStack.Interceptor("demo")})
+    /**
+     * demo interceptor & interceptor stack
+     */
+    @InterceptorStack(interceptors = { @InterceptorStack.Interceptor("demo") })
     public static final String DEMO = "demo";
 
-    /** spring inject interceptor */
+    /**
+     * spring inject interceptor
+     */
     public static final String SPRING_DEMO = "springInject";
 
     // 注入的属性
@@ -51,8 +57,8 @@ public class DemoInterceptor {
      */
     @Interceptor(name = DEMO)
     public Object test(ActionInvocation invocation) {
-        Assert.assertEquals("demo interceptor", value);
-        Assert.assertEquals((Integer) 10000, number);
+        assertEquals("demo interceptor", value);
+        assertEquals((Integer) 10000, number);
         return invocation.invoke();
     }
 
@@ -61,7 +67,7 @@ public class DemoInterceptor {
      */
     @Interceptor(name = SPRING_DEMO)
     public Object springTest(ActionInvocation invocation) {
-        Assert.assertEquals("spring inject", inject);
+        assertEquals("spring inject", inject);
         return invocation.invoke();
     }
 
@@ -78,4 +84,5 @@ public class DemoInterceptor {
     public void setNumber(Integer number) {
         this.number = number;
     }
+
 }

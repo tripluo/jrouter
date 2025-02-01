@@ -21,7 +21,8 @@ import java.lang.annotation.*;
 
 /**
  * <p>
- * 当Result定义于注解Action中的子项时，表示Action特定的结果对象；</p>
+ * 当Result定义于注解Action中的子项时，表示Action特定的结果对象；
+ * </p>
  * <p>
  * 当Result单独定义于方法上时，表示某种特定{@code String}类型全局的结果对象。
  * 当作为全局结果对象时，type值为空时直接调用后结束；type值不为空调用后再调用相应的{@link ResultType}。
@@ -34,22 +35,20 @@ public @interface Result {
 
     /**
      * 结果对象的名称。
-     *
      * @return 结果对象的名称。
      */
     String name();
 
     /**
      * 结果对象的类型名称。
-     *
      * @return 结果对象的类型。
      */
     String type() default "";
 
     /**
      * 结果对象相关联的资源路径。
-     *
      * @return 资源路径。
      */
     String location() default "";
+
 }

@@ -29,47 +29,38 @@ public @interface InterceptorStack {
 
     /**
      * 拦截栈名称，未指定则默认取字符串变量的值。
-     *
      * @return 拦截栈名称。
      */
     String name() default "";
 
     /**
-     * TODO
-     * 父拦截栈名称。
-     *
+     * TODO 父拦截栈名称。
      * @return 父拦截栈名称。
      */
     // String parent() default "";
 
     /**
      * 包含的拦截器集合。
-     *
      * @return 所包含的拦截器集合。
      */
     Interceptor[] interceptors() default {};
 
     /**
      * 匹配的路径集合（默认空不包含任何）。
-     *
      * @return 匹配的路径集合。
-     *
      * @since 1.8.1
      */
     String[] include() default {};
 
     /**
      * 不匹配的路径集合（默认空不排除任何）。
-     *
      * @return 不匹配的路径集合。
-     *
      * @since 1.8.1
      */
     String[] exclude() default {};
 
     /**
      * 排序值，默认0。多匹配后者覆盖前者。
-     *
      * @return 排序值。
      */
     int order() default 0;
@@ -84,18 +75,17 @@ public @interface InterceptorStack {
 
         /**
          * 拦截器名称。
-         *
          * @return 拦截器名称。
          */
         String value();
 
         /**
          * 不匹配的路径集合（默认空不排除任何）。
-         *
          * @return 不匹配的路径集合。
-         *
          * @since 1.8.1
          */
         String[] exclude() default {};
+
     }
+
 }

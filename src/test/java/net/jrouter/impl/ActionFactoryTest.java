@@ -17,8 +17,6 @@
 
 package net.jrouter.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.jrouter.ActionProxy;
 import net.jrouter.JRouterException;
 import net.jrouter.SimpleAction;
@@ -31,9 +29,13 @@ import net.jrouter.result.DefaultResult;
 import net.jrouter.result.DemoResult;
 import net.jrouter.spring.RequestMappingActionFilter;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.*;
 
 /**
  * ActionFactoryTest对应{@link SimpleAction}的测试。
@@ -98,63 +100,67 @@ public class ActionFactoryTest {
 
     /**
      * 测试路径解析。
-     *
      * @throws Exception 如果发生异常。
      * @see PathActionFactory.ColonString#parseMatch
      */
     @Test
     public void test_parseMatch() throws Exception {
-        java.lang.reflect.Method method = PathActionFactory.ColonString.class.getDeclaredMethod("parseMatch", String.class, String[].class);
+        java.lang.reflect.Method method = PathActionFactory.ColonString.class.getDeclaredMethod("parseMatch",
+                String.class, String[].class);
         method.setAccessible(true);
-        String[] emptyDefaults = new String[]{"", ""};
+        String[] emptyDefaults = new String[] { "", "" };
 
-        String[] nullDefaults = new String[]{null, null};
-        assertArrayEquals(new String[]{"", ""}, (String[]) method.invoke(null, "  ", nullDefaults));
-        assertArrayEquals(new String[]{"", ""}, (String[]) method.invoke(null, "", nullDefaults));
-        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, "abc", nullDefaults));
-        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, "  abc", nullDefaults));
-        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, "abc ", nullDefaults));
-        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, " abc  ", nullDefaults));
+        String[] nullDefaults = new String[] { null, null };
+        assertArrayEquals(new String[] { "", "" }, (String[]) method.invoke(null, "  ", nullDefaults));
+        assertArrayEquals(new String[] { "", "" }, (String[]) method.invoke(null, "", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "" }, (String[]) method.invoke(null, "abc", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "" }, (String[]) method.invoke(null, "  abc", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "" }, (String[]) method.invoke(null, "abc ", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "" }, (String[]) method.invoke(null, " abc  ", nullDefaults));
 
-        assertArrayEquals(new String[]{"1", ""}, (String[]) method.invoke(null, "1:", nullDefaults));
-        assertArrayEquals(new String[]{"1", ""}, (String[]) method.invoke(null, "1 :", nullDefaults));
-        assertArrayEquals(new String[]{"1", ""}, (String[]) method.invoke(null, "1 :  ", nullDefaults));
-        assertArrayEquals(new String[]{"", "1"}, (String[]) method.invoke(null, ":1", nullDefaults));
-        assertArrayEquals(new String[]{"", "1"}, (String[]) method.invoke(null, " :1", nullDefaults));
-        assertArrayEquals(new String[]{"", "1"}, (String[]) method.invoke(null, ": 1  ", nullDefaults));
-        assertArrayEquals(new String[]{"", "123"}, (String[]) method.invoke(null, ":123", nullDefaults));
-        assertArrayEquals(new String[]{"", "123"}, (String[]) method.invoke(null, "  :123  ", nullDefaults));
-        assertArrayEquals(new String[]{"", "123"}, (String[]) method.invoke(null, ":  123  ", nullDefaults));
-        assertArrayEquals(new String[]{"", "123"}, (String[]) method.invoke(null, "   :  123   ", nullDefaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "abc:123  ", nullDefaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "abc    :123  ", nullDefaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc:123 ", nullDefaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc    :123 ", nullDefaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc    :   123 ", nullDefaults));
-        assertArrayEquals(new String[]{"abc", ""}, (String[]) method.invoke(null, "   abc    :", nullDefaults));
+        assertArrayEquals(new String[] { "1", "" }, (String[]) method.invoke(null, "1:", nullDefaults));
+        assertArrayEquals(new String[] { "1", "" }, (String[]) method.invoke(null, "1 :", nullDefaults));
+        assertArrayEquals(new String[] { "1", "" }, (String[]) method.invoke(null, "1 :  ", nullDefaults));
+        assertArrayEquals(new String[] { "", "1" }, (String[]) method.invoke(null, ":1", nullDefaults));
+        assertArrayEquals(new String[] { "", "1" }, (String[]) method.invoke(null, " :1", nullDefaults));
+        assertArrayEquals(new String[] { "", "1" }, (String[]) method.invoke(null, ": 1  ", nullDefaults));
+        assertArrayEquals(new String[] { "", "123" }, (String[]) method.invoke(null, ":123", nullDefaults));
+        assertArrayEquals(new String[] { "", "123" }, (String[]) method.invoke(null, "  :123  ", nullDefaults));
+        assertArrayEquals(new String[] { "", "123" }, (String[]) method.invoke(null, ":  123  ", nullDefaults));
+        assertArrayEquals(new String[] { "", "123" }, (String[]) method.invoke(null, "   :  123   ", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "123" }, (String[]) method.invoke(null, "abc:123  ", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "123" }, (String[]) method.invoke(null, "abc    :123  ", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "123" }, (String[]) method.invoke(null, "   abc:123 ", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "123" },
+                (String[]) method.invoke(null, "   abc    :123 ", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "123" },
+                (String[]) method.invoke(null, "   abc    :   123 ", nullDefaults));
+        assertArrayEquals(new String[] { "abc", "" }, (String[]) method.invoke(null, "   abc    :", nullDefaults));
         assertArrayEquals(emptyDefaults, (String[]) method.invoke(null, ":", nullDefaults));
         assertArrayEquals(emptyDefaults, (String[]) method.invoke(null, " : ", nullDefaults));
         assertArrayEquals(emptyDefaults, (String[]) method.invoke(null, "    :   ", nullDefaults));
 
         String defaultType = "defaultType";
         String defaultLoc = "defaultLoc";
-        String[] defaults = new String[]{defaultType, defaultLoc};
+        String[] defaults = new String[] { defaultType, defaultLoc };
         assertArrayEquals(defaults, (String[]) method.invoke(null, "  ", defaults));
         assertArrayEquals(defaults, (String[]) method.invoke(null, "", defaults));
-        assertArrayEquals(new String[]{"abc", "defaultLoc"}, (String[]) method.invoke(null, "abc", defaults));
-        assertArrayEquals(new String[]{"abc", "defaultLoc"}, (String[]) method.invoke(null, "  abc", defaults));
-        assertArrayEquals(new String[]{"abc", "defaultLoc"}, (String[]) method.invoke(null, "abc ", defaults));
-        assertArrayEquals(new String[]{"abc", "defaultLoc"}, (String[]) method.invoke(null, " abc  ", defaults));
-        assertArrayEquals(new String[]{defaultType, "123"}, (String[]) method.invoke(null, ":123", defaults));
-        assertArrayEquals(new String[]{defaultType, "123"}, (String[]) method.invoke(null, "  :123  ", defaults));
-        assertArrayEquals(new String[]{defaultType, "123"}, (String[]) method.invoke(null, ":  123  ", defaults));
-        assertArrayEquals(new String[]{defaultType, "123"}, (String[]) method.invoke(null, "   :  123   ", defaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "abc:123  ", defaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "abc    :123  ", defaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc:123 ", defaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc    :123 ", defaults));
-        assertArrayEquals(new String[]{"abc", "123"}, (String[]) method.invoke(null, "   abc    :   123 ", defaults));
-        assertArrayEquals(new String[]{"abc", defaultLoc}, (String[]) method.invoke(null, "   abc    :", defaults));
+        assertArrayEquals(new String[] { "abc", "defaultLoc" }, (String[]) method.invoke(null, "abc", defaults));
+        assertArrayEquals(new String[] { "abc", "defaultLoc" }, (String[]) method.invoke(null, "  abc", defaults));
+        assertArrayEquals(new String[] { "abc", "defaultLoc" }, (String[]) method.invoke(null, "abc ", defaults));
+        assertArrayEquals(new String[] { "abc", "defaultLoc" }, (String[]) method.invoke(null, " abc  ", defaults));
+        assertArrayEquals(new String[] { defaultType, "123" }, (String[]) method.invoke(null, ":123", defaults));
+        assertArrayEquals(new String[] { defaultType, "123" }, (String[]) method.invoke(null, "  :123  ", defaults));
+        assertArrayEquals(new String[] { defaultType, "123" }, (String[]) method.invoke(null, ":  123  ", defaults));
+        assertArrayEquals(new String[] { defaultType, "123" },
+                (String[]) method.invoke(null, "   :  123   ", defaults));
+        assertArrayEquals(new String[] { "abc", "123" }, (String[]) method.invoke(null, "abc:123  ", defaults));
+        assertArrayEquals(new String[] { "abc", "123" }, (String[]) method.invoke(null, "abc    :123  ", defaults));
+        assertArrayEquals(new String[] { "abc", "123" }, (String[]) method.invoke(null, "   abc:123 ", defaults));
+        assertArrayEquals(new String[] { "abc", "123" }, (String[]) method.invoke(null, "   abc    :123 ", defaults));
+        assertArrayEquals(new String[] { "abc", "123" },
+                (String[]) method.invoke(null, "   abc    :   123 ", defaults));
+        assertArrayEquals(new String[] { "abc", defaultLoc }, (String[]) method.invoke(null, "   abc    :", defaults));
         assertArrayEquals(defaults, (String[]) method.invoke(null, ":", defaults));
         assertArrayEquals(defaults, (String[]) method.invoke(null, " : ", defaults));
         assertArrayEquals(defaults, (String[]) method.invoke(null, "    :   ", defaults));
@@ -211,7 +217,8 @@ public class ActionFactoryTest {
             // 测试调用时抛出异常
             ap.invoke();
             fail("no exception");
-        } catch (InvocationProxyException e) {
+        }
+        catch (InvocationProxyException e) {
             assertNotNull(e);
             assertSame(ap, e.getTarget());
         }
@@ -219,7 +226,8 @@ public class ActionFactoryTest {
             // 测试调用时抛出异常
             factory.invokeAction(url3);
             fail("no exception");
-        } catch (InvocationProxyException e) {
+        }
+        catch (InvocationProxyException e) {
             assertNotNull(e);
             // ActionFactory调用抛出异常，测试消除拦截器的递归调用对异常信息的扰乱。
             assertFalse(e.getCause() instanceof InvocationProxyException);
@@ -233,15 +241,16 @@ public class ActionFactoryTest {
         assertEquals("null", factory.invokeAction(url4));
         assertEquals("null", factory.invokeAction(url4, (Object) null));
         assertEquals("null", factory.invokeAction(url4, (Object[]) null));
-        assertEquals("null", factory.invokeAction(url4, new Object[]{null}));
+        assertEquals("null", factory.invokeAction(url4, new Object[] { null }));
         // assertEquals("null", factory.invokeAction(url4, new Object[0]));
         assertEquals("null", factory.invokeAction(url4, new Object[0]));
-        assertEquals("[]", factory.invokeAction(url4, new Object[]{new String[]{}}));
-        assertEquals("[null, null, null]", factory.invokeAction(url4, new Object[]{new String[]{null, null, null}}));
-        assertEquals("null", factory.invokeAction(url4, new Object[]{"123", "abc"}));
-        assertEquals("[123, abc]", factory.invokeAction(url4, new Object[]{new String[]{"123", "abc"}}));
-        assertEquals("null", factory.invokeAction(url4, (Object[]) new String[]{"123", "abc"}));
-        assertEquals("null", factory.invokeAction(url4, new Object[]{null, null, null}));
+        assertEquals("[]", factory.invokeAction(url4, new Object[] { new String[] {} }));
+        assertEquals("[null, null, null]",
+                factory.invokeAction(url4, new Object[] { new String[] { null, null, null } }));
+        assertEquals("null", factory.invokeAction(url4, new Object[] { "123", "abc" }));
+        assertEquals("[123, abc]", factory.invokeAction(url4, new Object[] { new String[] { "123", "abc" } }));
+        assertEquals("null", factory.invokeAction(url4, (Object[]) new String[] { "123", "abc" }));
+        assertEquals("null", factory.invokeAction(url4, new Object[] { null, null, null }));
         assertEquals("null", factory.invokeAction(url4, null, null, null));
         assertEquals("null", factory.invokeAction(url4, "123"));
         assertEquals("null", factory.invokeAction(url4, "123", "abc"));
@@ -254,14 +263,14 @@ public class ActionFactoryTest {
         assertEquals("100null", factory.invokeAction(url5, 100, null));
         assertEquals("100null", factory.invokeAction(url5, 100, null, null, null));
         assertEquals("100[]", factory.invokeAction(url5, 100, new String[0]));
-        assertEquals("100[]", factory.invokeAction(url5, 100, new String[]{}));
-        assertEquals("100[]", factory.invokeAction(url5, 100, new String[]{""}));
-        assertEquals("100[null]", factory.invokeAction(url5, 100, new String[]{null}));
-        assertEquals("100[1, 2]", factory.invokeAction(url5, 100, new String[]{"1", "2"}));
-        assertEquals("100[]", factory.invokeAction(url5, new Object[]{100, new String[]{}}));
-        assertEquals("100[1, 2]", factory.invokeAction(url5, new Object[]{100, new String[]{"1", "2"}}));
-        assertEquals("100[]", factory.invokeAction(url5, new Object[]{100, new String[0]}));
-        assertEquals("100null", factory.invokeAction(url5, new Object[]{100, null}));
+        assertEquals("100[]", factory.invokeAction(url5, 100, new String[] {}));
+        assertEquals("100[]", factory.invokeAction(url5, 100, new String[] { "" }));
+        assertEquals("100[null]", factory.invokeAction(url5, 100, new String[] { null }));
+        assertEquals("100[1, 2]", factory.invokeAction(url5, 100, new String[] { "1", "2" }));
+        assertEquals("100[]", factory.invokeAction(url5, new Object[] { 100, new String[] {} }));
+        assertEquals("100[1, 2]", factory.invokeAction(url5, new Object[] { 100, new String[] { "1", "2" } }));
+        assertEquals("100[]", factory.invokeAction(url5, new Object[] { 100, new String[0] }));
+        assertEquals("100null", factory.invokeAction(url5, new Object[] { 100, null }));
         assertEquals("100null", factory.invokeAction(url5, 100, "1"));
         assertEquals("100null", factory.invokeAction(url5, 100, "1", "2"));
         // set first parameter null
@@ -273,14 +282,14 @@ public class ActionFactoryTest {
         assertEquals("100nullnull", factory.invokeAction(url6, 100, null));
         assertEquals("100nullnull", factory.invokeAction(url6, 100, null, null, null));
         assertEquals("100200[]", factory.invokeAction(url6, 100, 200, new String[0]));
-        assertEquals("100200[]", factory.invokeAction(url6, 100, 200, new String[]{}));
-        assertEquals("100200[]", factory.invokeAction(url6, 100, 200, new String[]{""}));
-        assertEquals("100200[null]", factory.invokeAction(url6, 100, 200, new String[]{null}));
-        assertEquals("100200[1, 2]", factory.invokeAction(url6, 100, 200, new String[]{"1", "2"}));
-        assertEquals("100200[]", factory.invokeAction(url6, new Object[]{100, 200, new String[]{}}));
-        assertEquals("100200[1, 2]", factory.invokeAction(url6, new Object[]{100, 200, new String[]{"1", "2"}}));
-        assertEquals("100200[]", factory.invokeAction(url6, new Object[]{100, 200, new String[0]}));
-        assertEquals("100200null", factory.invokeAction(url6, new Object[]{100, 200, null}));
+        assertEquals("100200[]", factory.invokeAction(url6, 100, 200, new String[] {}));
+        assertEquals("100200[]", factory.invokeAction(url6, 100, 200, new String[] { "" }));
+        assertEquals("100200[null]", factory.invokeAction(url6, 100, 200, new String[] { null }));
+        assertEquals("100200[1, 2]", factory.invokeAction(url6, 100, 200, new String[] { "1", "2" }));
+        assertEquals("100200[]", factory.invokeAction(url6, new Object[] { 100, 200, new String[] {} }));
+        assertEquals("100200[1, 2]", factory.invokeAction(url6, new Object[] { 100, 200, new String[] { "1", "2" } }));
+        assertEquals("100200[]", factory.invokeAction(url6, new Object[] { 100, 200, new String[0] }));
+        assertEquals("100200null", factory.invokeAction(url6, new Object[] { 100, 200, null }));
         assertEquals("100200null", factory.invokeAction(url6, 100, 200, "1"));
         assertEquals("100200null", factory.invokeAction(url6, 100, 200, "1", "2"));
         // set previous parameter null
@@ -335,12 +344,14 @@ public class ActionFactoryTest {
         assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + ":/test/simple2"));
         assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + "  : /test/simple2"));
         assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, DefaultResult.FORWARD + "  : /test/simple2  "));
-        assertEquals(SimpleAction.SUCCESS, factory.invokeAction(url1, "   " + DefaultResult.FORWARD + "  :   /test/simple2  "));
+        assertEquals(SimpleAction.SUCCESS,
+                factory.invokeAction(url1, "   " + DefaultResult.FORWARD + "  :   /test/simple2  "));
 
         try {
             factory.invokeAction(url1, "notype:/nolocation");
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertNotNull(e);
         }
     }
@@ -377,11 +388,14 @@ public class ActionFactoryTest {
         String url = "/test/resultNotFound";
         assertTrue(factory.getResults().containsKey(DemoResult.DEMO_RESULT_NOT_FOUND));
         assertTrue(factory.getResults().containsKey(DemoResult.DEMO_RESULT_EXCEPTION));
-        assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url, factory.invokeAction(url, DemoResult.DEMO_RESULT_NOT_FOUND));
+        assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url,
+                factory.invokeAction(url, DemoResult.DEMO_RESULT_NOT_FOUND));
         try {
-            assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url, factory.invokeAction(url, DemoResult.DEMO_RESULT_EXCEPTION));
+            assertEquals(DemoResult.DEMO_RESULT_NOT_FOUND + ":" + url,
+                    factory.invokeAction(url, DemoResult.DEMO_RESULT_EXCEPTION));
             fail("no exception");
-        } catch (InvocationProxyException e) {
+        }
+        catch (InvocationProxyException e) {
             assertNotNull(e);
             assertTrue(e.getSource() instanceof RuntimeException);
         }
@@ -404,7 +418,7 @@ public class ActionFactoryTest {
         assertEquals("value1", ap.getActionParameter("test1"));
         assertEquals("value2", ap.getActionParameter("test2"));
         assertEquals("value3", ap.getActionParameter("test3"));
-        assertArrayEquals(new String[]{"value3", "value33"}, ap.getActionParameterValues("test3"));
+        assertArrayEquals(new String[] { "value3", "value33" }, ap.getActionParameterValues("test3"));
     }
 
     /**
@@ -427,7 +441,7 @@ public class ActionFactoryTest {
         String included = "test/autoIncluded";
         ActionProxy ap = factory.getActions().get(included);
         assertNotNull(ap);
-        assertEquals(1L, factory.invokeAction(included));
+        assertEquals((Object) 1L, factory.invokeAction(included));
     }
 
     /**
@@ -456,4 +470,5 @@ public class ActionFactoryTest {
         assertEquals("test", factory.invokeAction(actionFilter, "test"));
         assertEquals(actionFilter2, factory.invokeAction(actionFilter2));
     }
+
 }

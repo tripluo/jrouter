@@ -17,11 +17,12 @@
 
 package net.jrouter;
 
-import java.util.List;
-import java.util.Map;
 import net.jrouter.annotation.Action;
 import net.jrouter.annotation.Interceptor;
 import net.jrouter.annotation.Result;
+
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link Action}代理类接口。
@@ -32,30 +33,25 @@ public interface ActionProxy<P> {
 
     /**
      * 返回所代理的Action对象。
-     *
      * @return 代理的Action对象。
      */
     Action getAction();
 
     /**
      * 返回Action所映射的全路径（可能为带参数的动态路径，而非真实调用路径）。
-     *
      * @return Action所对应的全路径（可能为带参数的动态路径，而非真实调用路径）。
      */
     P getPath();
 
     /**
      * 返回Action的命名空间。
-     *
      * @return Action的命名空间。
      */
     String getNamespace();
 
     /**
      * 返回Action初始化参数键/值（多值）映射，不包含任何参数映射则返回长度为 0 的映射。
-     *
      * @return Action初始化参数键/值（多值）映射。
-     *
      * @see Action#parameters()
      */
     Map<String, String[]> getActionParameters();
@@ -63,15 +59,10 @@ public interface ActionProxy<P> {
     /**
      * 由指定名称返回Action初始化参数中字符串形式的值。
      * <p>
-     * 如果值不存在则返回 null；
-     * 如果为多值，请使用{@link #getActionParameterValues}。
-     * 如果为多值，请使用返回多值数组中的第一个。
+     * 如果值不存在则返回 null； 如果为多值，请使用{@link #getActionParameterValues}。 如果为多值，请使用返回多值数组中的第一个。
      * </p>
-     *
      * @param name 指定的名称。
-     *
      * @return Action初始化参数中字符串形式的值。
-     *
      * @see #getActionParameterValues(java.lang.String)
      */
     String getActionParameter(String name);
@@ -81,29 +72,22 @@ public interface ActionProxy<P> {
      * <p>
      * 如果值不存在，则返回 null。如果值为空，则返回长宽为 0 的数组。
      * </p>
-     *
      * @param name 指定的名称。
-     *
      * @return Action初始化参数中多值字符串数组。
-     *
      * @see #getActionParameter(java.lang.String)
      */
     String[] getActionParameterValues(String name);
 
     /**
      * 返回Action所配置的拦截器集合，不包含任何拦截器则返回长度为 0 的集合。
-     *
      * @return Action所配置的拦截器集合。
-     *
      * @see Action#interceptors()
      */
     List<Interceptor> getInterceptors();
 
     /**
      * 返回Action的结果对象集合，不包含任何结果对象则返回长度为 0 的集合。
-     *
      * @return Action的结果对象集合。
-     *
      * @see Action#results()
      * @deprecated
      */
@@ -112,18 +96,16 @@ public interface ActionProxy<P> {
 
     /**
      * 返回调用的底层方法。
-     *
      * @return 调用的底层方法。
      */
     java.lang.reflect.Method getMethod();
 
     /**
      * 返回调用方法的描述信息。
-     *
      * @return 调用方法的描述信息。
-     *
      * @deprecated
      */
     @Deprecated
     String getMethodInfo();
+
 }

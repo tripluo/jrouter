@@ -179,7 +179,7 @@
             <xsd:attribute name="file" use="required">
                 <xsd:annotation>
                     <xsd:documentation>
-                    <![CDATA[
+                        <![CDATA[
                     The absolute resource location of the XML (bean definition) file to import, for example "/myImport.xml" or "/includes/myImport.xml".
                     ]]>
                     </xsd:documentation>
@@ -224,7 +224,7 @@
             <xsd:attribute name="matches" use="required">
                 <xsd:annotation>
                     <xsd:documentation>
-                    <![CDATA[
+                        <![CDATA[
                     The matching path of actions'.
                     ]]>
                     </xsd:documentation>
@@ -233,7 +233,7 @@
             <xsd:attribute name="interceptors">
                 <xsd:annotation>
                     <xsd:documentation>
-                    <![CDATA[
+                        <![CDATA[
                     The comma-separated list of existed interceptors' names.
                     ]]>
                     </xsd:documentation>
@@ -242,7 +242,7 @@
             <xsd:attribute name="interceptor-stacks">
                 <xsd:annotation>
                     <xsd:documentation>
-                    <![CDATA[
+                        <![CDATA[
                     The comma-separated list of existed interceptor-stacks' names.
                     ]]>
                     </xsd:documentation>
@@ -251,7 +251,7 @@
             <xsd:attribute name="type" use="required" type="aop-type">
                 <xsd:annotation>
                     <xsd:documentation>
-                    <![CDATA[
+                        <![CDATA[
                     Type of aop operation.
                     ]]>
                     </xsd:documentation>

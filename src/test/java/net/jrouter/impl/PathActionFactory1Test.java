@@ -21,9 +21,10 @@ import net.jrouter.ActionInvocation;
 import net.jrouter.annotation.ResultType;
 import net.jrouter.impl.PathActionFactory.ColonString;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * 测试PathActionFactory.ColonString正确性。
@@ -31,24 +32,6 @@ import org.junit.Test;
 public class PathActionFactory1Test {
 
     private PathActionFactory.ColonString factory;
-
-    // public for javassist
-    public static class TestResult {
-
-        private final String prefix;
-
-        /** 结果类型名称 */
-        private static final String DEMO = "demo";
-
-        public TestResult(String prefix) {
-            this.prefix = prefix;
-        }
-
-        @ResultType(type = DEMO)
-        public Object result(ActionInvocation invocation) {
-            return prefix + invocation.getInvokeResult();
-        }
-    }
 
     @Before
     public void init() {
@@ -100,4 +83,26 @@ public class PathActionFactory1Test {
     public void tearDown() {
         factory.clear();
     }
+
+    // public for javassist
+    public static class TestResult {
+
+        /**
+         * 结果类型名称
+         */
+        private static final String DEMO = "demo";
+
+        private final String prefix;
+
+        public TestResult(String prefix) {
+            this.prefix = prefix;
+        }
+
+        @ResultType(type = DEMO)
+        public Object result(ActionInvocation invocation) {
+            return prefix + invocation.getInvokeResult();
+        }
+
+    }
+
 }

@@ -17,13 +17,14 @@
 
 package net.jrouter.bytecode.javassist;
 
-import java.lang.reflect.Method;
 import net.jrouter.Invoker;
+
+import java.lang.reflect.Method;
 
 /**
  * Invoker接口的封装，本质未实现方法。
  *
- * @see JavassistMethodInvokerFactory#newInstance(java.lang.Class, java.lang.reflect.Method)
+ * @see JavassistMethodInvokerFactory#newInstance
  */
 public class JavassistInvoker implements Invoker {
 
@@ -31,4 +32,5 @@ public class JavassistInvoker implements Invoker {
     public <T> T invoke(Method method, Object obj, Object... params) {
         throw new UnsupportedOperationException("Not implemented here.");
     }
+
 }

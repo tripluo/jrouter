@@ -17,9 +17,6 @@
 
 package net.jrouter.impl;
 
-import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Map;
 import net.jrouter.ActionFactory;
 import net.jrouter.ActionInvocation;
 import net.jrouter.ParameterConverter;
@@ -31,6 +28,10 @@ import net.jrouter.util.MethodUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.annotation.Annotation;
+import java.util.List;
+import java.util.Map;
+
 /**
  * 基于{@code String}类型路径的{@link Action}运行时上下文代理类，
  * 记录了{@link Action}运行时的状态、调用参数、拦截器、结果对象、{@link ActionFactory}等信息。
@@ -38,56 +39,82 @@ import org.slf4j.LoggerFactory;
 @Dynamic
 public class PathActionInvocation implements ActionInvocation<String> {
 
-    /** LOG */
+    /**
+     * LOG
+     */
     private static final Logger LOG = LoggerFactory.getLogger(PathActionInvocation.class);
 
-    /** Action是否已调用 */
+    /**
+     * ActionFactory
+     */
+    @lombok.Getter
+    private final ActionFactory<String> actionFactory;
+
+    /**
+     * PathActionProxy
+     */
+    @lombok.Getter
+    private final PathActionProxy actionProxy;
+
+    /**
+     * interceptors reference
+     */
+    private final List<InterceptorProxy> interceptors;
+
+    /**
+     * Aciton调用的真实路径
+     */
+    @lombok.Getter
+    private final String actionPath;
+
+    /**
+     * 方法原始调用的参数
+     */
+    private final Object[] originalParameters;
+
+    /**
+     * Action是否已调用
+     */
     @lombok.Setter(lombok.AccessLevel.PACKAGE)
     @lombok.Getter
     private boolean executed = false;
 
-    /** ActionFactory */
-    @lombok.Getter
-    private final ActionFactory<String> actionFactory;
-
-    /** PathActionProxy */
-    @lombok.Getter
-    private final PathActionProxy actionProxy;
-
-    /** interceptors reference */
-    private final List<InterceptorProxy> interceptors;
-
-    /** recursion invoke index */
+    /**
+     * recursion invoke index
+     */
     private int interceptorIndex = 0;
 
-    /** Aciton调用的真实路径 */
-    @lombok.Getter
-    private final String actionPath;
-
-    /** 方法原始调用的参数 */
-    private final Object[] originalParameters;
-
-    /** 提供给转换器的参数 */
+    /**
+     * 提供给转换器的参数
+     */
     @lombok.Getter
     @lombok.Setter
     private Object[] convertParameters;
 
-    /** 方法调用后的结果 */
+    /**
+     * 方法调用后的结果
+     */
     @lombok.Getter
     @lombok.Setter
     private Object invokeResult;
 
-    /** Action结果对象 */
+    /**
+     * Action结果对象
+     */
     @lombok.Getter
     @lombok.Setter
     private Result result;
 
-    /** Action路径的参数匹配映射 */
+    /**
+     * Action路径的参数匹配映射
+     */
     @lombok.Getter
     @lombok.Setter(lombok.AccessLevel.PACKAGE)
     private Map<String, String> pathParameters;
 
-    /** 方法参数转换器 */
+    /**
+     * 方法参数转换器
+     */
     @Dynamic
     @lombok.Getter
     @lombok.Setter
@@ -95,19 +122,18 @@ public class PathActionInvocation implements ActionInvocation<String> {
 
     /**
      * 构造一个Action运行时上下文的代理类，包含指定的ActionFactory、ActionProxy、Action路径的参数匹配映射及调用参数。
-     *
      * @param realPath Actino不含绑定参数的真实路径。
      * @param actionFactory Action工厂对象。
      * @param actionProxy Action代理对象。
      * @param originalParams Action代理对象中方法调用的原始参数。
      */
     public PathActionInvocation(String realPath, ActionFactory<String> actionFactory, PathActionProxy actionProxy,
-                                Object... originalParams) {
+            Object... originalParams) {
         this.actionPath = realPath;
         this.actionFactory = actionFactory;
         this.actionProxy = actionProxy;
         this.originalParameters = originalParams;
-        this.convertParameters = new Object[]{this};
+        this.convertParameters = new Object[] { this };
         this.interceptors = actionProxy.getInterceptorProxies();
     }
 
@@ -116,12 +142,12 @@ public class PathActionInvocation implements ActionInvocation<String> {
         Object[] originalParams = this.originalParameters;
         // additional parameters pass to Action
         if (CollectionUtil.isNotEmpty(params)) {
-            originalParams = CollectionUtil.append(params, this); //TODO
+            originalParams = CollectionUtil.append(params, this); // TODO
         }
         setExecuted(true);
         if (LOG.isDebugEnabled()) {
-            LOG.debug("Invoke Action [{}]; Parameters {} at : {}",
-                    actionProxy.getPath(), java.util.Arrays.toString(originalParams), actionProxy.getMethodInfo());
+            LOG.debug("Invoke Action [{}]; Parameters {} at : {}", actionProxy.getPath(),
+                    java.util.Arrays.toString(originalParams), actionProxy.getMethodInfo());
         }
         // set invokeResult
         invokeResult = MethodUtil.invoke(actionProxy, parameterConverter, originalParams, getConvertParameters());
@@ -142,12 +168,14 @@ public class PathActionInvocation implements ActionInvocation<String> {
             if (LOG.isDebugEnabled()) {
                 LOG.debug("Invoke Interceptor [{}] at : {}", interceptor.getName(), interceptor.getMethodInfo());
             }
-            // pass ActionInvocation to Interceptor for recursive invoking by parameterConverter
+            // pass ActionInvocation to Interceptor for recursive invoking by
+            // parameterConverter
             MethodUtil.invokeConvertParameters(interceptor, this);
-        } else //action invoke
-            if (!executed) {
-                invokeActionOnly(params);
-            }
+        }
+        else // action invoke
+        if (!executed) {
+            invokeActionOnly(params);
+        }
         return invokeResult;
     }
 
@@ -178,7 +206,6 @@ public class PathActionInvocation implements ActionInvocation<String> {
 
         /**
          * 构造一个结果对象。
-         *
          * @param name 结果对象的名称。
          * @param type 结果对象的类型。
          * @param location 结果对象对应的资源路径。
@@ -208,5 +235,7 @@ public class PathActionInvocation implements ActionInvocation<String> {
         public Class<? extends Annotation> annotationType() {
             return ResultProxy.class;
         }
+
     }
+
 }

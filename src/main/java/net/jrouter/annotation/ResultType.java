@@ -29,8 +29,8 @@ public @interface ResultType {
 
     /**
      * 结果类型的名称。
-     *
      * @return 结果类型的名称。
      */
     String type();
+
 }

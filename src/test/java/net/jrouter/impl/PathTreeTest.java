@@ -17,50 +17,31 @@
 
 package net.jrouter.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import org.junit.After;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 /**
  * PathTree树路径的测试。
  */
 public class PathTreeTest {
 
-    private PathTree<String> tree;
-
     /**
-     * 模拟的树路径如下，@表示有值，叶子一定有值
-     * /(root)
-     * xx   {k1}             aa
-     * yy            b1      b2      b3           *               b4            b5
-     * zz            c1      c2    c1   *         c1             {k1}            *
-     * d0   d1   d2    d1   d1(@)     d1(@)      d1(@)   d2(@)       *
-     * *     {k2}       e1         e1      {k2}       *
-     * *
+     * 模拟的树路径如下，@表示有值，叶子一定有值 /(root) xx {k1} aa yy b1 b2 b3 * b4 b5 zz c1 c2 c1 * c1 {k1}
+     * * d0 d1 d2 d1 d1(@) d1(@) d1(@) d2(@) * * {k2} e1 e1 {k2} * *
      */
     // 模拟路径数据
-    public static final String[] PATHS = {
-            "/xx/yy/zz",
-            "/{k1}",
-            "/aa/b1/c1/d0",
-            "/aa/b1/c1/d1",
-            "/aa/b2/c2/d2",
-            "/aa/b3/c1/d1/*",
-            "/aa/b3/*/d1",
-            "/aa/b3/*/d1/{k2}",
-            "/aa/*/c1/d1",
-            "/aa/*/c1/d1/e1",
-            "/aa/b4/{k1}/d1",
-            "/aa/b4/{k1}/d2",
-            "/aa/b4/{k1}/d2/e1",
-            "/aa/b4/{k1}/d2/{k2}",
-            "/aa/b5/*/*/*/*"
-    };
+    public static final String[] PATHS = { "/xx/yy/zz", "/{k1}", "/aa/b1/c1/d0", "/aa/b1/c1/d1", "/aa/b2/c2/d2",
+            "/aa/b3/c1/d1/*", "/aa/b3/*/d1", "/aa/b3/*/d1/{k2}", "/aa/*/c1/d1", "/aa/*/c1/d1/e1", "/aa/b4/{k1}/d1",
+            "/aa/b4/{k1}/d2", "/aa/b4/{k1}/d2/e1", "/aa/b4/{k1}/d2/{k2}", "/aa/b5/*/*/*/*" };
+
+    private PathTree<String> tree;
 
     @After
     public void tearDown() {
@@ -201,7 +182,6 @@ public class PathTreeTest {
 
     /**
      * 测试期望的键值映射是否与调用Action路径后的路径匹配的键值映射一致。
-     *
      * @param excepted 期望的键值映射。
      * @param path Action路径。
      */
@@ -223,22 +203,22 @@ public class PathTreeTest {
         java.lang.reflect.Method method = PathTree.class.getDeclaredMethod("isMatchKay", String.class);
         method.setAccessible(true);
 
-        Assert.assertEquals(false, method.invoke(null, ""));
-        Assert.assertEquals(false, method.invoke(null, "*"));
-        Assert.assertEquals(false, method.invoke(null, "abc"));
-        Assert.assertEquals(false, method.invoke(null, "{abc"));
-        Assert.assertEquals(false, method.invoke(null, "abc}"));
-        Assert.assertEquals(false, method.invoke(null, "{}"));
+        assertEquals(false, method.invoke(null, ""));
+        assertEquals(false, method.invoke(null, "*"));
+        assertEquals(false, method.invoke(null, "abc"));
+        assertEquals(false, method.invoke(null, "{abc"));
+        assertEquals(false, method.invoke(null, "abc}"));
+        assertEquals(false, method.invoke(null, "{}"));
 
-        Assert.assertEquals(true, method.invoke(null, "{abc}"));
-        Assert.assertEquals(true, method.invoke(null, "[abc]"));
-        Assert.assertEquals(true, method.invoke(null, "{abc)"));
-        Assert.assertEquals(true, method.invoke(null, "{ abc  }"));
-        Assert.assertEquals(true, method.invoke(null, "{*}"));
-        Assert.assertEquals(true, method.invoke(null, "{ }"));
-        Assert.assertEquals(true, method.invoke(null, "{{abc}"));
-        Assert.assertEquals(true, method.invoke(null, "{{abc}}}"));
-        Assert.assertEquals(true, method.invoke(null, "aa{{abc}}}xx"));
+        assertEquals(true, method.invoke(null, "{abc}"));
+        assertEquals(true, method.invoke(null, "[abc]"));
+        assertEquals(true, method.invoke(null, "{abc)"));
+        assertEquals(true, method.invoke(null, "{ abc  }"));
+        assertEquals(true, method.invoke(null, "{*}"));
+        assertEquals(true, method.invoke(null, "{ }"));
+        assertEquals(true, method.invoke(null, "{{abc}"));
+        assertEquals(true, method.invoke(null, "{{abc}}}"));
+        assertEquals(true, method.invoke(null, "aa{{abc}}}xx"));
     }
 
     /**
@@ -251,21 +231,22 @@ public class PathTreeTest {
         java.lang.reflect.Method method = PathTree.class.getDeclaredMethod("getMatchKey", String.class);
         method.setAccessible(true);
 
-        Assert.assertEquals(null, method.invoke(null, ""));
-        Assert.assertEquals(null, method.invoke(null, "*"));
-        Assert.assertEquals(null, method.invoke(null, "abc"));
-        Assert.assertEquals(null, method.invoke(null, "{abc"));
-        Assert.assertEquals(null, method.invoke(null, "abc}"));
-        Assert.assertEquals(null, method.invoke(null, "{}"));
+        assertEquals(null, method.invoke(null, ""));
+        assertEquals(null, method.invoke(null, "*"));
+        assertEquals(null, method.invoke(null, "abc"));
+        assertEquals(null, method.invoke(null, "{abc"));
+        assertEquals(null, method.invoke(null, "abc}"));
+        assertEquals(null, method.invoke(null, "{}"));
 
-        Assert.assertEquals("abc", method.invoke(null, "{abc}"));
-        Assert.assertEquals("abc", method.invoke(null, "[abc]"));
-        Assert.assertEquals("abc", method.invoke(null, "{abc)"));
-        Assert.assertEquals(" abc  ", method.invoke(null, "{ abc  }"));
-        Assert.assertEquals("*", method.invoke(null, "{*}"));
-        Assert.assertEquals(" ", method.invoke(null, "{ }"));
-        Assert.assertEquals("{abc", method.invoke(null, "{{abc}"));
-        Assert.assertEquals("{abc}}", method.invoke(null, "{{abc}}}"));
-        Assert.assertEquals("{abc}}", method.invoke(null, "aa{{abc}}}xx"));
+        assertEquals("abc", method.invoke(null, "{abc}"));
+        assertEquals("abc", method.invoke(null, "[abc]"));
+        assertEquals("abc", method.invoke(null, "{abc)"));
+        assertEquals(" abc  ", method.invoke(null, "{ abc  }"));
+        assertEquals("*", method.invoke(null, "{*}"));
+        assertEquals(" ", method.invoke(null, "{ }"));
+        assertEquals("{abc", method.invoke(null, "{{abc}"));
+        assertEquals("{abc}}", method.invoke(null, "{{abc}}}"));
+        assertEquals("{abc}}", method.invoke(null, "aa{{abc}}}xx"));
     }
+
 }

@@ -17,11 +17,7 @@
 
 package net.jrouter.impl;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.*;
+import lombok.Getter;
 import net.jrouter.*;
 import net.jrouter.annotation.*;
 import net.jrouter.bytecode.javassist.JavassistMethodChecker;
@@ -31,6 +27,12 @@ import net.jrouter.util.MethodUtil;
 import net.jrouter.util.StringUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.*;
 
 /**
  * 提供常用属性/公共组件的基础{@code ActionFactory}抽象类型；
@@ -52,6 +54,7 @@ import org.slf4j.LoggerFactory;
  *
  * @param <P> 调用{@link Action}的标识。
  */
+@Getter
 public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
@@ -62,25 +65,21 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
     /**
      * 创建对象的工厂对象。
      */
-    @lombok.Getter
     private final ObjectFactory objectFactory;
 
     /**
      * 创建方法代理的工厂对象。
      */
-    @lombok.Getter
     private final MethodInvokerFactory methodInvokerFactory;
 
     /**
      * 创建方法转换器的工厂对象。
      */
-    @lombok.Getter
     private final ConverterFactory converterFactory;
 
     /**
      * 方法检查器。
      */
-    @lombok.Getter
     private final JavassistMethodChecker methodChecker;
 
     /**
@@ -88,37 +87,32 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      *
      * @since 1.7.4
      */
-    @lombok.Getter
     private final ActionFilter actionFilter;
-////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 拦截器。
      */
-    @lombok.Getter
     private final Map<String, InterceptorProxy> interceptors;
 
     /**
      * 拦截栈。
      */
-    @lombok.Getter
     private final Map<String, InterceptorStackProxy> interceptorStacks;
 
     /**
      * 结果类型。
      */
-    @lombok.Getter
     private final Map<String, ResultTypeProxy> resultTypes;
 
     /**
      * 默认的全局结果对象集合。
      */
-    @lombok.Getter
     private final Map<String, ResultProxy> results;
 
     /**
      * 根据指定的{@code Properties}初始化{@code ActionFactory}对象。
-     *
      * @param prop 指定的{@code Properties}。
      */
     public AbstractActionFactory(Properties prop) {
@@ -134,14 +128,18 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         this.interceptorStacks = new LinkedHashMap<>();
         this.resultTypes = new HashMap<>();
         this.results = new HashMap<>();
-        invokeAwareInterfaces(
-                prop,
-                this.objectFactory,
-                this.converterFactory,
-                this.actionFilter,
-                this.methodInvokerFactory,
-                this.methodChecker
-        );
+        invokeAwareInterfaces(prop, this.objectFactory, this.converterFactory, this.actionFilter,
+                this.methodInvokerFactory, this.methodChecker);
+    }
+
+    /**
+     * 根据指定的键值映射构造初始化数据的ActionFactory对象。
+     * @param properties 指定的初始化数据键值映射。
+     * @see #AbstractActionFactory(Properties)
+     * @deprecated
+     */
+    public AbstractActionFactory(Map<String, Object> properties) {
+        this(new Properties().properties(properties));
     }
 
     /**
@@ -155,18 +153,6 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         }
     }
 
-    /**
-     * 根据指定的键值映射构造初始化数据的ActionFactory对象。
-     *
-     * @param properties 指定的初始化数据键值映射。
-     *
-     * @see #AbstractActionFactory(Properties)
-     * @deprecated
-     */
-    public AbstractActionFactory(Map<String, Object> properties) {
-        this(new Properties().properties(properties));
-    }
-
     @Override
     public void clear() {
         interceptorStacks.clear();
@@ -174,11 +160,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         resultTypes.clear();
         results.clear();
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 添加拦截器。
-     *
      * @param ip 拦截器代理对象。
      */
     public void addInterceptor(InterceptorProxy ip) {
@@ -188,10 +173,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
             throw new IllegalArgumentException("Null name of Interceptor : " + ip.getMethodInfo());
         }
         if (interceptors.containsKey(name)) {
-            throw new JRouterException("Duplicate Interceptor [" + name + "] : "
-                    + ip.getMethodInfo() + " override "
+            throw new JRouterException("Duplicate Interceptor [" + name + "] : " + ip.getMethodInfo() + " override "
                     + interceptors.get(name).getMethodInfo());
-        } else if (LOG.isInfoEnabled()) {
+        }
+        else if (LOG.isInfoEnabled()) {
             LOG.info("Add Interceptor [{}] at : {} ", name, ip.getMethodInfo());
         }
         interceptors.put(name, ip);
@@ -199,9 +184,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 添加拦截器。
-     *
      * @param obj 包含{@link Interceptor}注解的类或实例对象。
-     *
      * @see net.jrouter.annotation.Interceptor
      */
     public void addInterceptors(Object obj) {
@@ -213,8 +196,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         for (Method m : ms) {
             int mod = m.getModifiers();
             // 带@Interceptor的public/protected方法
-            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
-                    && m.isAnnotationPresent(Interceptor.class)) {
+            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod)) && m.isAnnotationPresent(Interceptor.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
                     if (LOG.isInfoEnabled()) {
                         LOG.info("Ignore Interceptor : {}", MethodUtil.getMethod(m));
@@ -225,7 +207,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 // static method
                 if (Modifier.isStatic(mod)) {
                     addInterceptor(createInterceptorProxy(m, null));
-                } else {
+                }
+                else {
                     // 为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
@@ -240,7 +223,6 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 添加拦截栈。
-     *
      * @param isp 拦截栈代理对象。
      */
     public void addInterceptorStack(InterceptorStackProxy isp) {
@@ -249,10 +231,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
             throw new IllegalArgumentException("Null name of InterceptorStack : " + isp.getFieldName());
         }
         if (interceptorStacks.containsKey(name)) {
-            throw new JRouterException("Duplicate InterceptorStack [" + name + "] : "
-                    + isp.getFieldName() + " override "
-                    + interceptorStacks.get(name).getFieldName());
-        } else if (LOG.isInfoEnabled()) {
+            throw new JRouterException("Duplicate InterceptorStack [" + name + "] : " + isp.getFieldName()
+                    + " override " + interceptorStacks.get(name).getFieldName());
+        }
+        else if (LOG.isInfoEnabled()) {
             LOG.info("Add InterceptorStack [{}] : {}", name, isp.toString());
         }
         interceptorStacks.put(name, isp);
@@ -260,9 +242,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 添加拦截栈。
-     *
      * @param obj 包含{@link InterceptorStack}注解的类或实例对象。
-     *
      * @see net.jrouter.annotation.InterceptorStack
      */
     public void addInterceptorStacks(Object obj) {
@@ -292,7 +272,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                     // static field
                     if (Modifier.isStatic(mod)) {
                         sortedSet.add(createInterceptorStackProxy(f, null));
-                    } else {
+                    }
+                    else {
                         // 为类对象且调用者为 null
                         if (isCls && invoker == null) {
                             invoker = objectFactory.newInstance(cls);
@@ -301,7 +282,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                         // the same object
                         sortedSet.add(createInterceptorStackProxy(f, invoker));
                     }
-                } catch (IllegalAccessException e) {
+                }
+                catch (IllegalAccessException e) {
                     throw new JRouterException(e);
                 }
             }
@@ -311,11 +293,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         }
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 添加结果类型。
-     *
      * @param rtp 结果类型的代理对象。
      */
     public void addResultType(ResultTypeProxy rtp) {
@@ -324,10 +305,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
             throw new IllegalArgumentException("Null type of ResultType : " + rtp.getMethodInfo());
         }
         if (resultTypes.containsKey(type)) {
-            throw new JRouterException("Duplicate ResultType [" + type + "] : "
-                    + rtp.getMethodInfo() + " override "
+            throw new JRouterException("Duplicate ResultType [" + type + "] : " + rtp.getMethodInfo() + " override "
                     + resultTypes.get(type).getMethodInfo());
-        } else if (LOG.isInfoEnabled()) {
+        }
+        else if (LOG.isInfoEnabled()) {
             LOG.info("Add ResultType [{}] at : {}", type, rtp.getMethodInfo());
         }
         resultTypes.put(type, rtp);
@@ -335,9 +316,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 添加结果类型。
-     *
      * @param obj 包含{@link ResultType}注解的类或实例对象。
-     *
      * @see net.jrouter.annotation.ResultType
      */
     public void addResultTypes(Object obj) {
@@ -349,8 +328,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         for (Method m : ms) {
             int mod = m.getModifiers();
             // 带@ResultType的public/protected方法
-            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
-                    && m.isAnnotationPresent(ResultType.class)) {
+            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod)) && m.isAnnotationPresent(ResultType.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
                     if (LOG.isInfoEnabled()) {
                         LOG.info("Ignore ResultType : {}", MethodUtil.getMethod(m));
@@ -361,7 +339,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 // static method
                 if (Modifier.isStatic(mod)) {
                     addResultType(createResultTypeProxy(m, null));
-                } else {
+                }
+                else {
                     // 为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
@@ -376,7 +355,6 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 添加结果对象。
-     *
      * @param rp 结果对象的代理对象。
      */
     public void addResult(ResultProxy rp) {
@@ -385,10 +363,10 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
             throw new IllegalArgumentException("Null name of Result : " + rp.getMethodInfo());
         }
         if (results.containsKey(name)) {
-            throw new JRouterException("Duplicate Result [" + name + "] : "
-                    + rp.getMethodInfo() + " override "
+            throw new JRouterException("Duplicate Result [" + name + "] : " + rp.getMethodInfo() + " override "
                     + results.get(name).getMethodInfo());
-        } else if (LOG.isInfoEnabled()) {
+        }
+        else if (LOG.isInfoEnabled()) {
             LOG.info("Add Result [{}] : {}", name, rp.getMethodInfo());
         }
         results.put(name, rp);
@@ -396,9 +374,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 添加全局结果对象。
-     *
      * @param obj 包含{@link Result}注解的类或实例对象。
-     *
      * @see net.jrouter.annotation.Result
      */
     public void addResults(Object obj) {
@@ -410,8 +386,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         for (Method m : ms) {
             int mod = m.getModifiers();
             // 带@Result的public/protected方法
-            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod))
-                    && m.isAnnotationPresent(Result.class)) {
+            if ((Modifier.isPublic(mod) || Modifier.isProtected(mod)) && m.isAnnotationPresent(Result.class)) {
                 if (m.isAnnotationPresent(Ignore.class)) {
                     if (LOG.isInfoEnabled()) {
                         LOG.info("Ignore Result : {}", MethodUtil.getMethod(m));
@@ -422,7 +397,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 // static method
                 if (Modifier.isStatic(mod)) {
                     addResult(createResultProxy(m, null));
-                } else {
+                }
+                else {
                     // 为类对象且调用者为 null
                     if (isCls && invoker == null) {
                         invoker = objectFactory.newInstance(cls);
@@ -435,14 +411,12 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         }
     }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 创建Interceptor代理对象。
-     *
      * @param method 指定的方法。
      * @param obj 方法所在的对象。
-     *
      * @return Interceptor代理对象。
      */
     private InterceptorProxy createInterceptorProxy(Method method, Object obj) {
@@ -456,12 +430,9 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 创建InterceptorStack代理对象
-     *
      * @param field 指定的字段。
      * @param obj 字段所在对象。
-     *
      * @return InterceptorStack代理对象。
-     *
      * @throws IllegalAccessException 如果调用的对象无法访问指定字段。
      */
     private InterceptorStackProxy createInterceptorStackProxy(Field field, Object obj) throws IllegalAccessException {
@@ -473,7 +444,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
             stackName = field.get(obj).toString();
             // 空命名异常
             if (StringUtil.isEmpty(stackName)) {
-                throw new IllegalArgumentException("Null name of InterceptorStack : " + field.getName() + " at " + objectFactory.getClass(obj));
+                throw new IllegalArgumentException(
+                        "Null name of InterceptorStack : " + field.getName() + " at " + objectFactory.getClass(obj));
             }
         }
         // interceptors
@@ -488,7 +460,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 // if null
                 if (ip == null) {
                     LOG.warn("No such Interceptor [{}] for : {}", interceptor, field);
-                } else {
+                }
+                else {
                     list.add(new InterceptorStackProxy.InterceptorDelegate(interceptor, ip));
                 }
             }
@@ -498,10 +471,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 创建ResultType代理对象。
-     *
      * @param method 指定的方法。
      * @param obj 方法所在的对象。
-     *
      * @return ResultType代理对象。
      */
     private ResultTypeProxy createResultTypeProxy(Method method, Object obj) {
@@ -511,17 +482,15 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
     /**
      * 创建Result代理对象。
-     *
      * @param method 指定的方法。
      * @param obj 方法所在的对象。
-     *
      * @return Result代理对象
      */
     private ResultProxy createResultProxy(Method method, Object obj) {
         Result res = method.getAnnotation(Result.class);
         return new ResultProxy(this, res, method, obj);
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * AbstractActionFactory属性。
@@ -574,11 +543,8 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
         /**
          * 根据键值映射构造Builder。
-         *
          * @param properties 属性值键值映射。
-         *
          * @return Properties
-         *
          * @deprecated
          */
         @Deprecated
@@ -589,15 +555,20 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 String strValue = value.toString().trim();
                 if (value instanceof String && StringUtil.isNotBlank(strValue)) {
                     try {
-                        this.objectFactory = (ObjectFactory) (DefaultObjectFactory.newInstance0(ClassUtil.loadClass(strValue)));
-                    } catch (ClassNotFoundException ex) {
+                        this.objectFactory = (ObjectFactory) (DefaultObjectFactory
+                            .newInstance0(ClassUtil.loadClass(strValue)));
+                    }
+                    catch (ClassNotFoundException ex) {
                         throw new JRouterException(ex);
                     }
-                } else if (value instanceof Class) {
+                }
+                else if (value instanceof Class) {
                     this.objectFactory = (ObjectFactory) (DefaultObjectFactory.newInstance0((Class) value));
-                } else {
+                }
+                else {
                     // 设置创建对象的工厂对象
-                    this.objectFactory = (ObjectFactory) value; //throw exception if not matched
+                    this.objectFactory = (ObjectFactory) value; // throw exception if not
+                    // matched
                 }
                 LOG.info("Set objectFactory : {}", this.objectFactory);
             }
@@ -617,27 +588,33 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                         if ("default".equalsIgnoreCase(strValue)) {
                             methodInvokerFactory = null;
                             LOG.info("Set methodInvokerFactory : {}", strValue);
-                        } else if ("javassist".equalsIgnoreCase(strValue)) {
+                        }
+                        else if ("javassist".equalsIgnoreCase(strValue)) {
                             methodInvokerFactory = new JavassistMethodInvokerFactory();
                             LOG.info("Set methodInvokerFactory : {}", this.methodInvokerFactory);
-                        } else {
+                        }
+                        else {
                             LOG.warn("Unknown bytecode property : {}", strValue);
                         }
-                    } else {
+                    }
+                    else {
                         // throw exception if not matched
                         methodInvokerFactory = (MethodInvokerFactory) val;
                         LOG.info("Set methodInvokerFactory : {}", this.methodInvokerFactory);
                     }
-                } else if ("converterFactory".equalsIgnoreCase(name)) {
+                }
+                else if ("converterFactory".equalsIgnoreCase(name)) {
                     converterFactory = loadComponent(ConverterFactory.class, val);
                     LOG.info("Set converterFactory : {}", this.converterFactory);
-                } else if ("interceptorMethodChecker".equalsIgnoreCase(name)) {
+                }
+                else if ("interceptorMethodChecker".equalsIgnoreCase(name)) {
                     // create interceptorMethodChecker
                     if (ClassUtil.isJavassistSupported() && StringUtil.isNotBlank(strValue)) {
                         methodChecker = new JavassistMethodChecker(strValue);
                         LOG.info("Set methodChecker : {}", this.methodChecker);
                     }
-                } else if ("actionFilter".equalsIgnoreCase(name)) {
+                }
+                else if ("actionFilter".equalsIgnoreCase(name)) {
                     actionFilter = loadComponent(ActionFilter.class, val);
                     LOG.info("Set actionFilter : {}", this.actionFilter);
                 }
@@ -647,11 +624,9 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
         /**
          * {@code ObjectFactory}初始化完成后提供便捷地加载所需组件.
-         *
          * @param <T> 所加载组件的类型。
          * @param componentClass 所加载组件的类型。
          * @param value 所加载组件的值。
-         *
          * @return 已加载组件的值。
          */
         protected <T> T loadComponent(Class<T> componentClass, Object value) {
@@ -659,15 +634,18 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
                 if (StringUtil.isNotBlank((String) value)) {
                     try {
                         return objectFactory.newInstance((Class<T>) ClassUtil.loadClass((String) value));
-                    } catch (ClassNotFoundException ex) {
+                    }
+                    catch (ClassNotFoundException ex) {
                         LOG.error("Can't set {} of class : {}", componentClass, value);
                         throw new JRouterException(ex);
                     }
                 }
                 return null;
-            } else if (value instanceof Class) {
+            }
+            else if (value instanceof Class) {
                 return objectFactory.newInstance((Class<T>) value);
-            } else {
+            }
+            else {
                 // throw exception if not matched
                 return (T) value;
             }
@@ -704,14 +682,13 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
 
         /**
          * Get {@link ActionFactory} object.
-         *
          * @param <T> ActionFactory type.
-         *
          * @return {@link ActionFactory} object.
          */
         public <T extends ActionFactory> T getActionFactory() {
             return (T) actionFactory;
         }
+
     }
 
     /**
@@ -719,26 +696,29 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
      */
     protected static class DefaultObjectFactory implements ObjectFactory {
 
-        @Override
-        public <T> T newInstance(Class<T> clazz) {
-            return newInstance0(clazz);
-        }
-
         // default new object with empty construction method
-        private static <T> T newInstance0(Class<T> clazz) { // NOPMD MethodNamingConventions
+        private static <T> T newInstance0(Class<T> clazz) { // NOPMD
+            // MethodNamingConventions
             try {
                 Constructor<T> constructor = clazz.getDeclaredConstructor();
                 constructor.setAccessible(true);
                 return constructor.newInstance();
-            } catch (ReflectiveOperationException e) {
+            }
+            catch (ReflectiveOperationException e) {
                 throw new JRouterException(e);
             }
+        }
+
+        @Override
+        public <T> T newInstance(Class<T> clazz) {
+            return newInstance0(clazz);
         }
 
         @Override
         public Class<?> getClass(Object obj) {
             return obj.getClass();
         }
+
     }
 
     /**
@@ -760,5 +740,7 @@ public abstract class AbstractActionFactory<P> implements ActionFactory<P> {
         public Namespace getNamespace(Object obj, Method method) {
             return method.getDeclaringClass().getAnnotation(Namespace.class);
         }
+
     }
+
 }

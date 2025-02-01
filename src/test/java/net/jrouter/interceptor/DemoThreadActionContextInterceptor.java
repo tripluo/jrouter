@@ -27,13 +27,17 @@ import net.jrouter.annotation.InterceptorStack;
  */
 public class DemoThreadActionContextInterceptor {
 
-    @InterceptorStack(interceptors = {@InterceptorStack.Interceptor("demoThread")})
+    @InterceptorStack(interceptors = { @InterceptorStack.Interceptor("demoThread") })
     public static final String DEMO_THREAD = "demoThread";
 
-    /** ThreadLocal */
+    /**
+     * ThreadLocal
+     */
     private static final ThreadLocal<ActionInvocation> THREAD_LOCAL = new ThreadLocal<>();
 
-    /** Action调用结束后是否清除线程变量中的ActionInvocation对象，默认清除 */
+    /**
+     * Action调用结束后是否清除线程变量中的ActionInvocation对象，默认清除
+     */
     private boolean removeActionInvocation = true;
 
     public DemoThreadActionContextInterceptor() {
@@ -44,6 +48,14 @@ public class DemoThreadActionContextInterceptor {
     }
 
     /**
+     * 返回线程变量中的ActionInvocation对象。
+     * @return ActionInvocation对象。
+     */
+    public static ActionInvocation get() {
+        return THREAD_LOCAL.get();
+    }
+
+    /**
      * 拦截器。
      */
     @Interceptor(name = DEMO_THREAD)
@@ -51,19 +63,12 @@ public class DemoThreadActionContextInterceptor {
         try {
             THREAD_LOCAL.set(invocation);
             return invocation.invoke();
-        } finally {
+        }
+        finally {
             // just keep thread local ActionInvocation for test
             if (removeActionInvocation)
                 THREAD_LOCAL.remove();
         }
     }
 
-    /**
-     * 返回线程变量中的ActionInvocation对象。
-     *
-     * @return ActionInvocation对象。
-     */
-    public static ActionInvocation get() {
-        return THREAD_LOCAL.get();
-    }
 }

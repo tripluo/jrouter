@@ -7,8 +7,8 @@ public interface ActionFactoryAware {
 
     /**
      * Set {@link ActionFactory}.
-     *
      * @param actionFactory ActionFactory object.
      */
     void setActionFactory(ActionFactory actionFactory);
+
 }

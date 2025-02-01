@@ -26,11 +26,10 @@ public interface MethodInvokerFactory {
 
     /**
      * 由指定的底层方法及所表示的 {@code Class} 对象生成调用对象。
-     *
      * @param targetClass 底层方法所表示的 {@code Class} 对象。
      * @param method 底层方法。
-     *
      * @return Invoker调用对象。
      */
     Invoker newInstance(Class<?> targetClass, Method method);
+
 }

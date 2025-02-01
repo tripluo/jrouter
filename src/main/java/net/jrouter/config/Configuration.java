@@ -17,20 +17,7 @@
 
 package net.jrouter.config;
 
-import java.beans.IntrospectionException;
-import java.beans.PropertyDescriptor;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.util.*;
-import javax.xml.XMLConstants;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
+import lombok.Setter;
 import net.jrouter.ActionFactory;
 import net.jrouter.config.AopAction.Type;
 import net.jrouter.impl.Injector;
@@ -45,18 +32,31 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.xml.sax.*;
 
+import javax.xml.XMLConstants;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.*;
+
 /**
- * 启动jrouter容器的入口配置类。
- * 通过Configuration类加载jrouter的配置文件（默认为jrouter.xml）初始化ActionFactory及加载相应的属性配置，最终得到ActionFactory具体实例。
+ * 启动JRouter容器的入口配置类。
+ * 通过Configuration类加载JRouter的配置文件（默认为{@code jrouter.xml}）初始化ActionFactory及加载相应的属性配置，最终得到ActionFactory具体实例。
  *
  * <p>
- * 如果jrouter.xml中未指明ActionFactory的具体实现类，则默认使用{@link PathActionFactory
- * }。
+ * 如果{@code jrouter.xml}中未指明ActionFactory的具体实现类，则默认使用{@link PathActionFactory}。
  * </p>
  *
  * <p>
- * 通常如下使用：
- * <code><blockquote><pre>
+ * 通常如下使用： <code><blockquote><pre>
  * Configuration config = new Configuration().load(URL url);
  * ActionFactory factory = config.buildActionFactory();
  * factory...
@@ -67,58 +67,77 @@ import org.xml.sax.*;
  */
 public class Configuration {
 
-    /** LOG */
-    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
-
-////////////////////////////////////////////////////////////////////////////////
-//                           xml配置文件元素                                   //
-////////////////////////////////////////////////////////////////////////////////
-
     /**
-     * JAXP attribute used to configure the schema language for validation.
+     * 默认xml文件的名称
      */
-    private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
-
-    /** 默认xml文件的名称 */
     public static final String JROUTER_XML = "jrouter.xml";
 
-    /** 默认xsd文件的名称 */
+    ////////////////////////////////////////////////////////////////////////////////
+    // xml配置文件元素 //
+    ////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 默认xsd文件的名称
+     */
     public static final String JROUTER_XSD = "jrouter-1.6.xsd";
 
-    /** 配置文件中表示ActionFactory的标签名 */
+    /**
+     * 配置文件中表示ActionFactory的标签名
+     */
     public static final String ACTION_FACTORY = "action-factory";
 
-    /** 配置文件中表示属性的标签属性 */
+    /**
+     * 配置文件中表示属性的标签属性
+     */
     public static final String PROPERTY = "property";
 
-    /** 配置文件中表示类名称的标签属性 */
+    /**
+     * 配置文件中表示类名称的标签属性
+     */
     public static final String CLASS = "class";
 
-    /** 配置文件中表示值的标签属性 */
+    /**
+     * 配置文件中表示值的标签属性
+     */
     public static final String VALUE = "value";
 
-    /** 配置文件中表示名称的标签属性 */
+    /**
+     * 配置文件中表示名称的标签属性
+     */
     public static final String NAME = "name";
 
-    /** 配置文件中表示拦截器的标签名 */
+    /**
+     * 配置文件中表示拦截器的标签名
+     */
     public static final String INTERCEPTOR = "interceptor";
 
-    /** 配置文件中表示拦截栈的标签名 */
+    /**
+     * 配置文件中表示拦截栈的标签名
+     */
     public static final String INTERCEPTOR_STACK = "interceptor-stack";
 
-    /** 配置文件中表示结果类型的标签名 */
+    /**
+     * 配置文件中表示结果类型的标签名
+     */
     public static final String RESULT_TYPE = "result-type";
 
-    /** 配置文件中表示结果对象的标签名 */
+    /**
+     * 配置文件中表示结果对象的标签名
+     */
     public static final String RESULT = "result";
 
-    /** 配置文件中表示Action的标签名 */
+    /**
+     * 配置文件中表示Action的标签名
+     */
     public static final String ACTION = "action";
 
-    /** 配置文件中表示path的标签名 */
+    /**
+     * 配置文件中表示path的标签名
+     */
     public static final String PATH = "path";
 
-    /** 配置文件中表示包含其它配置的标签名 */
+    /**
+     * 配置文件中表示包含其它配置的标签名
+     */
     public static final String INCLUDE = "include";
 
     /**
@@ -126,93 +145,154 @@ public class Configuration {
      */
     public static final String FILE = "file";
 
-    /** 配置文件中表示扫描组件的标签名 */
+    /**
+     * 配置文件中表示扫描组件的标签名
+     */
     public static final String COMPONENT_SCAN = "component-scan";
 
-    /** 配置文件中表示包名称的标签属性 */
+    /**
+     * 配置文件中表示包名称的标签属性
+     */
     public static final String PACKAGE = "package";
 
     /**
      * 配置文件中表示不包含的标签属性
-     *
      * @deprecated
      */
     @Deprecated
     public static final String EXCLUDE = "exclude";
 
-    /** 配置文件中表示包含表达式的标签属性 */
+    /**
+     * 配置文件中表示包含表达式的标签属性
+     */
     public static final String INCLUDE_EXPRESSION = "includeExpression";
 
-    /** 配置文件中表示排除表达式的标签属性 */
+    /**
+     * 配置文件中表示排除表达式的标签属性
+     */
     public static final String EXCLUDE_EXPRESSION = "excludeExpression";
 
-    /** 配置文件中表示aop配置的标签名 */
+    /**
+     * 配置文件中表示aop配置的标签名
+     */
     public static final String AOP_CONFIG = "aop-config";
 
-    /** 配置文件中表示针对action的aop配置标签属性 */
+    /**
+     * 配置文件中表示针对action的aop配置标签属性
+     */
     public static final String AOP_ACTION = "aop-action";
 
-    /** 配置文件中表示路径匹配的标签属性 */
+    /**
+     * 配置文件中表示路径匹配的标签属性
+     */
     public static final String MATCHES = "matches";
 
-    /** 配置文件中表示类型的标签属性 */
+    /**
+     * 配置文件中表示类型的标签属性
+     */
     public static final String TYPE = "type";
 
-    /** 配置文件中表示拦截栈集合的标签属性 */
+    /**
+     * 配置文件中表示拦截栈集合的标签属性
+     */
     public static final String INTERCEPTOR_STACKS = "interceptor-stacks";
 
-    /** 配置文件中表示拦截器集合的标签属性 */
+    /**
+     * 配置文件中表示拦截器集合的标签属性
+     */
     public static final String INTERCEPTORS = "interceptors";
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * LOG
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(Configuration.class);
 
-    /** ActionFactory的类型，默热为PathActionFactory类型 */
+    /**
+     * JAXP attribute used to configure the schema language for validation.
+     */
+    private static final String JAXP_SCHEMA_LANGUAGE = "http://java.sun.com/xml/jaxp/properties/schemaLanguage";
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
+    /**
+     * 组件扫描
+     */
+    private final List<ClassScanner> classScanners;
+
+    /**
+     * interceptors' class or object
+     */
+    private final Set<Object> interceptors;
+
+    /**
+     * interceptors' properties
+     */
+    private final Map<Class<?>, Map<String, Object>> interceptorProperties;
+
+    /**
+     * interceptorStacks' class or object
+     */
+    private final Set<Object> interceptorStacks;
+
+    /**
+     * interceptorStacks' properties
+     */
+    private final Map<Class<?>, Map<String, Object>> interceptorStackProperties;
+
+    /**
+     * resultTypes' class or object
+     */
+    private final Set<Object> resultTypes;
+
+    /**
+     * resultTypes' properties
+     */
+    private final Map<Class<?>, Map<String, Object>> resultTypeProperties;
+
+    /**
+     * results' class or object
+     */
+    private final Set<Object> results;
+
+    /**
+     * results' properties
+     */
+    private final Map<Class<?>, Map<String, Object>> resultProperties;
+
+    /**
+     * actions' class or object
+     */
+    private final Set<Object> actions;
+
+    /**
+     * actions' properties
+     */
+    private final Map<Class<?>, Map<String, Object>> actionProperties;
+
+    /**
+     * path - action class map
+     */
+    private final Map<String, Class<?>> pathActions;
+
+    /**
+     * path actions' properties
+     */
+    private final Map<String, Map<String, Object>> pathProperties;
+
+    /**
+     * actions' aop
+     */
+    private final List<AopAction> aopActions;
+
+    /**
+     * ActionFactory的类型，默热为PathActionFactory类型.
+     */
+    @Setter
     private Class<? extends ActionFactory> actionFactoryClass = PathActionFactory.class;
 
-    /** ActionFactory的属性 */
+    /**
+     * ActionFactory的属性
+     */
     private Map<String, Object> actionFactoryProperties;
-
-    /** 组件扫描 */
-    private List<ClassScanner> classScanners;
-
-    /** interceptors' class or object */
-    private Set<Object> interceptors;
-
-    /** interceptors' properties */
-    private Map<Class<?>, Map<String, Object>> interceptorProperties;
-
-    /** interceptorStacks' class or object */
-    private Set<Object> interceptorStacks;
-
-    /** interceptorStacks' properties */
-    private Map<Class<?>, Map<String, Object>> interceptorStackProperties;
-
-    /** resultTypes' class or object */
-    private Set<Object> resultTypes;
-
-    /** resultTypes' properties */
-    private Map<Class<?>, Map<String, Object>> resultTypeProperties;
-
-    /** results' class or object */
-    private Set<Object> results;
-
-    /** results' properties */
-    private Map<Class<?>, Map<String, Object>> resultProperties;
-
-    /** actions' class or object */
-    private Set<Object> actions;
-
-    /** actions' properties */
-    private Map<Class<?>, Map<String, Object>> actionProperties;
-
-    /** path - action class map */
-    private Map<String, Class<?>> pathActions;
-
-    /** path actions' properties */
-    private Map<String, Map<String, Object>> pathProperties;
-
-    /** actions' aop */
-    private List<AopAction> aopActions;
 
     /**
      * Constructor with initialization.
@@ -236,71 +316,8 @@ public class Configuration {
     }
 
     /**
-     * 加载默认配置文件{@link #JROUTER_XML}。
-     *
-     * @return 此配置对象的引用。
-     *
-     * @throws ConfigurationException 如果发生配置错误。
-     */
-    public Configuration load() throws ConfigurationException {
-        return load(JROUTER_XML);
-    }
-
-    /**
-     * 从指定的URL对象加载配置。
-     *
-     * @param url 指定的URL。
-     *
-     * @return 此配置对象的引用。
-     *
-     * @throws ConfigurationException 如果发生配置错误。
-     */
-    public Configuration load(URL url) throws ConfigurationException {
-        LOG.info("Configuring from url : {}", url);
-        try {
-            return load(url.openStream(), url.toString());
-        } catch (IOException ioe) {
-            throw new ConfigurationException("Could not configure from URL : " + url, ioe);
-        }
-    }
-
-    /**
-     * 从指定的资源路径加载配置。
-     *
-     * @param resource 指定的资源路径。
-     *
-     * @return 此配置对象的引用。
-     *
-     * @throws ConfigurationException 如果发生配置错误。
-     */
-    public Configuration load(String resource) throws ConfigurationException {
-        LOG.info("Configuration from resource : {}", resource);
-        return load(getResource(resource));
-    }
-
-    /**
-     * 从指定的配置文件加载配置。
-     *
-     * @param configFile 指定的配置文件。
-     *
-     * @return 此配置对象的引用。
-     *
-     * @throws ConfigurationException 如果发生配置错误。
-     */
-    public Configuration load(File configFile) throws ConfigurationException {
-        LOG.info("Configuring from file : {}", configFile.getName());
-        try (InputStream is = Files.newInputStream(configFile.toPath())) {
-            return load(is, configFile.toString());
-        } catch (IOException ex) {
-            throw new ConfigurationException("Could not load file : " + configFile, ex);
-        }
-    }
-
-    /**
      * 从指定资源获取URL。
-     *
      * @param resource 资源文件名。
-     *
      * @return URL。
      */
     private static URL getResource(String resource) {
@@ -314,7 +331,8 @@ public class Configuration {
             url = Configuration.class.getResource(resource);
         }
         if (url == null) {
-            url = Configuration.class.getClassLoader().getResource(name); // NOPMD UseProperClassLoader
+            url = Configuration.class.getClassLoader().getResource(name); // NOPMD
+            // UseProperClassLoader
         }
         if (url == null) {
             throw new IllegalArgumentException(resource + " not found");
@@ -324,7 +342,6 @@ public class Configuration {
 
     /**
      * 打印分隔符。
-     *
      * @param bool 是否打印。
      */
     @SuppressWarnings("UseOfSystemOutOrSystemErr")
@@ -335,81 +352,150 @@ public class Configuration {
     }
 
     /**
-     * 解析xml配置文件。
+     * 由<property>标签解析类的注入属性。
+     * @param cls 指定的类型。
+     * @param propnodes <property>标签集合。
+     * @return 可注入属性的映射。
+     * @throws IntrospectionException 如果在内省期间发生异常。
      */
-    private static class DocumentLoader {
-
-        /** SAX 错误处理对象 */
-        static final ErrorHandler ERROR_HANDLER = new ErrorHandler() {
-
-            @Override
-            public void warning(SAXParseException ex) throws SAXException {
-                LOG.warn("Ignored XML validation warning", ex);
+    private static Map<String, Object> parseProperties(Class<?> cls, List<Element> propnodes)
+            throws IntrospectionException {
+        Map<String, Object> properties = new LinkedHashMap<>();
+        for (Element prop : propnodes) {
+            String pName = prop.getAttribute(NAME);
+            if (null != properties.put(pName, prop.getAttribute(VALUE))) {
+                LOG.warn("Override property [{}] value [{}] in {}", pName, prop.getAttribute(VALUE), cls);
             }
+        }
+        return properties;
+    }
 
-            @Override
-            public void error(SAXParseException ex) throws SAXException {
-                throw ex;
+    /**
+     * 获取指定父节点和节点名称的子节点集合。
+     * @param parent 指定的父节点。
+     * @param name 指定的节点名称。
+     * @return 子节点集合。
+     */
+    private static List<Element> getChildNodesByTagName(Element parent, String name) {
+        List<Element> eles = new ArrayList<>();
+        for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
+            // System.out.println(child.getNodeName() + "," + child.getNodeType());
+            if (Node.ELEMENT_NODE == child.getNodeType() && name.equals(child.getNodeName())) {
+                eles.add((Element) child);
             }
+        }
+        return eles;
+    }
 
-            @Override
-            public void fatalError(SAXParseException ex) throws SAXException {
-                throw ex;
-            }
-        };
-
-        /** 用于解析实体的对象 */
-        static final EntityResolver ENTITY_RESOLVER = new EntityResolver() {
-
-            @Override
-            public InputSource resolveEntity(String publicId, String systemId) throws
-                    SAXException, IOException {
-                if (systemId != null) {
-                    InputSource source = new InputSource(getResource(JROUTER_XSD).openStream());
-                    source.setPublicId(publicId);
-                    source.setSystemId(JROUTER_XSD);
-                    return source;
+    /**
+     * 注入属性至指定的对象，并去除不支持的属性。
+     * @param obj 指定的对象。
+     * @param properties 注入属性映射集合。
+     * @param removeUnsupported 是否去除不支持的属性。
+     * @throws IntrospectionException 如果在内省期间发生异常。
+     * @throws IllegalAccessException 如果底层方法不可访问。
+     * @throws InvocationTargetException 如果底层方法抛出异常。
+     */
+    private static void injectProperties(Object obj, Map<String, Object> properties, boolean removeUnsupported)
+            throws IntrospectionException, IllegalAccessException, InvocationTargetException {
+        String cls = obj.getClass().getName();
+        Map<String, PropertyDescriptor> supports = Injector.getSupportedProperties(obj.getClass());
+        Iterator<Map.Entry<String, Object>> it = properties.entrySet().iterator();
+        while (it.hasNext()) {
+            Map.Entry<String, Object> e = it.next();
+            String pName = e.getKey();
+            PropertyDescriptor pd = supports.get(pName);
+            if (pd == null) {
+                LOG.error("Not supported property [{}] in [{}]", pName, cls);
+                if (removeUnsupported) {
+                    it.remove();
                 }
-                return null;
             }
-        };
+            else {
+                Object value = e.getValue();
+                // convert string to specific object
+                if (value instanceof String) {
+                    value = Injector.stringToObject((String) value, pd.getPropertyType());
+                }
+                pd.getWriteMethod().invoke(obj, value);
+            }
+        }
+    }
 
-        /**
-         * 将给定 InputStream 的内容解析为一个 XML 文档，并且返回一个新的 DOM {@code Document} 对象。
-         *
-         * @param stream 包含要解析内容的 InputStream。
-         *
-         * @return {@code Document} 对象。
-         */
-        private static Document loadDocument(InputStream stream) throws ParserConfigurationException, SAXException,
-                IOException {
-            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-            factory.setNamespaceAware(true);
-            factory.setValidating(true);
-            try {
-                factory.setAttribute(JAXP_SCHEMA_LANGUAGE, XMLConstants.W3C_XML_SCHEMA_NS_URI);
-            } catch (IllegalArgumentException ex) {
-                // Happens if the parser does not support JAXP 1.2
-                throw new ConfigurationException(
-                        "Unable to validate using XSD: Your JAXP provider [" + factory
-                                + "] does not support XML Schema. Are you running on Java 1.4 with Apache Crimson? "
-                                + "Upgrade to Apache Xerces (or Java 1.5) for full XSD support.", ex);
-            }
-            DocumentBuilder docBuilder = factory.newDocumentBuilder();
-            docBuilder.setEntityResolver(ENTITY_RESOLVER);
-            docBuilder.setErrorHandler(ERROR_HANDLER);
-            return docBuilder.parse(stream);
+    /**
+     * 创建新对象。
+     * @param factory 指定的{@code ActionFactory}。
+     * @param obj 传入的对象。
+     * @return 如果传入的对象为{@code String}或{@code Class}，返回由{@code ActionFactory}创建的实例对象；否则直接返回传入的对象。
+     * @throws ClassNotFoundException 如果没有找到具有指定名称的类。
+     */
+    private static Object newInstance(ActionFactory factory, Object obj) throws ClassNotFoundException {
+        if (obj instanceof Class) {
+            obj = factory.getObjectFactory().newInstance((Class<?>) obj);
+        }
+        else if (obj instanceof String) {
+            obj = factory.getObjectFactory().newInstance(ClassUtil.loadClass((String) obj));
+        }
+        return obj;
+    }
+
+    /**
+     * 加载默认配置文件{@link #JROUTER_XML}。
+     * @return 此配置对象的引用。
+     * @throws ConfigurationException 如果发生配置错误。
+     */
+    public Configuration load() throws ConfigurationException {
+        return load(JROUTER_XML);
+    }
+
+    /**
+     * 从指定的URL对象加载配置。
+     * @param url 指定的URL。
+     * @return 此配置对象的引用。
+     * @throws ConfigurationException 如果发生配置错误。
+     */
+    public Configuration load(URL url) throws ConfigurationException {
+        LOG.info("Configuring from url : {}", url);
+        try {
+            return load(url.openStream(), url.toString());
+        }
+        catch (IOException ioe) {
+            throw new ConfigurationException("Could not configure from URL : " + url, ioe);
+        }
+    }
+
+    /**
+     * 从指定的资源路径加载配置。
+     * @param resource 指定的资源路径。
+     * @return 此配置对象的引用。
+     * @throws ConfigurationException 如果发生配置错误。
+     */
+    public Configuration load(String resource) throws ConfigurationException {
+        LOG.info("Configuration from resource : {}", resource);
+        return load(getResource(resource));
+    }
+
+    /**
+     * 从指定的配置文件加载配置。
+     * @param configFile 指定的配置文件。
+     * @return 此配置对象的引用。
+     * @throws ConfigurationException 如果发生配置错误。
+     */
+    public Configuration load(File configFile) throws ConfigurationException {
+        LOG.info("Configuring from file : {}", configFile.getName());
+        try (InputStream is = Files.newInputStream(configFile.toPath())) {
+            return load(is, configFile.toString());
+        }
+        catch (IOException ex) {
+            throw new ConfigurationException("Could not load file : " + configFile, ex);
         }
     }
 
     /**
      * 从指定的InputStream对象中加载配置。
-     *
      * @param stream 指定的InputStream。
      * @param resourceName InputStream对象的名称。
-     *
      * @return 此配置对象的引用。
-     *
      * @throws ConfigurationException 如果发生配置错误。
      */
     protected Configuration load(InputStream stream, String resourceName) throws ConfigurationException {
@@ -434,8 +520,10 @@ public class Configuration {
                 list = getChildNodesByTagName(e, PROPERTY);
                 // parse ActionFactory's properties
                 actionFactoryProperties = parseProperties(actionFactoryClass, list);
-            } else if (length > 1) {
-                throw new ConfigurationException("More than one <" + ACTION_FACTORY + "> tag in : " + resourceName, null);
+            }
+            else if (length > 1) {
+                throw new ConfigurationException("More than one <" + ACTION_FACTORY + "> tag in : " + resourceName,
+                        null);
             }
 
             // parse "<component-scan>"
@@ -458,39 +546,18 @@ public class Configuration {
             // parse "<aop-config>"
             parseAop(root);
 
-        } catch (ConfigurationException e) {
+        }
+        catch (ConfigurationException e) {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ConfigurationException("Could not configure from input stream resource : " + resourceName, e);
         }
         return this;
     }
 
     /**
-     * 由<property>标签解析类的注入属性。
-     *
-     * @param cls 指定的类型。
-     * @param propnodes <property>标签集合。
-     *
-     * @return 可注入属性的映射。
-     *
-     * @throws IntrospectionException 如果在内省期间发生异常。
-     */
-    private static Map<String, Object> parseProperties(Class<?> cls, List<Element> propnodes) throws
-            IntrospectionException {
-        Map<String, Object> properties = new LinkedHashMap<>();
-        for (Element prop : propnodes) {
-            String pName = prop.getAttribute(NAME);
-            if (null != properties.put(pName, prop.getAttribute(VALUE))) {
-                LOG.warn("Override property [{}] value [{}] in {}", pName, prop.getAttribute(VALUE), cls);
-            }
-        }
-        return properties;
-    }
-
-    /**
      * 添加包含的配置文件"<include>", 用一个集合映射判断并避免循环引用。
-     *
      * @param from 源配置文件名称。
      * @param includeFile 被包含的配置文件名称。
      * @param record 指定的被包含/包含文件的映射。
@@ -503,14 +570,15 @@ public class Configuration {
         InputStream stream = null;
         try {
             stream = include.openStream();
-        } catch (IOException e) {
+        }
+        catch (IOException e) {
             throw new ConfigurationException("IOException occurred in included file : " + include, e);
         }
 
         // if circular reference
         if (record.containsKey(includeFile)) {
-            throw new ConfigurationException("Load circular reference file, "
-                    + "[" + includeFile + "] included in [" + from + "] and [" + record.get(includeFile) + "]", null);
+            throw new ConfigurationException("Load circular reference file, " + "[" + includeFile + "] included in ["
+                    + from + "] and [" + record.get(includeFile) + "]", null);
         }
         record.put(includeFile, from);
 
@@ -527,15 +595,19 @@ public class Configuration {
                 parseInclude(includeFile, e.getAttribute(FILE), record);
             }
 
-        } catch (ConfigurationException e) {
+        }
+        catch (ConfigurationException e) {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ConfigurationException("Could not load or parse properties from included file : " + include, e);
-        } finally {
+        }
+        finally {
             if (stream != null) {
                 try {
                     stream.close();
-                } catch (IOException e) {
+                }
+                catch (IOException e) {
                     LOG.error("Fail to close input stream : " + include, e);
                 }
             }
@@ -544,16 +616,14 @@ public class Configuration {
 
     /**
      * 依次添加interceptor、interceptorStack、resultType、result、action。
-     *
      * @param root 文档根节点。
-     *
      * @throws ClassNotFoundException 如果没有找到具有指定名称的类。
      * @throws IllegalAccessException 如果底层方法不可访问。
      * @throws IntrospectionException 如果在内省期间发生异常。
      * @throws InstantiationException 如果实例化失败。
      */
-    private void parseActionFactoryElements(Element root) throws ClassNotFoundException, IllegalAccessException,
-            IntrospectionException, InvocationTargetException {
+    private void parseActionFactoryElements(Element root)
+            throws ClassNotFoundException, IllegalAccessException, IntrospectionException, InvocationTargetException {
         List<Element> list = null;
         // interceptor
         list = getChildNodesByTagName(root, INTERCEPTOR);
@@ -673,9 +743,7 @@ public class Configuration {
 
     /**
      * 解析"<component-scan>"并添加自动检索的类。
-     *
      * @param root 文档根节点。
-     *
      * @throws ClassNotFoundException 如果无法定位类。
      */
     private void parseScanComponentClasses(Element root) throws ClassNotFoundException {
@@ -686,8 +754,8 @@ public class Configuration {
             String pkg = e.getAttribute(PACKAGE);
             String include = e.getAttribute(INCLUDE_EXPRESSION);
             String exclude = e.getAttribute(EXCLUDE_EXPRESSION);
-            LOG.info("Parse <component-scan> : [package = {}, includeExpression = {}, excludeExpression = {}]",
-                    pkg, include, exclude);
+            LOG.info("Parse <component-scan> : [package = {}, includeExpression = {}, excludeExpression = {}]", pkg,
+                    include, exclude);
             Map<String, String> props = new HashMap<>(4);
             if (StringUtil.isNotBlank(pkg)) {
                 props.put(PACKAGE, pkg);
@@ -699,7 +767,8 @@ public class Configuration {
                 }
                 // add a new ClassScanner for each <component-scan>
                 classScanners.add(parsecComponentClassScanner(props));
-            } else {
+            }
+            else {
                 LOG.warn("Property [{}] can't be empty for <component-scan>.", PACKAGE);
             }
         }
@@ -707,14 +776,12 @@ public class Configuration {
 
     /**
      * 由属性映射集合创建一个扫描工具类。
-     *
      * @param scannerProperties 扫描工具类的属性映射集合。
-     *
      * @return 扫描工具类。
      */
     private ClassScanner parsecComponentClassScanner(Map<String, String> scannerProperties) {
         ClassScanner scanner = new ClassScanner();
-        char[] sep = {',', ';'};
+        char[] sep = { ',', ';' };
         for (Map.Entry<String, String> e : scannerProperties.entrySet()) {
             String name = e.getKey();
             String value = e.getValue();
@@ -727,15 +794,18 @@ public class Configuration {
                 CollectionUtil.stringToCollection(value, set, sep);
                 // packages
                 scanner.setIncludePackages(set);
-            } else if (INCLUDE_EXPRESSION.equalsIgnoreCase(name)) {
+            }
+            else if (INCLUDE_EXPRESSION.equalsIgnoreCase(name)) {
                 CollectionUtil.stringToCollection(value, set, sep);
                 // include expression
                 scanner.setIncludeExpressions(set);
-            } else if (EXCLUDE_EXPRESSION.equalsIgnoreCase(name)) {
+            }
+            else if (EXCLUDE_EXPRESSION.equalsIgnoreCase(name)) {
                 CollectionUtil.stringToCollection(value, set, sep);
                 // exclude expression
                 scanner.setExcludeExpressions(set);
-            } else {
+            }
+            else {
                 LOG.warn("Unknown property [{}] : [{}]", name, value);
             }
         }
@@ -744,13 +814,12 @@ public class Configuration {
 
     /**
      * 解析"<aop-config>"并添加aop属性。
-     *
      * @param root 文档根节点。
      */
     private void parseAop(Element root) {
         List<Element> aops = getChildNodesByTagName(root, AOP_CONFIG);
         printSeparator(!aops.isEmpty());
-        char[] sep = {',', ';'};
+        char[] sep = { ',', ';' };
         for (Element aop : aops) {
             List<Element> aas = getChildNodesByTagName(aop, AOP_ACTION);
             for (Element e : aas) {
@@ -777,104 +846,13 @@ public class Configuration {
             }
         }
     }
-
-    /**
-     * 获取指定父节点和节点名称的子节点集合。
-     *
-     * @param parent 指定的父节点。
-     * @param name 指定的节点名称。
-     *
-     * @return 子节点集合。
-     */
-    private static List<Element> getChildNodesByTagName(Element parent, String name) {
-        List<Element> eles = new ArrayList<>();
-        for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
-            // System.out.println(child.getNodeName() + "," + child.getNodeType());
-            if (Node.ELEMENT_NODE == child.getNodeType() && name.equals(child.getNodeName())) {
-                eles.add((Element) child);
-            }
-        }
-        return eles;
-    }
-
-    /**
-     * TODO
-     */
-    private String getTrimmedToNullString(Element element, String attribute) {
-        String str = element.getAttribute(attribute);
-        if (str != null) {
-            str = str.trim();
-        }
-        if (str != null && str.length() == 0) {
-            str = null;
-        }
-        return str;
-    }
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-    /**
-     * 注入属性至指定的对象，并去除不支持的属性。
-     *
-     * @param obj 指定的对象。
-     * @param properties 注入属性映射集合。
-     * @param removeUnsupported 是否去除不支持的属性。
-     *
-     * @throws IntrospectionException 如果在内省期间发生异常。
-     * @throws IllegalAccessException 如果底层方法不可访问。
-     * @throws InvocationTargetException 如果底层方法抛出异常。
-     */
-    private static void injectProperties(Object obj, Map<String, Object> properties, boolean removeUnsupported) throws
-            IntrospectionException, IllegalAccessException, InvocationTargetException {
-        String cls = obj.getClass().getName();
-        Map<String, PropertyDescriptor> supports = Injector.getSupportedProperties(obj.getClass());
-        Iterator<Map.Entry<String, Object>> it = properties.entrySet().iterator();
-        while (it.hasNext()) {
-            Map.Entry<String, Object> e = it.next();
-            String pName = e.getKey();
-            PropertyDescriptor pd = supports.get(pName);
-            if (pd == null) {
-                LOG.error("Not supported property [{}] in [{}]", pName, cls);
-                if (removeUnsupported) {
-                    it.remove();
-                }
-            } else {
-                Object value = e.getValue();
-                // convert string to specific object
-                if (value instanceof String) {
-                    value = Injector.stringToObject((String) value, pd.getPropertyType());
-                }
-                pd.getWriteMethod().invoke(obj, value);
-            }
-        }
-    }
-
-    /**
-     * 创建新对象。
-     *
-     * @param factory 指定的{@code ActionFactory}。
-     * @param obj 传入的对象。
-     *
-     * @return 如果传入的对象为{@code String}或{@code Class}，返回由{@code ActionFactory}创建的实例对象；否则直接返回传入的对象。
-     *
-     * @throws ClassNotFoundException 如果没有找到具有指定名称的类。
-     */
-    private static Object newInstance(ActionFactory factory, Object obj) throws ClassNotFoundException {
-        if (obj instanceof Class) {
-            obj = factory.getObjectFactory().newInstance((Class<?>) obj);
-        } else if (obj instanceof String) {
-            obj = factory.getObjectFactory().newInstance(ClassUtil.loadClass((String) obj));
-        }
-        return obj;
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 由此Configuration对象中的配置属性创建一个新的ActionFactory对象。
      * 此Configuration对象中配置属性的变更不影响已生成的ActionFactory对象。
-     *
      * @param <T> ActionFactory的类型。
-     *
      * @return 生成的{@code ActionFactory}对象。
-     *
      * @throws ConfigurationException 如果发生无效的配置。
      */
     public <T extends ActionFactory> T buildActionFactory() throws ConfigurationException {
@@ -894,13 +872,12 @@ public class Configuration {
                 if (LOG.isDebugEnabled()) {
                     if (!scanComponents.isEmpty()) {
                         LOG.debug("Checking auto scan classes as follows :");
-                        Iterator<Class<?>> it = scanComponents.iterator();
-                        while (it.hasNext()) {
-                            Class<?> cls = it.next();
+                        for (Class<?> cls : scanComponents) {
                             LOG.debug(cls.toString());
                         }
                         LOG.debug("Finish check auto scan classes : {}", scanComponents.size());
-                    } else {
+                    }
+                    else {
                         LOG.debug("No auto scan classes.");
                     }
                 }
@@ -1045,8 +1022,7 @@ public class Configuration {
                     Set<String> existMatchPaths = new HashSet<>();
                     // 倒序，最后匹配的路径优先
                     for (int i = aopActions.size() - 1; i > -1; i--) {
-                        in:
-                        for (Map.Entry<String, PathActionProxy> e : pathActionFactory.getActions().entrySet()) {
+                        in: for (Map.Entry<String, PathActionProxy> e : pathActionFactory.getActions().entrySet()) {
                             AopAction aa = aopActions.get(i);
                             String path = e.getKey();
                             if (matcher.match(aa.getMatches(), path)) {
@@ -1061,8 +1037,11 @@ public class Configuration {
                                 if (CollectionUtil.isNotEmpty(aa.getInterceptorStacks())) {
                                     for (String stackName : aa.getInterceptorStacks()) {
                                         if (pathActionFactory.getInterceptorStacks().containsKey(stackName)) {
-                                            news.addAll(pathActionFactory.getInterceptorStacks().get(stackName).getInterceptors());
-                                        } else {
+                                            news.addAll(pathActionFactory.getInterceptorStacks()
+                                                .get(stackName)
+                                                .getInterceptors());
+                                        }
+                                        else {
                                             LOG.warn("Can't find InterceptorStack [{}]", stackName);
                                         }
                                     }
@@ -1071,7 +1050,8 @@ public class Configuration {
                                     for (String interceptorName : aa.getInterceptors()) {
                                         if (pathActionFactory.getInterceptors().containsKey(interceptorName)) {
                                             news.add(pathActionFactory.getInterceptors().get(interceptorName));
-                                        } else {
+                                        }
+                                        else {
                                             LOG.warn("Can't find Interceptor [{}]", interceptorName);
                                         }
                                     }
@@ -1097,8 +1077,8 @@ public class Configuration {
                                     }
                                 }
                                 if (LOG.isInfoEnabled()) {
-                                    LOG.info("Aop Action [{}] interceptors {} -> {}, matches {}",
-                                            path, existName, interceptorsToString(exist), aa.toString());
+                                    LOG.info("Aop Action [{}] interceptors {} -> {}, matches {}", path, existName,
+                                            interceptorsToString(exist), aa.toString());
                                 }
                             }
                         }
@@ -1107,9 +1087,11 @@ public class Configuration {
             }
             // give subclasses a chance to prepare factory
             afterActionFactoryBuild(factory);
-        } catch (ConfigurationException e) {
+        }
+        catch (ConfigurationException e) {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ConfigurationException(e);
         }
         return (T) factory;
@@ -1118,58 +1100,54 @@ public class Configuration {
     /**
      * 由指定的ActionFactory类型和属性集合创建ActionFactory的对象实例,可用于子类继承以覆写。
      * 如果存在，默认优先调用&lt;init&gt;(java.util.Map)的构造函数。
-     *
      * @param <T> ActionFactory特定类型。
      * @param actionFactoryClass 指定的ActionFactory类型。
      * @param actionFactoryProperties ActionFactory的属性集合。
-     *
      * @return ActionFactory的对象实例。
-     *
      * @throws ConfigurationException 如果发生任何构造异常。
      */
     protected <T extends ActionFactory> T createActionFactory(Class<? extends ActionFactory> actionFactoryClass,
-                                                              Map<String, Object> actionFactoryProperties) throws ConfigurationException {
+            Map<String, Object> actionFactoryProperties) throws ConfigurationException {
         ActionFactory factory = null;
         Constructor<? extends ActionFactory> con = null;
         try {
             // look up for (Map) constructor first
             con = actionFactoryClass.getDeclaredConstructor(Map.class);
-        } catch (NoSuchMethodException ex) {
-            LOG.info("No constructor {}, use {}.<init>(). ",
-                    ex.getLocalizedMessage(), actionFactoryClass.getName());
+        }
+        catch (NoSuchMethodException ex) {
+            LOG.info("No constructor {}, use {}.<init>(). ", ex.getLocalizedMessage(), actionFactoryClass.getName());
         }
         try {
             if (con == null) {
                 con = actionFactoryClass.getDeclaredConstructor();
                 con.setAccessible(true);
                 factory = con.newInstance();
-            } else {
+            }
+            else {
                 con.setAccessible(true);
                 factory = con.newInstance(actionFactoryProperties);
             }
             // give subclasses a chance to prepare factory
             afterActionFactoryCreation(factory);
-        } catch (ConfigurationException e) {
+        }
+        catch (ConfigurationException e) {
             throw e;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new ConfigurationException(e);
         }
         return (T) factory;
     }
 
     /**
-     * 用于子类继承, 在初始化ActionFactory前执行设置其一些特定的操作。
-     * 默认情况下不做任何处理。
-     *
+     * 用于子类继承, 在初始化ActionFactory前执行设置其一些特定的操作。 默认情况下不做任何处理。
      * @param factory 未初始化属性的{@link ActionFactory}。
      */
     protected void afterActionFactoryCreation(ActionFactory factory) {
     }
 
     /**
-     * 用于子类继承, 在构造好ActionFactory后执行设置其一些特定的操作。
-     * 默认情况下不做任何处理。
-     *
+     * 用于子类继承, 在构造好ActionFactory后执行设置其一些特定的操作。 默认情况下不做任何处理。
      * @param factory 未初始化属性的{@link ActionFactory}。
      */
     protected void afterActionFactoryBuild(ActionFactory factory) {
@@ -1177,11 +1155,8 @@ public class Configuration {
 
     /**
      * 返回ActionFactory。
-     *
      * @param <T> Action工厂对象的类型。
-     *
      * @return ActionFactory。
-     *
      * @deprecated 由{@link #buildActionFactory()}取代。
      */
     @Deprecated
@@ -1191,9 +1166,7 @@ public class Configuration {
 
     /**
      * 拦截器集合字符串显示名称。
-     *
      * @param interceptors 拦截器集合。
-     *
      * @return 显示名称。
      */
     private String interceptorsToString(List<InterceptorProxy> interceptors) {
@@ -1206,7 +1179,7 @@ public class Configuration {
         }
         StringBuilder msg = new StringBuilder();
         msg.append('[');
-        for (int i = 0; ; i++) {
+        for (int i = 0;; i++) {
             msg.append(interceptors.get(i).getName());
             if (i == iMax) {
                 return msg.append(']').toString();
@@ -1214,24 +1187,13 @@ public class Configuration {
             msg.append(", ");
         }
     }
-////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * 设置ActionFactory的类型。
-     *
-     * @param actionFactoryClass 指定的ActionFactory类型。
-     */
-    public void setActionFactoryClass(Class<? extends ActionFactory> actionFactoryClass) {
-        this.actionFactoryClass = actionFactoryClass;
-    }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * 添加ActionFactory的属性映射集合。
-     *
      * @param actionFactoryProperties ActionFactory的属性映射集合。
-     *
      * @return 此配置对象的引用。
-     *
      * @see PathActionFactory
      */
     public Configuration addActionFactoryProperties(Map<String, Object> actionFactoryProperties) {
@@ -1241,9 +1203,7 @@ public class Configuration {
 
     /**
      * 添加Action集合。
-     *
      * @param actions Action集合。
-     *
      * @return 此配置对象的引用。
      */
     public Configuration addActions(Collection<Object> actions) {
@@ -1253,9 +1213,7 @@ public class Configuration {
 
     /**
      * 添加拦截栈集合。
-     *
      * @param interceptorStacks 拦截栈集合。
-     *
      * @return 此配置对象的引用。
      */
     public Configuration addInterceptorStacks(Collection<Object> interceptorStacks) {
@@ -1265,9 +1223,7 @@ public class Configuration {
 
     /**
      * 添加拦截器集合。
-     *
      * @param interceptors 拦截器集合。
-     *
      * @return 此配置对象的引用。
      */
     public Configuration addInterceptors(Collection<Object> interceptors) {
@@ -1277,9 +1233,7 @@ public class Configuration {
 
     /**
      * 添加结果类型集合。
-     *
      * @param resultTypes 结果类型集合。
-     *
      * @return 此配置对象的引用。
      */
     public Configuration addResultTypes(Collection<Object> resultTypes) {
@@ -1289,9 +1243,7 @@ public class Configuration {
 
     /**
      * 添加结果对象集合。
-     *
      * @param results 结果对象集合。
-     *
      * @return 此配置对象的引用。
      */
     public Configuration addResults(Collection<Object> results) {
@@ -1301,9 +1253,7 @@ public class Configuration {
 
     /**
      * 添加指定路径Action的属性集合。
-     *
      * @param pathProperties 指定路径Action的属性集合。
-     *
      * @return 此配置对象的引用。
      */
     public Configuration addPathProperties(Map<String, Map<String, Object>> pathProperties) {
@@ -1313,11 +1263,8 @@ public class Configuration {
 
     /**
      * 添加扫描配置。
-     *
      * @param scanProperties 扫描配置
-     *
      * @return 此配置对象的引用。
-     *
      * @see ClassScanner
      * @see #parsecComponentClassScanner(java.util.Map)
      */
@@ -1330,13 +1277,82 @@ public class Configuration {
 
     /**
      * 添加Action Aop。
-     *
      * @param aopActions Action Aop。
-     *
      * @return 此配置对象的引用。
      */
     public Configuration addAopActions(Collection<? extends AopAction> aopActions) {
         this.aopActions.addAll(aopActions);
         return this;
     }
+
+    /**
+     * 解析xml配置文件。
+     */
+    private static class DocumentLoader {
+
+        /**
+         * SAX 错误处理对象
+         */
+        static final ErrorHandler ERROR_HANDLER = new ErrorHandler() {
+
+            @Override
+            public void warning(SAXParseException ex) throws SAXException {
+                LOG.warn("Ignored XML validation warning", ex);
+            }
+
+            @Override
+            public void error(SAXParseException ex) throws SAXException {
+                throw ex;
+            }
+
+            @Override
+            public void fatalError(SAXParseException ex) throws SAXException {
+                throw ex;
+            }
+        };
+
+        /**
+         * 用于解析实体的对象
+         */
+        static final EntityResolver ENTITY_RESOLVER = new EntityResolver() {
+
+            @Override
+            public InputSource resolveEntity(String publicId, String systemId) throws SAXException, IOException {
+                if (systemId != null) {
+                    InputSource source = new InputSource(getResource(JROUTER_XSD).openStream());
+                    source.setPublicId(publicId);
+                    source.setSystemId(JROUTER_XSD);
+                    return source;
+                }
+                return null;
+            }
+        };
+
+        /**
+         * 将给定 InputStream 的内容解析为一个 XML 文档，并且返回一个新的 DOM {@code Document} 对象。
+         * @param stream 包含要解析内容的 InputStream。
+         * @return {@code Document} 对象。
+         */
+        private static Document loadDocument(InputStream stream)
+                throws ParserConfigurationException, SAXException, IOException {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            factory.setNamespaceAware(true);
+            factory.setValidating(true);
+            try {
+                factory.setAttribute(JAXP_SCHEMA_LANGUAGE, XMLConstants.W3C_XML_SCHEMA_NS_URI);
+            }
+            catch (IllegalArgumentException ex) {
+                // Happens if the parser does not support JAXP 1.2
+                throw new ConfigurationException("Unable to validate using XSD: Your JAXP provider [" + factory
+                        + "] does not support XML Schema. Are you running on Java 1.4 with Apache Crimson? "
+                        + "Upgrade to Apache Xerces (or Java 1.5) for full XSD support.", ex);
+            }
+            DocumentBuilder docBuilder = factory.newDocumentBuilder();
+            docBuilder.setEntityResolver(ENTITY_RESOLVER);
+            docBuilder.setErrorHandler(ERROR_HANDLER);
+            return docBuilder.parse(stream);
+        }
+
+    }
+
 }

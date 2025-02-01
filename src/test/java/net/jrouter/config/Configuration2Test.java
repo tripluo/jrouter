@@ -86,4 +86,5 @@ public class Configuration2Test extends Assert {
         config = new Configuration();
         config.load("/jrouter_error.xml");
     }
+
 }

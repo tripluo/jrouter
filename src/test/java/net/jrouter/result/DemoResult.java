@@ -27,32 +27,26 @@ import org.junit.Assert;
  */
 public class DemoResult {
 
-    /** demo */
+    /**
+     * demo
+     */
     public static final String DEMO_RESULT_TYPE = "demo";
 
-    /** result not found */
+    /**
+     * result not found
+     */
     public static final String DEMO_RESULT_NOT_FOUND = "demoResultNotFound";
 
-    /** result exception */
+    /**
+     * result exception
+     */
     public static final String DEMO_RESULT_EXCEPTION = "demoResultException";
 
     // 注入的属性
     private String value;
 
     /**
-     * 返回结果对象的路径。
-     *
-     * @param invocation Action运行时上下文。
-     */
-    @ResultType(type = DEMO_RESULT_TYPE)
-    public Object demo(ActionInvocation invocation) {
-        Assert.assertEquals("demo result", value);
-        return invocation.getResult().location();
-    }
-
-    /**
      * 返回结果未找到的字符串。
-     *
      * @param invocation Action运行时上下文。
      */
     @Result(name = DEMO_RESULT_NOT_FOUND)
@@ -62,7 +56,6 @@ public class DemoResult {
 
     /**
      * 抛出运行时异常。
-     *
      * @param invocation Action运行时上下文。
      */
     @Result(name = DEMO_RESULT_EXCEPTION)
@@ -71,9 +64,20 @@ public class DemoResult {
     }
 
     /**
+     * 返回结果对象的路径。
+     * @param invocation Action运行时上下文。
+     */
+    @ResultType(type = DEMO_RESULT_TYPE)
+    public Object demo(ActionInvocation invocation) {
+        Assert.assertEquals("demo result", value);
+        return invocation.getResult().location();
+    }
+
+    /**
      * 注入属性。
      */
     public void setValue(String value) {
         this.value = value;
     }
+
 }

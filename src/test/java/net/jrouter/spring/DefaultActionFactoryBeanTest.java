@@ -25,7 +25,6 @@ import net.jrouter.interceptor.DemoInterceptor;
 import net.jrouter.interceptor.SampleInterceptor;
 import net.jrouter.result.DefaultResult;
 import net.jrouter.result.DemoResult;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -34,11 +33,13 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import static org.junit.Assert.*;
+
 /**
  * DefaultActionFactoryBeanTest。
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:jrouter-spring_test.xml"})
+@ContextConfiguration(locations = { "classpath:jrouter-spring_test.xml" })
 public class DefaultActionFactoryBeanTest {
 
     // singleton ActionFactory
@@ -89,7 +90,8 @@ public class DefaultActionFactoryBeanTest {
         try {
             factory.invokeAction("");
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertNotNull(e);
         }
         assertEquals("/", factory.invokeAction("/"));
@@ -122,7 +124,8 @@ public class DefaultActionFactoryBeanTest {
         try {
             factory.invokeAction("");
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertNotNull(e);
         }
         assertEquals("/url/a2", factory.invokeAction("/url/a2"));
@@ -143,4 +146,5 @@ public class DefaultActionFactoryBeanTest {
         assertEquals("/url_test3/abc", factory.invokeAction("/url_test3/abc"));
         assertEquals("/url_test4/abc", factory.invokeAction("/url_test4/abc"));
     }
+
 }

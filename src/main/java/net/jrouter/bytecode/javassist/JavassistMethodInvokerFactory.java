@@ -17,9 +17,6 @@
 
 package net.jrouter.bytecode.javassist;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
-import java.util.concurrent.atomic.AtomicInteger;
 import javassist.*;
 import net.jrouter.JRouterException;
 import net.jrouter.MethodInvokerFactory;
@@ -27,12 +24,15 @@ import net.jrouter.util.MethodUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * 提供基于javassist的根据{@link Method}底层方法动态构建{@link JavassistInvoker}对象的工厂类。
  *
  * <p>
- * 通常如下使用：
- * <code><blockquote><pre>
+ * 通常如下使用： <code><blockquote><pre>
  * Class<?> targetClass = ...
  * Method method = ...
  * JavassistMethodInvokerFactory factory = new JavassistMethodInvokerFactory();
@@ -64,7 +64,8 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
     private static final AtomicInteger COUNTER = new AtomicInteger(0x10000);
 
     static {
-        // CtClass.debugDump = System.getProperty("user.home") + "/Desktop" + "/javaDebug";
+        // CtClass.debugDump = System.getProperty("user.home") + "/Desktop" +
+        // "/javaDebug";
         ClassPool.getDefault().insertClassPath(new LoaderClassPath(Thread.currentThread().getContextClassLoader()));
     }
 
@@ -72,7 +73,7 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
     public JavassistInvoker newInstance(Class<?> targetClass, Method method) {
         // only public method can be proxied
         if (!Modifier.isPublic(method.getModifiers())) {
-            LOG.warn("Only public method can be proxied, no proxy at : {}", MethodUtil.getFullMethod(method));
+            LOG.warn("Only public method can be proxied, no proxy at : {}", method.toGenericString());
             return null;
         }
         try {
@@ -80,28 +81,26 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
                 LOG.debug("Create JavassistInvoker at : {}", MethodUtil.getMethod(method));
             }
             Constructor<?> constructor = createInvokeClass(targetClass, method)
-                    .toClass(Thread.currentThread().getContextClassLoader(), targetClass.getProtectionDomain())
-                    .getDeclaredConstructor();
+                .toClass(Thread.currentThread().getContextClassLoader(), targetClass.getProtectionDomain())
+                .getDeclaredConstructor();
             constructor.setAccessible(true);
             JavassistInvoker invoker = (JavassistInvoker) (constructor.newInstance());
             return invoker;
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             throw new JRouterException(e);
         }
     }
 
     /**
      * 根据底层方法构建{@link CtClass}对象。
-     *
      * @param method 底层方法。
-     *
      * @return CtClass对象。
-     *
      * @throws CannotCompileException when bytecode transformation has failed.
      * @throws NotFoundException when class is not found.
      */
-    private CtClass createInvokeClass(Class<?> targetClass, Method method) throws CannotCompileException,
-            NotFoundException {
+    private CtClass createInvokeClass(Class<?> targetClass, Method method)
+            throws CannotCompileException, NotFoundException {
         ClassPool classPool = ClassPool.getDefault();
         ClassClassPath classPath = new ClassClassPath(targetClass);
         classPool.insertClassPath(classPath);
@@ -109,7 +108,8 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
         classPool.importPackage(targetClass.getPackage().getName());
 
         // 类前缀 + 16进制计数值
-        CtClass clazz = classPool.makeClass(PROXY_CLASS_PREFIX + targetClass.getSimpleName() + PROXY_CLASS_SUFFIX + Integer.toHexString(COUNTER.getAndIncrement()));
+        CtClass clazz = classPool.makeClass(PROXY_CLASS_PREFIX + targetClass.getSimpleName() + PROXY_CLASS_SUFFIX
+                + Integer.toHexString(COUNTER.getAndIncrement()));
         try {
             // 特定接口/抽象类/类的调用
             clazz.setSuperclass(classPool.getCtClass(JavassistInvoker.class.getName()));
@@ -117,7 +117,8 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
             clazz.setModifiers(Modifier.FINAL);
             // invoke method
             clazz.addMethod(createInvokeMethod(clazz, targetClass, method));
-        } finally {
+        }
+        finally {
             classPool.removeClassPath(classPath);
             classPool.clearImportedPackages();
             if (clazz != null) {
@@ -129,17 +130,15 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
 
     /**
      * 基于底层方法构建{@link CtMethod}方法。
-     *
      * @param clazz 代理方法所在的CtClass类。
      * @param method 底层方法。
-     *
      * @return CtMethod方法。
-     *
      * @throws CannotCompileException when bytecode transformation has failed.
      */
-    private CtMethod createInvokeMethod(CtClass clazz, Class<?> targetClass, Method method) throws
-            CannotCompileException {
-        StringBuilder body = new StringBuilder("public Object invoke(java.lang.reflect.Method m, Object obj, Object[] params){");
+    private CtMethod createInvokeMethod(CtClass clazz, Class<?> targetClass, Method method)
+            throws CannotCompileException {
+        StringBuilder body = new StringBuilder(
+                "public Object invoke(java.lang.reflect.Method m, Object obj, Object[] params){");
         boolean voidMethod = void.class == method.getReturnType();
         if (!voidMethod) {
             body.append("return ($w)");
@@ -147,7 +146,8 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
         // static method needs to import class package to invoke by simple class name
         if (Modifier.isStatic(method.getModifiers())) {
             body.append(targetClass.getName());
-        } else {
+        }
+        else {
             body.append("((").append(targetClass.getName()).append(")obj)");
         }
         // invoke begin
@@ -156,14 +156,16 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
         // no parameters method
         if (parameterTypes.length == 0) {
             body.append(method.getName()).append("()");
-        } else {
+        }
+        else {
             // can't use ($$) here because of "Object[] params"
             body.append(method.getName()).append('(');
             for (int i = 0; i < parameterTypes.length - 1; i++) {
                 body.append(getClassName(parameterTypes[i], "params[" + i + "]"));
                 body.append(',');
             }
-            body.append(getClassName(parameterTypes[parameterTypes.length - 1], "params[" + (parameterTypes.length - 1) + "]"));
+            body.append(getClassName(parameterTypes[parameterTypes.length - 1],
+                    "params[" + (parameterTypes.length - 1) + "]"));
             body.append(')');
         }
         body.append(';');
@@ -173,17 +175,15 @@ public class JavassistMethodInvokerFactory implements MethodInvokerFactory {
 
     /**
      * 指定对象类型（包括基本类型）的名称转换。
-     *
      * @param clazz 指定的对象类型。
      * @param parameter 参数名称。
-     *
      * @return 转换后的名称。
      */
     private String getClassName(Class<?> clazz, String parameter) {
         return void.class != clazz && clazz.isPrimitive()
-                ? (clazz == boolean.class
-                ? "((Boolean)" + parameter + ").booleanValue()"
-                : "((Number)" + parameter + ")." + clazz.getCanonicalName() + "Value()")
+                ? (clazz == boolean.class ? "((Boolean)" + parameter + ").booleanValue()"
+                        : "((Number)" + parameter + ")." + clazz.getCanonicalName() + "Value()")
                 : "(" + clazz.getCanonicalName() + ")" + parameter;
     }
+
 }

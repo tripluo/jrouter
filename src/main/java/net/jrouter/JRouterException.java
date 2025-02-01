@@ -26,7 +26,6 @@ public class JRouterException extends RuntimeException {
 
     /**
      * 构造一个包含指定详细消息的JRouterException。
-     *
      * @param message 详细消息。
      */
     public JRouterException(String message) {
@@ -35,7 +34,6 @@ public class JRouterException extends RuntimeException {
 
     /**
      * 构造一个包含指定原因的的JRouterException。
-     *
      * @param cause 异常原因。
      */
     public JRouterException(Throwable cause) {
@@ -44,11 +42,11 @@ public class JRouterException extends RuntimeException {
 
     /**
      * 构造一个包含指定详细消息和原因的JRouterException。
-     *
      * @param message 详细消息。
      * @param cause 异常原因。
      */
     public JRouterException(String message, Throwable cause) {
         super(message, cause);
     }
+
 }

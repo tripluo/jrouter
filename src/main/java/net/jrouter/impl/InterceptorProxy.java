@@ -17,31 +17,31 @@
 
 package net.jrouter.impl;
 
-import java.lang.reflect.Method;
+import lombok.Getter;
 import net.jrouter.ActionFactory;
 import net.jrouter.annotation.Action;
 import net.jrouter.annotation.Interceptor;
 
+import java.lang.reflect.Method;
+
 /**
  * 拦截器的代理类，包括了拦截器的名称及在对{@link Action}做拦截调用时是否将{@link Action}的运行时状态作为参数传递等信息。
  */
+@Getter
 public final class InterceptorProxy extends DefaultProxy {
 
     /**
      * 拦截器的名称。
      */
-    @lombok.Getter
     private final String name;
 
     /**
      * 拦截器。
      */
-    @lombok.Getter
     private final Interceptor interceptor;
 
     /**
      * 构造一个拦截器的代理类，包含指定的拦截器名称、拦截器调用参数的状态。
-     *
      * @param actionFactory 指定的ActionFactory。
      * @param interceptor 所代理的拦截器。
      * @param method 代理的方法。
@@ -52,4 +52,5 @@ public final class InterceptorProxy extends DefaultProxy {
         this.interceptor = interceptor;
         this.name = interceptor.name().trim();
     }
+
 }

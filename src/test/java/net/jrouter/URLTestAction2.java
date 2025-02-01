@@ -110,4 +110,5 @@ public class URLTestAction2 extends URLTestAction {
     public String test404() {
         return "/url_test4/abc";
     }
+
 }

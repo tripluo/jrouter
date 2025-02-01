@@ -17,9 +17,10 @@
 
 package net.jrouter.util;
 
+import org.junit.Test;
+
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
 /**
  * AntPathMatcherTest。
@@ -32,7 +33,10 @@ public class AntPathMatcherTest {
         matcher.setTrimTokens(true);
         assertFalse(matcher.match("?", ""));
         assertFalse(matcher.match("?", " "));
+        assertTrue(matcher.match("?", "a"));
+        assertFalse(matcher.match("?", "ab"));
         assertFalse(matcher.match("*", ""));
+        assertTrue(matcher.match("*", "a"));
         assertFalse(matcher.match("*", "   "));
     }
 
@@ -62,7 +66,7 @@ public class AntPathMatcherTest {
         assertFalse(matcher.match("*", ""));
         assertTrue(matcher.match("*", "   "));
         assertTrue(matcher.match("*", "a"));
-        assertTrue(matcher.match("*", "aa"));
+        assertTrue(matcher.match("*", "abc"));
         assertTrue(matcher.match("**", "a"));
         assertTrue(matcher.match("*****", "a"));
         assertTrue(matcher.match("****", "aaabbb"));
@@ -83,24 +87,31 @@ public class AntPathMatcherTest {
 
         assertFalse(matcher.match("?", "/"));
         assertFalse(matcher.match("*", "/"));
+        assertFalse(matcher.match("*", "///"));
         assertFalse(matcher.match("*", "abc/123"));
 
         assertTrue(matcher.match("/*", "/"));
         assertTrue(matcher.match("/???", "/abc"));
+        assertFalse(matcher.match("/???", "/abc///"));
         assertTrue(matcher.match("?/???", "1/abc"));
 
         assertFalse(matcher.match("/*", "abc"));
+        assertFalse(matcher.match("/*", "abc///"));
         assertTrue(matcher.match("/*", "/abc"));
         assertFalse(matcher.match("/*", "/abc/123"));
+        assertFalse(matcher.match("/*", "/abc/123///"));
 
         assertTrue(matcher.match("/*/*", "/abc/123"));
+        assertFalse(matcher.match("/*/*", "/abc/123///"));
         assertFalse(matcher.match("/*/*", "/abc/123/456"));
         assertFalse(matcher.match("/*/0*", "/abc/123"));
         assertTrue(matcher.match("/*/?/*", "/abc/d/123"));
         assertTrue(matcher.match("/*/?ef/*", "/abc/def/123"));
 
         assertTrue(matcher.match("/**", "/"));
+        assertTrue(matcher.match("/**", "///"));
         assertTrue(matcher.match("/**", "/abc/123"));
+        assertTrue(matcher.match("/**", "/abc/123///"));
         assertTrue(matcher.match("/**", "/abc/123/456.abc"));
         assertTrue(matcher.match("/**/", "/abc/123"));
         assertTrue(matcher.match("/**", "/abc/123/456"));
@@ -108,7 +119,7 @@ public class AntPathMatcherTest {
         assertFalse(matcher.match("/*/*", "/abc/123/456"));
         assertTrue(matcher.match("/**/", "/abc/123/456"));
         assertTrue(matcher.match("/**/*", "/abc/123/456"));
-        assertTrue(matcher.match("/**/*/", "/abc/123/456"));
+        assertFalse(matcher.match("/**/*/", "/abc/123/456"));
 
         assertFalse(matcher.match("/****", "/abc/123"));
         assertFalse(matcher.match("/**/?", "/abc/123/456"));
@@ -221,7 +232,7 @@ public class AntPathMatcherTest {
         assertFalse(matcher.match("||*||*", "||abc||123||456"));
         assertTrue(matcher.match("||**||", "||abc||123||456"));
         assertTrue(matcher.match("||**||*", "||abc||123||456"));
-        assertTrue(matcher.match("||**||*||", "||abc||123||456"));
+        assertFalse(matcher.match("||**||*||", "||abc||123||456"));
 
         assertFalse(matcher.match("||****", "||abc||123"));
         assertFalse(matcher.match("||**||?", "||abc||123||456"));
@@ -261,96 +272,4 @@ public class AntPathMatcherTest {
         assertTrue(matcher.match("||**||**Service", "||abc||123||456.Service"));
     }
 
-    @Test
-    public void testMatchStart() {
-        AntPathMatcher matcher = new AntPathMatcher();
-        matcher.setTrimTokens(false);
-        assertTrue(matcher.matchStart("a", "a"));
-        assertTrue(matcher.matchStart("abb", "abb"));
-
-        assertTrue(matcher.matchStart("?", ""));
-        assertTrue(matcher.matchStart("?", " "));
-        assertTrue(matcher.matchStart("?", "a"));
-        assertFalse(matcher.matchStart("?", "aa"));
-
-        assertTrue(matcher.matchStart("???", "aaa"));
-        assertFalse(matcher.matchStart("a?", "a"));
-        assertFalse(matcher.matchStart("?b", "b"));
-
-        assertTrue(matcher.matchStart("?b", "ab"));
-        assertTrue(matcher.matchStart("?b", "bb"));
-        assertFalse(matcher.matchStart("?b", "ba"));
-        assertTrue(matcher.matchStart("a?c", "abc"));
-        assertTrue(matcher.matchStart("a?cd?", "abcde"));
-
-        assertTrue(matcher.matchStart("*", ""));
-        assertTrue(matcher.matchStart("*", "   "));
-        assertTrue(matcher.matchStart("*", "a"));
-        assertTrue(matcher.matchStart("*", "aa"));
-        assertTrue(matcher.matchStart("**", "a"));
-        assertTrue(matcher.matchStart("*****", "a"));
-        assertTrue(matcher.matchStart("****", "aaabbb"));
-
-        assertTrue(matcher.matchStart("a*", "a"));
-        assertTrue(matcher.matchStart("*b", "b"));
-
-        assertTrue(matcher.matchStart("*b", "ab"));
-        assertTrue(matcher.matchStart("*b", "bb"));
-        assertFalse(matcher.matchStart("*b", "ba"));
-        assertTrue(matcher.matchStart("*b", "abab"));
-        assertTrue(matcher.matchStart("a*c", "ac"));
-        assertTrue(matcher.matchStart("a*c", "abbbc"));
-        assertTrue(matcher.matchStart("a*cd*", "abcd"));
-        assertTrue(matcher.matchStart("a*cd*", "abbbcdeee"));
-
-        assertFalse(matcher.matchStart("?", "/"));
-        assertFalse(matcher.matchStart("*", "/"));
-        assertFalse(matcher.matchStart("*", "abc/123"));
-
-        assertTrue(matcher.matchStart("/*", "/"));
-        assertTrue(matcher.matchStart("/???", "/abc"));
-        assertTrue(matcher.matchStart("?/???", "1/abc"));
-
-        assertFalse(matcher.matchStart("/*", "abc"));
-        assertTrue(matcher.matchStart("/*", "/abc"));
-        assertFalse(matcher.matchStart("/*", "/abc/123"));
-
-        assertTrue(matcher.matchStart("/*/*", "/abc/123"));
-        assertFalse(matcher.matchStart("/*/*", "/abc/123/456"));
-        assertFalse(matcher.matchStart("/*/0*", "/abc/123"));
-        assertTrue(matcher.matchStart("/*/?/*", "/abc/d/123"));
-        assertTrue(matcher.matchStart("/*/?ef/*", "/abc/def/123"));
-
-        assertTrue(matcher.matchStart("/**", "/"));
-        assertTrue(matcher.matchStart("/**", "/abc/123"));
-        assertTrue(matcher.matchStart("/**/", "/abc/123"));
-        assertTrue(matcher.matchStart("/**", "/abc/123/456"));
-        assertFalse(matcher.matchStart("/*/", "/abc/123/456"));
-        assertTrue(matcher.matchStart("/**/", "/abc/123/456"));
-        assertTrue(matcher.matchStart("/**/*", "/abc/123/456"));
-        assertTrue(matcher.matchStart("/**/*/", "/abc/123/456"));
-
-        assertFalse(matcher.matchStart("/****", "/abc/123"));
-        assertTrue(matcher.matchStart("/**/?", "/abc/123/456"));
-        assertTrue(matcher.matchStart("/**/?", "/abc/1"));
-        assertTrue(matcher.matchStart("/**/???", "/abc/123"));
-        assertTrue(matcher.matchStart("/*/???", "/abc/123"));
-
-        assertTrue(matcher.matchStart("/**/*", "/abc/123/456"));
-        assertTrue(matcher.matchStart("/**/**", "/abc/123/456"));
-        assertTrue(matcher.matchStart("/**/**/**/**", "/abc/123/456/xyz"));
-
-        assertFalse(matcher.matchStart("/a**", "/abc/123/456"));
-        assertTrue(matcher.matchStart("/a**/**", "/abc/123/456"));
-
-        assertFalse(matcher.matchStart("/*/**Service", "/abc/123/456.Service"));
-        assertFalse(matcher.matchStart("**Service", "/abc/456.Service"));
-        assertFalse(matcher.matchStart("/**Service", "/abc/456.Service"));
-        assertTrue(matcher.matchStart("/*/*Service", "/abc/456.Service"));
-
-        assertTrue(matcher.matchStart("/**/*Service", "/abc/123/456.Service"));
-        assertTrue(matcher.matchStart("/**/*Service*", "/abc/123/456.Service"));
-        assertTrue(matcher.matchStart("/**/**Service", "/abc/123/456.Service"));
-
-    }
 }

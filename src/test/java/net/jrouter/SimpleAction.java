@@ -17,7 +17,6 @@
 
 package net.jrouter;
 
-import java.util.Arrays;
 import net.jrouter.annotation.*;
 import net.jrouter.impl.PathActionInvocation;
 import net.jrouter.interceptor.DefaultInterceptorStack;
@@ -32,6 +31,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import java.util.Arrays;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+
 /**
  * SimpleAction。
  *
@@ -43,14 +47,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public class SimpleAction {
 
     /**
-     * 日志
-     */
-    private static final Logger LOG = LoggerFactory.getLogger(SimpleAction.class);
-
-    /**
      * 表示Action执行成功
      */
     public static final String SUCCESS = "success";
+
+    /**
+     * 日志
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(SimpleAction.class);
 
     /**
      * 测试与 springframework 的集成注入。
@@ -58,20 +62,24 @@ public class SimpleAction {
     @Autowired
     private URLTestAction2 urlTestAction2;
 
+    // 测试注入的字符串
+    private String string;
+
+    // 测试注入的数字
+    private int number;
+
     /**
      * 测试与 springframework 的集成注入。
-     *
      * @return 由springframework注入的bean对象。
      */
-    @Action(interceptors = {DemoInterceptor.SPRING_DEMO})
+    @Action(interceptors = { DemoInterceptor.SPRING_DEMO })
     public URLTestAction2 springInject() {
-        Assert.assertNotNull(urlTestAction2);
+        assertNotNull(urlTestAction2);
         return urlTestAction2;
     }
 
     /**
      * 测试简单调用。
-     *
      * @return Action执行成功。
      */
     @Action(name = "simple", interceptorStack = DefaultInterceptorStack.EMPTY_INTERCEPTOR_STACK)
@@ -81,7 +89,6 @@ public class SimpleAction {
 
     /**
      * 测试简单调用。
-     *
      * @return Action执行成功。
      */
     @Action(name = "simple2", interceptorStack = DefaultInterceptorStack.EMPTY_INTERCEPTOR_STACK)
@@ -92,11 +99,9 @@ public class SimpleAction {
     /**
      * 测试Action的初始属性。
      */
-    @Action(parameters = {
-            @Parameter(name = "test1", value = "value1"),
-            @Parameter(name = "test2", value = {"value2"}),
-            @Parameter(name = "test3", value = {"value3", "value33"})
-    })
+    @Action(parameters = { @Parameter(name = "test1", value = "value1"),
+            @Parameter(name = "test2", value = { "value2" }),
+            @Parameter(name = "test3", value = { "value3", "value33" }) })
     public String actionParameters() {
         return null;
     }
@@ -104,7 +109,7 @@ public class SimpleAction {
     /**
      * 带参数调用。
      */
-    @Action(name = "param", interceptors = {SampleInterceptor.LOGGING}, scope = Scope.PROTOTYPE)
+    @Action(name = "param", interceptors = { SampleInterceptor.LOGGING }, scope = Scope.PROTOTYPE)
     public String param(String str, int n) {
         return str + n;
     }
@@ -145,24 +150,18 @@ public class SimpleAction {
 
     /**
      * 测试forward结果类型。
-     *
      * @return 跳转至/test/simple的结果。
      */
-    @Action(results = {
-            @Result(name = "forward", type = DefaultResult.FORWARD, location = "/test/simple")
-    })
+    @Action(results = { @Result(name = "forward", type = DefaultResult.FORWARD, location = "/test/simple") })
     public String forward() {
         return "forward";
     }
 
     /**
      * 二次forward调用。
-     *
      * @return 跳转至/test/forward -> /test/simple的结果。
      */
-    @Action(results = {
-            @Result(name = "forward2", type = DefaultResult.FORWARD, location = "/test/forward")
-    })
+    @Action(results = { @Result(name = "forward2", type = DefaultResult.FORWARD, location = "/test/forward") })
     public String forward2() {
         return "forward2";
     }
@@ -171,35 +170,23 @@ public class SimpleAction {
      * 提供基于返回单表达式字符串的结果视图。
      * <p>
      * 例如： forward : /test/forward redirect: /test jsp: /index.jsp ......
-     *
      * @param type 测试输入的返回类型值。
-     *
      * @return 结果视图的表达式字符串。
      */
-    @Action(results = {
-            @Result(name = "test", type = DefaultResult.FORWARD, location = "/test/simple2"),
-            @Result(name = "*")
-    })
+    @Action(results = { @Result(name = "test", type = DefaultResult.FORWARD, location = "/test/simple2"),
+            @Result(name = "*") })
     public String autoRender(String type) {
         return type;
     }
-
-    // 测试注入的字符串
-    private String string;
-
-    // 测试注入的数字
-    private int number;
 
     /**
      * 测试Action的注入属性。
      */
     @Action(interceptorStack = DemoInterceptor.DEMO,
-            results = {
-                    @Result(name = "*", type = DemoResult.DEMO_RESULT_TYPE)
-            })
+            results = { @Result(name = "*", type = DemoResult.DEMO_RESULT_TYPE) })
     public String inject() {
-        Assert.assertEquals("admin", string);
-        Assert.assertEquals(100, number);
+        assertEquals("admin", string);
+        assertEquals(100, number);
         return ":" + string + number;
     }
 
@@ -208,8 +195,8 @@ public class SimpleAction {
      */
     @Action(scope = Scope.PROTOTYPE)
     public String inject2() {
-        Assert.assertEquals("admin", string);
-        Assert.assertEquals(200, number);
+        assertEquals("admin", string);
+        assertEquals(200, number);
         return string + number;
     }
 
@@ -237,7 +224,7 @@ public class SimpleAction {
      */
     @Action
     public String lastPadParameter(ActionInvocation<String> invocation) {
-        Assert.assertNotNull(invocation);
+        assertNotNull(invocation);
         return invocation.getActionPath();
     }
 
@@ -248,7 +235,7 @@ public class SimpleAction {
      */
     @Action
     public String lastPadParameter2(String test, PathActionInvocation invocation) {
-        Assert.assertNotNull(invocation);
+        assertNotNull(invocation);
         return test + invocation.getActionPath();
     }
 
@@ -291,9 +278,10 @@ public class SimpleAction {
     /**
      * 测试ActionFactory的actionFilter属性。
      */
-    @RequestMapping(path = {"/actionFilter2"})
+    @RequestMapping(path = { "/actionFilter2" })
     public String actionFilter2(ActionInvocation<String> invocation) {
         LOG.info("In actionFilter [{}] in {}", string, this);
         return invocation.getActionPath();
     }
+
 }

@@ -22,26 +22,27 @@ import net.jrouter.interceptor.DefaultInterceptorStack;
 import net.jrouter.interceptor.SampleInterceptor;
 import net.jrouter.result.DefaultResult;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * 测试有后缀Action路径的映射的正确性。
  */
 public class ActionFactory3Test {
 
-    // factory1
-    private PathActionFactory factory1;
-
-    // factory2
-    private PathActionFactory factory2;
-
     // extension for factory1
     private final String extension1 = ".do";
 
     // extension for factory2
     private final String extension2 = ".action";
+
+    // factory1
+    private PathActionFactory factory1;
+
+    // factory2
+    private PathActionFactory factory2;
 
     @Before
     public void init() {
@@ -61,7 +62,7 @@ public class ActionFactory3Test {
         // action
         factory1.addActions(net.jrouter.URLTestAction.class);
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////////////////////////
         PathActionFactory.Properties prop2 = new PathActionFactory.Properties();
         prop2.setExtension(extension2);
         factory2 = new PathActionFactory(prop2);
@@ -96,7 +97,8 @@ public class ActionFactory3Test {
         try {
             factory1.invokeAction("");
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertNotNull(e);
         }
 
@@ -135,7 +137,8 @@ public class ActionFactory3Test {
         try {
             factory2.invokeAction("");
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertNotNull(e);
         }
 
@@ -160,4 +163,5 @@ public class ActionFactory3Test {
         assertEquals("/url_test3/abc", factory2.invokeAction("/url_test3/abc" + extension2));
         assertEquals("/url_test4/abc", factory2.invokeAction("/url_test4/abc" + extension2));
     }
+
 }

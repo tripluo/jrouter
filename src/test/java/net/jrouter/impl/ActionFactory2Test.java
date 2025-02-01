@@ -25,9 +25,10 @@ import net.jrouter.interceptor.SampleInterceptor;
 import net.jrouter.result.DefaultResult;
 import net.jrouter.result.DemoResult;
 import org.junit.After;
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 /**
  * 测试无后缀的Action路径映射的正确性。
@@ -79,7 +80,8 @@ public class ActionFactory2Test {
         try {
             factory.invokeAction("");
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertNotNull(e);
         }
 
@@ -119,7 +121,8 @@ public class ActionFactory2Test {
         try {
             factory.invokeAction("");
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertNotNull(e);
         }
         assertEquals("/url/test100", factory.invokeAction("/url/test100"));
@@ -152,27 +155,31 @@ public class ActionFactory2Test {
         try {
             factory.addActions(TestDuplicate.DuplicateAction1.class);
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertTrue(e.getMessage().startsWith("Duplicate path Action "));
         }
         try {
             factory.addActions(TestDuplicate.DuplicateAction2.class);
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertTrue(e.getMessage().startsWith("Duplicate path Action "));
         }
         try {
             factory.addActions(TestDuplicate.DuplicateAction3.class);
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertTrue(e.getMessage().startsWith("Duplicate path Action "));
         }
-////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
         factory.addInterceptors(DemoInterceptor.class);
         try {
             factory.addInterceptors(TestDuplicate.DuplicateInterceptor1.class);
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertTrue(e.getMessage().startsWith("Duplicate Interceptor "));
         }
 
@@ -180,24 +187,28 @@ public class ActionFactory2Test {
         try {
             factory.addInterceptorStacks(TestDuplicate.DuplicateInterceptor1.class);
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertTrue(e.getMessage().startsWith("Duplicate InterceptorStack "));
         }
-////////////////////////////////////////////////////////////////////////////////
+        ////////////////////////////////////////////////////////////////////////////////
 
         factory.addResultTypes(DemoResult.class);
         try {
             factory.addResultTypes(TestDuplicate.DuplicateResult1.class);
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertTrue(e.getMessage().startsWith("Duplicate ResultType "));
         }
         factory.addResults(DemoResult.class);
         try {
             factory.addResults(TestDuplicate.DuplicateResult1.class);
             fail("no exception");
-        } catch (JRouterException e) {
+        }
+        catch (JRouterException e) {
             assertTrue(e.getMessage().startsWith("Duplicate Result "));
         }
     }
+
 }

@@ -36,10 +36,8 @@ public class DefaultInterceptorStack {
      * @see SampleInterceptor#logging
      * @see SampleInterceptor#timer
      */
-    @InterceptorStack(interceptors = {
-            @InterceptorStack.Interceptor(SampleInterceptor.LOGGING),
-            @InterceptorStack.Interceptor(SampleInterceptor.TIMER)
-    })
+    @InterceptorStack(interceptors = { @InterceptorStack.Interceptor(SampleInterceptor.LOGGING),
+            @InterceptorStack.Interceptor(SampleInterceptor.TIMER) })
     public static final String SAMPLE_INTERCEPTOR_STACK = "sample";
 
 }

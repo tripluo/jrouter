@@ -24,17 +24,20 @@ import java.lang.reflect.Method;
  */
 public abstract class AbstractProxy {
 
-    /** 方法对象 */
+    /**
+     * 方法对象
+     */
     @lombok.Getter
     protected Method method;
 
-    /** 方法所在的对象 */
+    /**
+     * 方法所在的对象
+     */
     @lombok.Getter
     protected Object object;
 
     /**
      * 指定方法及其对象的构造方法。
-     *
      * @param method 指定的方法。
      * @param object 指定的对象。
      */
@@ -45,13 +48,11 @@ public abstract class AbstractProxy {
 
     /**
      * 调用所代理的方法。
-     *
      * @param params 用于方法调用的参数。
-     *
      * @return 方法调用后的结果。
-     *
      * @throws JRouterException 如果发生方法调用错误。
      * @see Method#invoke(java.lang.Object, java.lang.Object[])
      */
     public abstract Object invoke(Object... params) throws JRouterException;
+
 }

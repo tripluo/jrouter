@@ -22,9 +22,10 @@ import net.jrouter.interceptor.DefaultInterceptorStack;
 import net.jrouter.interceptor.DemoInterceptorStack;
 import net.jrouter.interceptor.SampleInterceptor;
 import org.junit.After;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * 测试Namespace和Action上的拦截器集合。
@@ -65,8 +66,10 @@ public class ActionFactory4Test {
         PathActionProxy ap12 = factory.getActions().get("/test1/2");
         PathActionProxy ap13 = factory.getActions().get("/test1/3");
 
-        assertEquals(ap11.getInterceptorProxies(), factory.getInterceptorStacks().get(factory.getDefaultInterceptorStack()).getInterceptors());
-        assertEquals(ap12.getInterceptorProxies(), factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
+        assertEquals(ap11.getInterceptorProxies(),
+                factory.getInterceptorStacks().get(factory.getDefaultInterceptorStack()).getInterceptors());
+        assertEquals(ap12.getInterceptorProxies(),
+                factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
         assertEquals(1, ap13.getInterceptorProxies().size());
         assertEquals(ap13.getInterceptorProxies().get(0).getName(), SampleInterceptor.TIMER);
 
@@ -75,8 +78,10 @@ public class ActionFactory4Test {
         PathActionProxy ap23 = factory.getActions().get("/test2/3");
 
         assertEquals(0, ap21.getInterceptorProxies().size());
-        assertEquals(ap21.getInterceptorProxies(), factory.getInterceptorStacks().get(DefaultInterceptorStack.EMPTY_INTERCEPTOR_STACK).getInterceptors());
-        assertEquals(ap22.getInterceptorProxies(), factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
+        assertEquals(ap21.getInterceptorProxies(),
+                factory.getInterceptorStacks().get(DefaultInterceptorStack.EMPTY_INTERCEPTOR_STACK).getInterceptors());
+        assertEquals(ap22.getInterceptorProxies(),
+                factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
         assertEquals(1, ap23.getInterceptorProxies().size());
         assertEquals(ap23.getInterceptorProxies().get(0).getName(), SampleInterceptor.TIMER);
 
@@ -86,13 +91,17 @@ public class ActionFactory4Test {
 
         assertEquals(1, ap31.getInterceptorProxies().size());
         assertEquals(ap31.getInterceptorProxies().get(0).getName(), SampleInterceptor.LOGGING);
-        assertEquals(ap32.getInterceptorProxies(), factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
+        assertEquals(ap32.getInterceptorProxies(),
+                factory.getInterceptorStacks().get(DefaultInterceptorStack.SAMPLE_INTERCEPTOR_STACK).getInterceptors());
         assertEquals(1, ap33.getInterceptorProxies().size());
         assertEquals(ap33.getInterceptorProxies().get(0).getName(), SampleInterceptor.TIMER);
 
         PathActionProxy ap41 = factory.getActions().get("/test4/matched");
         PathActionProxy ap42 = factory.getActions().get("/test4/2");
-        assertEquals(ap41.getInterceptorProxies(), factory.getInterceptorStacks().get(DemoInterceptorStack.MATCHED_INTERCEPTOR_STACK).getInterceptors());
-        assertEquals(ap41.getInterceptorProxies(), factory.getInterceptorStacks().get(DemoInterceptorStack.MATCHED_INTERCEPTOR_STACK).getInterceptors());
+        assertEquals(ap41.getInterceptorProxies(),
+                factory.getInterceptorStacks().get(DemoInterceptorStack.MATCHED_INTERCEPTOR_STACK).getInterceptors());
+        assertEquals(ap41.getInterceptorProxies(),
+                factory.getInterceptorStacks().get(DemoInterceptorStack.MATCHED_INTERCEPTOR_STACK).getInterceptors());
     }
+
 }

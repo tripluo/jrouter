@@ -22,7 +22,7 @@ import java.lang.annotation.*;
 /**
  * 指示经常需要根据条件创建新对象的接口、类或成员变量（注解于成员变量上警示避免多线程安全问题）。
  */
-@Target({ElementType.TYPE, ElementType.FIELD})
+@Target({ ElementType.TYPE, ElementType.FIELD })
 @Retention(RetentionPolicy.SOURCE)
 @Documented
 public @interface Dynamic {

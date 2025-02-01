@@ -15,12 +15,8 @@ public class DemoInterceptorStack {
      *
      * @see SampleInterceptor#logging
      */
-    @InterceptorStack(
-            interceptors = {
-                    @InterceptorStack.Interceptor(SampleInterceptor.LOGGING)
-            },
-            include = {"/*/matched"},
-            order = 1
-    )
+    @InterceptorStack(interceptors = { @InterceptorStack.Interceptor(SampleInterceptor.LOGGING) },
+            include = { "/*/matched" }, order = 1)
     public static final String MATCHED_INTERCEPTOR_STACK = "matched";
+
 }

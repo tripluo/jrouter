@@ -17,13 +17,15 @@
 
 package net.jrouter.impl;
 
-import java.util.HashMap;
-import java.util.Map;
 import net.jrouter.annotation.Action;
 import net.jrouter.impl.ConverterParameterActionFactory.DemoActionInvocation;
-import static org.junit.Assert.assertEquals;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * 测试ActionFactory的ConverterFactory传递参数的扩展性。
@@ -37,7 +39,7 @@ public class ConverterParameterActionFactoryTest {
         Map<String, Object> props = new HashMap<>();
         // manually set converterFactory
         props.put("converterFactory", net.jrouter.impl.MultiParameterConverterFactory.class);
-//        props.put("bytecode", "default");
+        // props.put("bytecode", "default");
         factory = new ConverterParameterActionFactory(new PathActionFactory.Properties().properties(props));
         // add test Action
         factory.addActions(ConverterParameterAction.class);
@@ -62,5 +64,7 @@ public class ConverterParameterActionFactoryTest {
         public String simple(DemoActionInvocation invocation) {
             return invocation.getName();
         }
+
     }
+
 }

@@ -24,8 +24,8 @@ public interface ConverterFactory {
 
     /**
      * 根据参数创建或返回参数转换对象。
-     *
      * @return 参数转换对象。
      */
     ParameterConverter getParameterConverter();
+
 }

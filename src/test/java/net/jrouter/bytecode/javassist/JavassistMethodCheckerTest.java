@@ -17,17 +17,24 @@
 
 package net.jrouter.bytecode.javassist;
 
-import java.lang.reflect.Method;
-import java.util.List;
 import net.jrouter.ActionInvocation;
 import net.jrouter.interceptor.DemoInterceptor;
-import static org.junit.Assert.*;
 import org.junit.Test;
+
+import java.lang.reflect.Method;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 /**
  * JavassistMethodCheckerTest.
  */
 public class JavassistMethodCheckerTest {
+
+    // invoke JavassistMethodChecker#toClassNames
+    private static String[] toClassNames(Method m, String descriptor) throws Exception {
+        return ((List<String>) m.invoke(null, descriptor)).toArray(new String[0]);
+    }
 
     /**
      * Test of check method, of class JavassistMethodChecker.
@@ -40,7 +47,9 @@ public class JavassistMethodCheckerTest {
         assertFalse(new JavassistMethodChecker("*").check(method));
         assertFalse(new JavassistMethodChecker("NoMethod").check(method));
         assertTrue(new JavassistMethodChecker("**.**").check(method));
-        assertTrue(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke(**)|net.jrouter.ActionInvocation.invokeActionOnly(**)").check(method));
+        assertTrue(new JavassistMethodChecker(
+                "net.jrouter.ActionInvocation.invoke(**)|net.jrouter.ActionInvocation.invokeActionOnly(**)")
+            .check(method));
         assertTrue(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke").check(method));
         assertTrue(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke(java.lang.Object[])").check(method));
         assertFalse(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke()").check(method));
@@ -52,10 +61,14 @@ public class JavassistMethodCheckerTest {
         assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(Object, Object)").check(method));
         assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(Object,java.lang.Object)").check(method));
         assertTrue(new JavassistMethodChecker("org.junit.Assert.assertEquals(Object, java.lang.Object)").check(method));
-        assertTrue(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke & org.junit.Assert.assertEquals").check(method));
-        assertTrue(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke & org.junit.Assert.assertEquals | NoMethod").check(method));
+        assertTrue(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke & org.junit.Assert.assertEquals")
+            .check(method));
+        assertTrue(new JavassistMethodChecker(
+                "net.jrouter.ActionInvocation.invoke & org.junit.Assert.assertEquals | NoMethod")
+            .check(method));
         assertTrue(new JavassistMethodChecker("net.jrouter.ActionInvocation.invoke|NoMethod2|NoMethod3").check(method));
-        assertFalse(new JavassistMethodChecker("**&net.jrouter.ActionInvocation.invoke|NoMethod2|NoMethod3").check(method));
+        assertFalse(
+                new JavassistMethodChecker("**&net.jrouter.ActionInvocation.invoke|NoMethod2|NoMethod3").check(method));
         assertTrue(new JavassistMethodChecker("**&**.**|NoMethod").check(method));
         assertTrue(new JavassistMethodChecker("**|NoMethod2|NoMethod3").check(method));
         assertFalse(new JavassistMethodChecker("NoMethod|NoMethod2|NoMethod3").check(method));
@@ -68,18 +81,17 @@ public class JavassistMethodCheckerTest {
     public void test_toClassNames() throws Exception {
         Method method = JavassistMethodChecker.class.getDeclaredMethod("toClassNames", String.class);
         method.setAccessible(true);
-        assertArrayEquals(new String[]{}, toClassNames(method, ""));
-        assertArrayEquals(new String[]{}, toClassNames(method, "()"));
-        assertArrayEquals(new String[]{"java.lang.String"}, toClassNames(method, "(Ljava/lang/String;)"));
-        assertArrayEquals(new String[]{"java.lang.String[]"}, toClassNames(method, "([Ljava/lang/String;)"));
-        assertArrayEquals(new String[]{"net.jrouter.ActionInvocation"}, toClassNames(method, "Lnet/jrouter/ActionInvocation;"));
-        assertArrayEquals(new String[]{"net.jrouter.ActionInvocation"}, toClassNames(method, "(Lnet/jrouter/ActionInvocation;)Ljava/lang/Object;"));
-        assertArrayEquals(new String[]{"int[][]", "java.util.List", "java.lang.String[][][]"}, toClassNames(method, "([[ILjava/util/List;[[[Ljava/lang/String;)"));
+        assertArrayEquals(new String[] {}, toClassNames(method, ""));
+        assertArrayEquals(new String[] {}, toClassNames(method, "()"));
+        assertArrayEquals(new String[] { "java.lang.String" }, toClassNames(method, "(Ljava/lang/String;)"));
+        assertArrayEquals(new String[] { "java.lang.String[]" }, toClassNames(method, "([Ljava/lang/String;)"));
+        assertArrayEquals(new String[] { "net.jrouter.ActionInvocation" },
+                toClassNames(method, "Lnet/jrouter/ActionInvocation;"));
+        assertArrayEquals(new String[] { "net.jrouter.ActionInvocation" },
+                toClassNames(method, "(Lnet/jrouter/ActionInvocation;)Ljava/lang/Object;"));
+        assertArrayEquals(new String[] { "int[][]", "java.util.List", "java.lang.String[][][]" },
+                toClassNames(method, "([[ILjava/util/List;[[[Ljava/lang/String;)"));
 
     }
 
-    // invoke JavassistMethodChecker#toClassNames
-    private static String[] toClassNames(Method m, String descriptor) throws Exception {
-        return ((List<String>) m.invoke(null, descriptor)).toArray(new String[0]);
-    }
 }

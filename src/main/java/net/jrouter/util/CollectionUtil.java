@@ -32,12 +32,12 @@ public class CollectionUtil {
     /**
      * An empty immutable {@code Class} array.
      */
-    public static final Class<?>[] EMPTY_CLASS_ARRAY = new Class<?>[0];
+    public static final Class<?>[] EMPTY_CLASS_ARRAY = {};
 
     /**
      * An empty immutable {@code String} array.
      */
-    public static final String[] EMPTY_STRING_ARRAY = new String[0];
+    public static final String[] EMPTY_STRING_ARRAY = {};
 
     /**
      * An empty immutable {@code long} array.
@@ -121,10 +121,8 @@ public class CollectionUtil {
 
     /**
      * 判断数组是否为空。
-     *
      * @param <T> 数组元素的类型。
      * @param a 待检测的数组。
-     *
      * @return 数组为null或者为空则返回{@code true}。
      */
     public static <T> boolean isEmpty(T[] a) {
@@ -133,10 +131,8 @@ public class CollectionUtil {
 
     /**
      * 判断数组是否不为空。
-     *
      * @param <T> 数组元素的类型。
      * @param a 待检测的数组。
-     *
      * @return 数组不为null且不为空则返回{@code true}。
      */
     public static <T> boolean isNotEmpty(T[] a) {
@@ -145,9 +141,7 @@ public class CollectionUtil {
 
     /**
      * 判断Collection是否为空。
-     *
      * @param collection 待检测的Collection。
-     *
      * @return Collection为null或者为空则返回{@code true}。
      */
     public static boolean isEmpty(Collection<?> collection) {
@@ -156,9 +150,7 @@ public class CollectionUtil {
 
     /**
      * 判断Collection是否不为空。
-     *
      * @param collection 待检测的Collection。
-     *
      * @return Collection不为null且不为空则返回{@code true}。
      */
     public static boolean isNotEmpty(Collection<?> collection) {
@@ -167,9 +159,7 @@ public class CollectionUtil {
 
     /**
      * 判断Map是否不为空。
-     *
      * @param map 待检测的Map。
-     *
      * @return Map不为null且不为空则返回{@code true}。
      */
     public static boolean isEmpty(Map<?, ?> map) {
@@ -178,9 +168,7 @@ public class CollectionUtil {
 
     /**
      * 判断Map是否不为空。
-     *
      * @param map 待检测的Map。
-     *
      * @return Map不为null且不为空则返回{@code true}。
      */
     public static boolean isNotEmpty(Map<?, ?> map) {
@@ -189,10 +177,8 @@ public class CollectionUtil {
 
     /**
      * 指定数字是否包含于数字数组中。
-     *
      * @param element 指定的数字。
      * @param array 指定的数字集合。
-     *
      * @return 数字数组中存在此数字返回 true，否则返回false。
      */
     public static boolean contains(int element, int... array) {
@@ -206,10 +192,8 @@ public class CollectionUtil {
 
     /**
      * 指定字符是否包含于字符数组中。
-     *
      * @param element 指定的字符。
      * @param array 指定的字符集合。
-     *
      * @return 字符数组中存在此字符返回 true，否则返回false。
      */
     public static boolean contains(char element, char... array) {
@@ -223,10 +207,8 @@ public class CollectionUtil {
 
     /**
      * 指定boolean是否包含于boolean数组中。
-     *
      * @param element 指定的boolean。
      * @param array 指定的boolean集合。
-     *
      * @return boolean数组中存在此boolean返回 true，否则返回false。
      */
     public static boolean contains(boolean element, boolean... array) {
@@ -240,10 +222,8 @@ public class CollectionUtil {
 
     /**
      * 合并原数组和新元素至新数组中。
-     *
      * @param array 原数组。
      * @param elements 新元素
-     *
      * @return 新数组。
      */
     public static Object[] append(Object[] array, Object... elements) {
@@ -261,9 +241,7 @@ public class CollectionUtil {
 
     /**
      * 转换{@code booleans}数组中{@code true}值下标为相应{@code int}数组。
-     *
      * @param booleans {@code boolean} array
-     *
      * @return {@code int} array
      */
     public static int[] convert(boolean[] booleans) {
@@ -294,9 +272,7 @@ public class CollectionUtil {
 
     /**
      * 转换{@code int}数组为相应{@code boolean}数组（0正数下标为{@code true}）。
-     *
      * @param nums {@code int} array
-     *
      * @return {@code boolean} array
      */
     public static boolean[] convert(int[] nums) {
@@ -325,20 +301,16 @@ public class CollectionUtil {
     }
 
     /**
-     * 依照指定的字符解析字符串至指定类型的集合。
-     * 如果指定的集合为 null，则默认设置为{@link ArrayList}集合类型；
-     * 如果原字符串为 null，则直接返回集合；
-     * 如果字符分隔数组为空，则直接返回包含原字符串的集合。
-     *
+     * 依照指定的字符解析字符串至指定类型的集合。 如果指定的集合为 null，则默认设置为{@link ArrayList}集合类型； 如果原字符串为
+     * null，则直接返回集合； 如果字符分隔数组为空，则直接返回包含原字符串的集合。
      * @param <T> 指定的集合类型。
      * @param source 原字符串。
      * @param collection 指定类型的集合。
      * @param sep 指定的字符分隔数组。
-     *
      * @return 解析后的字符串集合。
      */
-    public static <T extends Collection<String>> T stringToCollection(final String source, Collection<String> collection,
-                                                                      char... sep) {
+    public static <T extends Collection<String>> T stringToCollection(final String source,
+            Collection<String> collection, char... sep) {
         if (collection == null) {
             collection = new ArrayList<>();
         }
@@ -386,22 +358,19 @@ public class CollectionUtil {
     }
 
     /**
-     * 依照指定的字符解析字符串("key=value 或 key:value")至指定类型的键值映射。
-     * 如果指定的映射为 null，则默认设置为{@link LinkedHashMap}映射类型；
-     * 如果字符分隔数组为空，则直接返回映射。
-     *
+     * 依照指定的字符解析字符串("key=value 或 key:value")至指定类型的键值映射。 如果指定的映射为
+     * null，则默认设置为{@link LinkedHashMap}映射类型； 如果字符分隔数组为空，则直接返回映射。
      * @param <T> 指定的映射类型。
      * @param source 原字符串。
      * @param map 指定类型的映射。
      * @param sep 指定的字符分隔数组。
-     *
      * @return 解析后的字符串键值映射。
      */
     public static <T extends Map<String, String>> T stringToMap(final String source, Map<String, String> map,
-                                                                char... sep) {
+            char... sep) {
         if (contains('=', sep) || contains(':', sep)) {
-            throw new IllegalArgumentException("Separate array " + Arrays.toString(sep)
-                    + " can't contain " + Arrays.toString(new char[]{'=', ':'}));
+            throw new IllegalArgumentException("Separate array " + Arrays.toString(sep) + " can't contain "
+                    + Arrays.toString(new char[] { '=', ':' }));
         }
         if (map == null) {
             map = new LinkedHashMap<>();
@@ -449,13 +418,10 @@ public class CollectionUtil {
 
     /**
      * 针对{@code stringToMap}方法的解析key:value对；左右索引已去空。
-     *
      * @param source 原字符串。
      * @param beginIndex 起始索引（包括）。
      * @param endIndex - 结束索引（包括）。
-     *
      * @return 指定的key:value对数组。
-     *
      * @see #stringToMap(java.lang.String, java.util.Map, char...)
      */
     private static String[] parseKeyValue(String source, int beginIndex, int endIndex) {
@@ -468,7 +434,7 @@ public class CollectionUtil {
             }
         }
         if (point == -1) {
-            return new String[]{source.substring(beginIndex, endIndex + 1), ""};
+            return new String[] { source.substring(beginIndex, endIndex + 1), "" };
         }
         int lp = point - 1;
         int rp = point + 1;
@@ -478,7 +444,8 @@ public class CollectionUtil {
         while (rp < endIndex && Character.isWhitespace(source.charAt(rp))) {
             rp++;
         }
-        return new String[]{point == beginIndex ? "" : source.substring(beginIndex, lp + 1),
-                point == endIndex ? "" : source.substring(rp, endIndex + 1)};
+        return new String[] { point == beginIndex ? "" : source.substring(beginIndex, lp + 1),
+                point == endIndex ? "" : source.substring(rp, endIndex + 1) };
     }
+
 }

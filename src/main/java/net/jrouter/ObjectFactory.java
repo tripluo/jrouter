@@ -24,20 +24,17 @@ public interface ObjectFactory {
 
     /**
      * 根据指定的{@code Class}对象所表示的类生成一个新的对象实例。
-     *
      * @param <T> 生成对象实例的类型。
      * @param clazz 指定的{@code Class}对象。
-     *
      * @return 新的对象实例。
      */
     <T> T newInstance(Class<T> clazz);
 
     /**
      * 根据指定的{@code Object}对象（或代理）获取其所属的{@code Class}类型。
-     *
      * @param obj {@code Object}对象。
-     *
      * @return 指定{@code Object}对象所属的{@code Class}类型。
      */
     Class<?> getClass(Object obj);
+
 }

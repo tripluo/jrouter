@@ -58,4 +58,5 @@ public class ConfigurationTest extends Assert {
         assertNotNull(factory.getResultTypes());
         assertNotNull(factory.getResults());
     }
+
 }

@@ -27,18 +27,23 @@ import net.jrouter.annotation.ResultType;
  */
 public class DefaultResult {
 
-    /** 默认结果类型名称，不作任何处理 */
+    /**
+     * 默认结果类型名称，不作任何处理
+     */
     public static final String EMPTY = "empty";
 
-    /** actionForward结果类型名称 */
+    /**
+     * actionForward结果类型名称
+     */
     public static final String FORWARD = "actionForward";
 
-    /** result not found */
+    /**
+     * result not found
+     */
     public static final String RESULT_NOT_FOUND = "resultNotFound";
 
     /**
      * 默认结果类型，未作任何处理。
-     *
      * @param invocation Action运行时上下文。
      */
     @ResultType(type = EMPTY)
@@ -47,26 +52,20 @@ public class DefaultResult {
     }
 
     /**
-     * Action结果直接调用映射的Action，类似forward结果类型。
-     * actionForward可多次关联调用，需自行判断循环调用。
-     *
+     * Action结果直接调用映射的Action，类似forward结果类型。 actionForward可多次关联调用，需自行判断循环调用。
      * @param invocation Action运行时上下文。
-     *
      * @return 返回actionForward后的调用结果。
      */
     @ResultType(type = FORWARD)
     public static Object actionForward(ActionInvocation invocation) {
-        return invocation.getActionFactory().invokeAction(invocation.getResult().location(), invocation.getParameters());
+        return invocation.getActionFactory()
+            .invokeAction(invocation.getResult().location(), invocation.getParameters());
     }
-    ////////////////////////////////////////////////////////////////////////////
 
     /**
      * result not found
-     *
      * @param invocation Action运行时上下文。
-     *
      * @return 抛出NullPointerException。
-     *
      * @deprecated
      */
     @Deprecated
@@ -74,4 +73,5 @@ public class DefaultResult {
     public static Object resultNotFound(ActionInvocation invocation) {
         throw new NotFoundException("Result not found : " + invocation.getResult().location());
     }
+
 }

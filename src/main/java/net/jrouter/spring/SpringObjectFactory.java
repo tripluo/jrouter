@@ -55,7 +55,6 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
 
     /**
      * Constructor.
-     *
      * @param autowireCapableBeanFactory {@link AutowireCapableBeanFactory}。
      */
     public SpringObjectFactory(AutowireCapableBeanFactory autowireCapableBeanFactory) {
@@ -64,7 +63,6 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
 
     /**
      * Constructor.
-     *
      * @param applicationContext ApplicationContext对象。
      */
     public SpringObjectFactory(ApplicationContext applicationContext) {
@@ -85,21 +83,21 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
     }
 
     /**
-     * If the given context is assignable to AutowireCapableBeanFactory or contains a parent or a factory that is, then
-     * set the autoWiringFactory appropriately.
-     *
+     * If the given context is assignable to AutowireCapableBeanFactory or contains a
+     * parent or a factory that is, then set the autoWiringFactory appropriately.
      * @param context the application context
-     *
      * @return the bean factory
      */
     protected AutowireCapableBeanFactory findAutoWiringBeanFactory(ApplicationContext context) {
         if (context instanceof AutowireCapableBeanFactory) {
             // Check the context
             return (AutowireCapableBeanFactory) context;
-        } else if (context instanceof ConfigurableApplicationContext) {
+        }
+        else if (context instanceof ConfigurableApplicationContext) {
             // Try and grab the beanFactory
             return ((ConfigurableApplicationContext) context).getBeanFactory();
-        } else if (context.getParent() != null) {
+        }
+        else if (context.getParent() != null) {
             // And if all else fails, try again with the parent context
             return findAutoWiringBeanFactory(context.getParent());
         }
@@ -110,4 +108,5 @@ public class SpringObjectFactory implements ObjectFactory, ApplicationContextAwa
     public Class<?> getClass(Object obj) {
         return AopProxyUtils.ultimateTargetClass(obj);
     }
+
 }

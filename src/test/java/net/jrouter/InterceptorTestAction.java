@@ -50,9 +50,10 @@ public class InterceptorTestAction {
         public void test2() {
         }
 
-        @Action(name = "3", interceptors = {SampleInterceptor.TIMER})
+        @Action(name = "3", interceptors = { SampleInterceptor.TIMER })
         public void test3() {
         }
+
     }
 
     /**
@@ -75,15 +76,16 @@ public class InterceptorTestAction {
         public void test2() {
         }
 
-        @Action(name = "3", interceptors = {SampleInterceptor.TIMER})
+        @Action(name = "3", interceptors = { SampleInterceptor.TIMER })
         public void test3() {
         }
+
     }
 
     /**
      * Namespace with interceptors。
      */
-    @Namespace(name = "/test3", interceptors = {SampleInterceptor.LOGGING})
+    @Namespace(name = "/test3", interceptors = { SampleInterceptor.LOGGING })
     public static class Action3 {
 
         /**
@@ -100,9 +102,10 @@ public class InterceptorTestAction {
         public void test2() {
         }
 
-        @Action(name = "3", interceptors = {SampleInterceptor.TIMER})
+        @Action(name = "3", interceptors = { SampleInterceptor.TIMER })
         public void test3() {
         }
+
     }
 
     @Namespace(name = "/test4")
@@ -118,5 +121,7 @@ public class InterceptorTestAction {
         @Action(name = "2", interceptorStack = DemoInterceptorStack.MATCHED_INTERCEPTOR_STACK)
         public void test2() {
         }
+
     }
+
 }

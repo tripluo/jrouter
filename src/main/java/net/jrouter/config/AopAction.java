@@ -17,9 +17,10 @@
 
 package net.jrouter.config;
 
+import net.jrouter.annotation.Action;
+
 import java.io.Serializable;
 import java.util.List;
-import net.jrouter.annotation.Action;
 
 /**
  * 针对相应路径的所有{@link Action}，添加/修改其对应的拦截器集合。
@@ -59,6 +60,12 @@ public class AopAction implements Serializable {
     @lombok.Setter
     private Type type;
 
+    @Override
+    public String toString() {
+        return "AopAction{" + "matches=" + matches + ", interceptorStacks=" + interceptorStacks + ", interceptors="
+                + interceptors + ", type=" + (type == null ? null : type.getCode()) + '}';
+    }
+
     /**
      * 修改Action拦截器集合的aop操作类型。
      */
@@ -83,7 +90,6 @@ public class AopAction implements Serializable {
 
         /**
          * 构造指定代码的aop类型。
-         *
          * @param code 指定代码。
          */
         Type(String code) {
@@ -92,25 +98,22 @@ public class AopAction implements Serializable {
 
         /**
          * 由指定代码返回aop类型。
-         *
          * @param code op的类型代码。
-         *
          * @return aop类型。
          */
         public static Type parseCode(String code) {
             if (ADD_BEFORE.getCode().equals(code)) {
                 return ADD_BEFORE;
-            } else if (ADD_AFTER.getCode().equals(code)) {
+            }
+            else if (ADD_AFTER.getCode().equals(code)) {
                 return ADD_AFTER;
-            } else if (OVERRIDE.getCode().equals(code)) {
+            }
+            else if (OVERRIDE.getCode().equals(code)) {
                 return OVERRIDE;
             }
             throw new IllegalArgumentException("No enum const " + Type.class + "." + code);
         }
+
     }
 
-    @Override
-    public String toString() {
-        return "AopAction{" + "matches=" + matches + ", interceptorStacks=" + interceptorStacks + ", interceptors=" + interceptors + ", type=" + (type == null ? null : type.getCode()) + '}';
-    }
 }

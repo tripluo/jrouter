@@ -17,31 +17,36 @@
 
 package net.jrouter.interceptor;
 
-import java.util.Date;
 import net.jrouter.ActionInvocation;
 import net.jrouter.annotation.Interceptor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Date;
 
 /**
  * 示例拦截器。
  */
 public class SampleInterceptor {
 
-    /** LOG */
-    private static final Logger LOG = LoggerFactory.getLogger(SampleInterceptor.class);
-
-    /** 计时拦截器 */
+    /**
+     * 计时拦截器
+     */
     public static final String TIMER = "timer";
 
-    /** 日志拦截器 */
+    /**
+     * 日志拦截器
+     */
     public static final String LOGGING = "logging";
 
     /**
+     * LOG
+     */
+    private static final Logger LOG = LoggerFactory.getLogger(SampleInterceptor.class);
+
+    /**
      * 记录Action调用耗时。
-     *
      * @param invocation Action运行时上下文。
-     *
      * @return 拦截器处理后的Action调用结果。
      */
     @Interceptor(name = TIMER)
@@ -51,7 +56,8 @@ public class SampleInterceptor {
         try {
             // invoke
             result = invocation.invoke();
-        } finally {
+        }
+        finally {
             if (LOG.isInfoEnabled()) {
                 long executionTime = System.currentTimeMillis() - startTime;
                 StringBuilder message = new StringBuilder(64);
@@ -65,9 +71,7 @@ public class SampleInterceptor {
 
     /**
      * 记录Action起始结束时间。
-     *
      * @param invocation Action运行时上下文。
-     *
      * @return 拦截器处理后的Action调用结果。
      */
     @Interceptor(name = LOGGING)
@@ -82,4 +86,5 @@ public class SampleInterceptor {
         }
         return result;
     }
+
 }

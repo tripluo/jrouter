@@ -35,6 +35,7 @@ public class TestDuplicate {
         public String test104_1() {
             return "/";
         }
+
     }
 
     public static class DuplicateAction2 {
@@ -46,6 +47,7 @@ public class TestDuplicate {
         public String test200_1() {
             return "/a";
         }
+
     }
 
     public static class DuplicateAction3 {
@@ -57,34 +59,40 @@ public class TestDuplicate {
         public String test404_1() {
             return "/test4/abc";
         }
+
     }
-////////////////////////////////////////////////////////////////////////////////
+
+    /// /////////////////////////////////////////////////////////////////////////////
 
     public static class DuplicateInterceptor1 {
 
-        @InterceptorStack(interceptors = {@InterceptorStack.Interceptor("demo")})
+        @InterceptorStack(interceptors = { @InterceptorStack.Interceptor("demo") })
         public static final String DEMO = DemoInterceptor.DEMO;
 
         @Interceptor(name = DemoInterceptor.SPRING_DEMO)
         public Object test(ActionInvocation invocation) {
             return invocation.invoke();
         }
+
     }
-////////////////////////////////////////////////////////////////////////////////
+
+    /// /////////////////////////////////////////////////////////////////////////////
 
     public static class DuplicateResult1 {
 
         public static final String DEMO_RESULT_TYPE = DemoResult.DEMO_RESULT_TYPE;
+
+        @Result(name = DemoResult.DEMO_RESULT_EXCEPTION)
+        public static Object resultException(ActionInvocation invocation) {
+            return null;
+        }
 
         @ResultType(type = DEMO_RESULT_TYPE)
         public Object test(ActionInvocation invocation) {
             return invocation.getResult().location();
         }
 
-        @Result(name = DemoResult.DEMO_RESULT_EXCEPTION)
-        public static Object resultException(ActionInvocation invocation) {
-            return null;
-        }
     }
-////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////
+
 }
